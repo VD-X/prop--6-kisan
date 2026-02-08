@@ -1,0 +1,8 @@
+{
+  "name": "KisanSetu-xxxxx",
+  "description": "An AI-powered, farmer-first marketplace connecting farmers, buyers, and transporters with voice-first accessibility and smart crop grading.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}
