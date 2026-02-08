@@ -236,7 +236,7 @@ const INITIAL_DISPUTES: Dispute[] = [
 ];
 
 // --- 1. LANDING PAGE ---
-const LandingPage = ({ onGetStarted, onAdminLogin }: { onGetStarted: (role?: UserRole) => void, onAdminLogin: () => void }) => {
+const LandingPage = ({ onGetStarted, onAdminLogin }: { onGetStarted: (role?: UserRole, mode?: 'login' | 'register') => void, onAdminLogin: () => void }) => {
    return (
       <div className="relative min-h-screen flex flex-col">
          <HarvestBackground />
@@ -248,8 +248,8 @@ const LandingPage = ({ onGetStarted, onAdminLogin }: { onGetStarted: (role?: Use
                <span className="font-bold text-xl text-nature-900 tracking-tight">KisanSetu</span>
             </div>
             <div className="flex gap-4">
-               <button onClick={() => onGetStarted()} className="text-sm font-medium text-slate-600 hover:text-nature-700">Login</button>
-               <Button onClick={() => onGetStarted()} className="py-2 px-4 text-sm h-10">Get Started</Button>
+               <button onClick={() => onGetStarted(undefined, 'login')} className="text-sm font-medium text-slate-600 hover:text-nature-700">Login</button>
+               <Button onClick={() => onGetStarted(undefined, 'register')} className="py-2 px-4 text-sm h-10">Get Started</Button>
             </div>
          </header>
 
@@ -269,35 +269,35 @@ const LandingPage = ({ onGetStarted, onAdminLogin }: { onGetStarted: (role?: Use
                   <TradeAnimation />
                </div>
 
-               <Button onClick={() => onGetStarted()} className="text-lg px-8 py-4 shadow-xl shadow-nature-600/20">Join the Network</Button>
+               <Button onClick={() => onGetStarted(undefined, 'register')} className="text-lg px-8 py-4 shadow-xl shadow-nature-600/20">Join the Network</Button>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8 w-full max-w-5xl">
-               <Card className="group hover:-translate-y-2 transition-transform duration-300 border-t-4 border-nature-500" onClick={() => onGetStarted('farmer')}>
+               <Card className="group hover:-translate-y-2 transition-transform duration-300 border-t-4 border-nature-500" onClick={() => onGetStarted('farmer', 'register')}>
                   <div className="h-12 w-12 bg-nature-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                      <Tractor className="w-6 h-6 text-nature-600" />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2">Farmer</h3>
                   <p className="text-slate-600 mb-4 text-sm">"I grow crops. I want fair prices without middlemen."</p>
-                  <div className="flex items-center text-nature-600 font-medium text-sm group-hover:gap-2 transition-all">Login / Register <ArrowRight className="w-4 h-4 ml-1" /></div>
+                  <div className="flex items-center text-nature-600 font-medium text-sm group-hover:gap-2 transition-all">Join as Farmer <ArrowRight className="w-4 h-4 ml-1" /></div>
                </Card>
 
-               <Card className="group hover:-translate-y-2 transition-transform duration-300 border-t-4 border-blue-500" onClick={() => onGetStarted('buyer')}>
+               <Card className="group hover:-translate-y-2 transition-transform duration-300 border-t-4 border-blue-500" onClick={() => onGetStarted('buyer', 'register')}>
                   <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                      <ShoppingBag className="w-6 h-6 text-blue-600" />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2">Buyer</h3>
                   <p className="text-slate-600 mb-4 text-sm">"I want reliable supply with transparent pricing."</p>
-                  <div className="flex items-center text-blue-600 font-medium text-sm group-hover:gap-2 transition-all">Login / Register <ArrowRight className="w-4 h-4 ml-1" /></div>
+                  <div className="flex items-center text-blue-600 font-medium text-sm group-hover:gap-2 transition-all">Join as Buyer <ArrowRight className="w-4 h-4 ml-1" /></div>
                </Card>
 
-               <Card className="group hover:-translate-y-2 transition-transform duration-300 border-t-4 border-orange-500" onClick={() => onGetStarted('transporter')}>
+               <Card className="group hover:-translate-y-2 transition-transform duration-300 border-t-4 border-orange-500" onClick={() => onGetStarted('transporter', 'register')}>
                   <div className="h-12 w-12 bg-orange-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                      <Truck className="w-6 h-6 text-orange-600" />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2">Transporter</h3>
                   <p className="text-slate-600 mb-4 text-sm">"I want verified delivery jobs without chaos."</p>
-                  <div className="flex items-center text-orange-600 font-medium text-sm group-hover:gap-2 transition-all">Login / Register <ArrowRight className="w-4 h-4 ml-1" /></div>
+                  <div className="flex items-center text-orange-600 font-medium text-sm group-hover:gap-2 transition-all">Join as Transporter <ArrowRight className="w-4 h-4 ml-1" /></div>
                </Card>
             </div>
          </main>
@@ -346,9 +346,9 @@ const AdminLogin = ({ onLogin, onBack }: { onLogin: () => void, onBack: () => vo
    );
 };
 
-const AuthWizard = ({ initialRole, onComplete, onBack, existingUsers }: { initialRole: UserRole | null, onComplete: (user: any) => void, onBack: () => void, existingUsers: User[] }) => {
+const AuthWizard = ({ initialRole, initialMode = 'login', onComplete, onBack, existingUsers }: { initialRole: UserRole | null, initialMode?: 'login' | 'register', onComplete: (user: any) => void, onBack: () => void, existingUsers: User[] }) => {
    const [step, setStep] = useState<'identity' | 'verify' | 'password' | 'role-confirm' | 'profile'>('identity');
-   const [isLoginMode, setIsLoginMode] = useState(false);
+   const [isLoginMode, setIsLoginMode] = useState(initialMode === 'login');
    const [formData, setFormData] = useState({
       role: initialRole,
       phone: '',
@@ -357,20 +357,33 @@ const AuthWizard = ({ initialRole, onComplete, onBack, existingUsers }: { initia
       confirmPassword: '',
       profile: {} as any
    });
+
+   // If explicitly set to 'register' mode, ensure we show registration fields immediately or adjust flow
+   // However, our flow relies on Phone Check first.
+   // To "separate" them, we can enforce the mode:
+   // If isLoginMode is true, we expect the user to exist.
+   // If isLoginMode is false, we expect the user to be new.
+
    const [otp, setOtp] = useState('');
    const [emailVerified, setEmailVerified] = useState(false);
 
    const checkIdentity = async () => {
-      // For login mode check
       const users = await svc.getUsers();
       const existingUser = users.find((u: any) => u.phone === formData.phone);
       
-      if (existingUser) {
-         setIsLoginMode(true);
-         setStep('password');
+      if (isLoginMode) {
+         if (existingUser) {
+             setStep('password');
+         } else {
+             alert("Account not found. Please register first.");
+         }
       } else {
-         setIsLoginMode(false);
-         setStep('verify');
+         if (existingUser) {
+             alert("Account already exists. Please login.");
+             setIsLoginMode(true);
+         } else {
+             setStep('verify');
+         }
       }
    };
 
@@ -427,9 +440,11 @@ const AuthWizard = ({ initialRole, onComplete, onBack, existingUsers }: { initia
                   <div className="space-y-6 max-w-sm mx-auto w-full">
                      <div>
                         <h2 className="text-3xl font-bold text-slate-900 mb-2">
-                           {isLoginMode ? 'Welcome Back!' : `Get Started`}
+                           {isLoginMode ? 'Login' : `Register`}
                         </h2>
-                        <p className="text-slate-500">Enter your details to access your account.</p>
+                        <p className="text-slate-500">
+                           {isLoginMode ? 'Enter your registered mobile number.' : 'Create a new account to get started.'}
+                        </p>
                      </div>
                      <div className="space-y-5">
                         <Input label="Mobile Number" placeholder="98765 43210" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })} icon={<Phone className="w-4 h-4" />} />
@@ -437,6 +452,11 @@ const AuthWizard = ({ initialRole, onComplete, onBack, existingUsers }: { initia
                         <Button className="w-full h-12 text-lg shadow-lg shadow-nature-600/20" onClick={checkIdentity} disabled={!formData.phone || (!isLoginMode && !formData.email)}>
                            Continue <ArrowRight className="w-4 h-4 ml-2" />
                         </Button>
+                        <div className="text-center pt-2">
+                            <button onClick={() => setIsLoginMode(!isLoginMode)} className="text-sm font-medium text-blue-600 hover:text-blue-800 underline">
+                                {isLoginMode ? 'New user? Create an account' : 'Already have an account? Login'}
+                            </button>
+                        </div>
                      </div>
                   </div>
                )}
@@ -1286,9 +1306,6 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
                               <Calendar className="w-4 h-4" /> {currentDate} • <MapPin className="w-4 h-4" /> {user.profile.district}
                            </p>
                         </div>
-                        <Button className="rounded-full shadow-lg shadow-nature-600/20" onClick={() => (document.getElementById('add-crop-btn') as any)?.click()}>
-                           <Plus className="w-5 h-5 mr-2" /> Add New Crop
-                        </Button>
                      </div>
 
                      {/* 3. Market Snapshot */}
@@ -1546,14 +1563,22 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
                                           </div>
                                        </div>
 
-                                       <div className="flex gap-4">
-                                          <button className="flex-1 h-12 text-sm font-black text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all" onClick={() => onRejectOffer(o.id)}>
-                                             Reject Offer
-                                          </button>
-                                          <Button className="flex-[2] h-12 bg-blue-600 hover:bg-blue-700 font-black rounded-2xl shadow-xl shadow-blue-600/20 text-sm tracking-wide" onClick={() => onAcceptOffer(o.id)}>
-                                             Accept & Start Deal
-                                          </Button>
-                                       </div>
+                                    <div className="flex gap-4">
+                                       {o.status === 'pending' ? (
+                                          <>
+                                             <button className="flex-1 h-12 text-sm font-black text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all" onClick={() => onRejectOffer(o.id)}>
+                                                Reject Offer
+                                             </button>
+                                             <Button className="flex-[2] h-12 bg-blue-600 hover:bg-blue-700 font-black rounded-2xl shadow-xl shadow-blue-600/20 text-sm tracking-wide" onClick={() => onAcceptOffer(o.id)}>
+                                                Accept & Start Deal
+                                             </Button>
+                                          </>
+                                       ) : (
+                                          <div className={`w-full py-3 rounded-2xl text-center font-bold text-sm ${o.status === 'accepted' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                             {o.status === 'accepted' ? 'Offer Accepted' : 'Offer Rejected'}
+                                          </div>
+                                       )}
+                                    </div>
                                     </div>
                                  </div>
                               </Card>
@@ -2443,7 +2468,9 @@ const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, onAddR
          buyerName: user.profile.fullName,
          buyerLocation: user.profile.city,
          pricePerKg: offerData.price,
+         offeredPrice: offerData.price,
          quantity: offerData.quantity,
+         quantityRequested: offerData.quantity,
          totalAmount: offerData.price * offerData.quantity
       });
       setShowOfferModal(false);
@@ -3075,6 +3102,9 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, onAddRoutePl
       locationSharing: true
    });
 
+   const [issueModalOpen, setIssueModalOpen] = useState(false);
+   const [issueOrderId, setIssueOrderId] = useState<string | null>(null);
+   const [issueText, setIssueText] = useState('');
 
    const availableJobs = orders.filter((o: any) => o.status === 'confirmed' && !o.transporterId);
    const myDeliveries = orders.filter((o: any) => o.transporterId === user.id);
@@ -3244,9 +3274,9 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, onAddRoutePl
                               <Button variant="outline" className="flex-1 h-10 text-xs font-bold border-dashed border-slate-300 hover:border-orange-500 hover:text-orange-600 transition-colors"><FileText className="w-4 h-4 mr-2" /> Upload POD</Button>
                               <Button className="flex-1 h-10 text-xs font-bold bg-orange-600 hover:bg-orange-700"><Phone className="w-4 h-4 mr-2" /> Contact Farmer</Button>
                               <Button variant="outline" className="flex-1 h-10 text-xs font-bold" onClick={() => {
-                                 const issue = prompt('Describe the issue with this delivery');
-                                 if (!issue) return;
-                                 onRaiseDispute?.({ orderId: o.id, raisedBy: user.profile.fullName, role: 'transporter', issue });
+                                 setIssueOrderId(o.id);
+                                 setIssueText('');
+                                 setIssueModalOpen(true);
                               }}>Report Issue</Button>
                               <Button variant="outline" className="flex-1 h-10 text-xs font-bold" onClick={() => {
                                  const stops = [{ name: 'Pickup', eta: new Date().toLocaleTimeString() }, { name: 'Drop', eta: new Date(Date.now() + 3600000).toLocaleTimeString() }];
@@ -3690,6 +3720,46 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, onAddRoutePl
                </div>
             )}
          </main>
+         {issueModalOpen && (
+            <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+               <Card className="w-full max-w-lg relative bg-white p-0 overflow-hidden">
+                  <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+                     <div className="font-bold text-slate-900">Report Issue</div>
+                     <button onClick={() => setIssueModalOpen(false)} className="bg-white/80 rounded-full p-2 text-slate-700 border border-slate-200">
+                        <X className="w-5 h-5" />
+                     </button>
+                  </div>
+                  <div className="p-5 space-y-3">
+                     <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Order</div>
+                     <div className="text-sm font-bold text-slate-900">{issueOrderId}</div>
+                     <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-2">Describe the issue</div>
+                     <textarea
+                        value={issueText}
+                        onChange={(e) => setIssueText(e.target.value)}
+                        rows={4}
+                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition-all placeholder:text-slate-400"
+                        placeholder="e.g., buyer unreachable, vehicle breakdown, address mismatch..."
+                     />
+                  </div>
+                  <div className="p-5 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+                     <Button variant="ghost" onClick={() => setIssueModalOpen(false)} className="h-10 text-sm font-bold">Cancel</Button>
+                     <Button
+                        className="h-10 text-sm font-bold bg-orange-600 hover:bg-orange-700"
+                        disabled={!issueOrderId || issueText.trim().length === 0}
+                        onClick={() => {
+                           if (!issueOrderId) return;
+                           const issue = issueText.trim();
+                           if (!issue) return;
+                           onRaiseDispute?.({ orderId: issueOrderId, raisedBy: user.profile.fullName, role: 'transporter', issue });
+                           setIssueModalOpen(false);
+                        }}
+                     >
+                        Submit
+                     </Button>
+                  </div>
+               </Card>
+            </div>
+         )}
       </div>
    );
 };
@@ -3843,6 +3913,7 @@ const AdminDashboard = ({ allUsers, listings, orders, disputes, systemConfig, on
 const App = () => {
    const [screen, setScreen] = useState<'landing' | 'choose-role' | 'auth' | 'admin-login' | 'dashboard'>('landing');
    const [selectedRole, setSelectedRole] = useState<UserRole>(null);
+   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
 
    // STATE
    const [allUsers, setAllUsers] = useState<User[]>(INITIAL_USERS);
@@ -3876,30 +3947,32 @@ const App = () => {
             svc.getRoutePlans()
          ]);
          
-         if (u && u.length > 0) setAllUsers(u);
-         if (l && l.length > 0) setListings(l);
-         if (off && off.length > 0) setOffers(off);
-         if (ord && ord.length > 0) setOrders(ord);
-         if (d && d.length > 0) setDisputes(d);
-         if (m && m.length > 0) setMessages(m);
-         if (inv && inv.length > 0) setInventoryItems(inv);
-         if (pr && pr.length > 0) setPricingRules(pr);
-         if (pay && pay.length > 0) setPayouts(pay);
-         if (r && r.length > 0) setRfqs(r);
-         if (rp && rp.length > 0) setRoutePlans(rp);
+         if (u) setAllUsers(u);
+         if (l) setListings(l);
+         if (off) setOffers(off);
+         if (ord) setOrders(ord);
+         if (d) setDisputes(d);
+         if (m) setMessages(m);
+         if (inv) setInventoryItems(inv);
+         if (pr) setPricingRules(pr);
+         if (pay) setPayouts(pay);
+         if (r) setRfqs(r);
+         if (rp) setRoutePlans(rp);
       };
       loadData();
    }, []);
 
-   const handleGetStarted = (role?: UserRole) => {
-      if (role) {
-         setScreen('auth');
-         setSelectedRole(role);
-      } else {
-         setScreen('choose-role');
-      }
+   const handleGetStarted = (role: UserRole | null = null, mode: 'login' | 'register' = 'register') => {
+      setSelectedRole(role);
+      setAuthMode(mode);
+      setScreen('auth');
    };
-   const handleRoleSelect = (role: UserRole) => { setSelectedRole(role); setScreen('auth'); };
+
+   const handleRoleSelect = (role: UserRole) => {
+      setSelectedRole(role);
+      setAuthMode('register');
+      setScreen('auth');
+   };
    const handleAuthComplete = async (userData: any) => {
       let user = userData;
       if (!userData.id) {
@@ -3911,26 +3984,78 @@ const App = () => {
    };
    const handleAdminLogin = () => { setCurrentUser({ id: 'admin', phone: '0000', role: 'admin', status: 'active', createdAt: new Date().toISOString() }); setScreen('dashboard'); };
    const handleLogout = () => { setCurrentUser(null); setScreen('landing'); };
-   const handleAddListing = async (l: any) => { await svc.addListing(l); setListings([l, ...listings]); };
-   const handleUpdateListing = (updatedListing: any) => { svc.updateListing(updatedListing); setListings(listings.map(l => l.id === updatedListing.id ? updatedListing : l)); };
-   const handleUpdateListingStatus = (id: string, status: ListingStatus) => { svc.updateListingStatus(id, status); setListings(listings.map(l => l.id === id ? { ...l, status } : l)); };
+   const handleAddListing = async (l: any) => {
+      try {
+         const saved = await svc.addListing(l);
+         if (!saved) return;
+         setListings(prev => [saved, ...prev]);
+      } catch (e) {
+         console.error(e);
+         alert('Failed to publish listing. Please try again.');
+      }
+   };
+   const handleUpdateListing = async (updatedListing: any) => {
+      try {
+         const saved = await svc.updateListing(updatedListing);
+         if (!saved) return;
+         setListings(prev => prev.map(l => l.id === saved.id ? saved : l));
+      } catch (e) {
+         console.error(e);
+         alert('Failed to update listing. Please try again.');
+      }
+   };
+   const handleUpdateListingStatus = async (id: string, status: ListingStatus) => {
+      try {
+         await svc.updateListingStatus(id, status);
+         setListings(prev => prev.map(l => l.id === id ? { ...l, status } : l));
+      } catch (e) {
+         console.error(e);
+         alert('Failed to update listing status. Please try again.');
+      }
+   };
 
    const handleDeleteListing = (id: string) => { svc.deleteListing(id); setListings(listings.filter(l => l.id !== id)); };
 
-   const handlePlaceOffer = async (offer: any) => { const newOffer = { ...offer, id: `off_${Date.now()}`, status: 'pending', createdAt: new Date().toISOString() }; await svc.placeOffer(newOffer); setOffers([newOffer, ...offers]); };
+   const handlePlaceOffer = async (offer: any) => {
+      const offerId = `off_${Date.now()}`;
+      const payload = { ...offer, id: offerId, status: 'pending', createdAt: new Date().toISOString() };
+      setOffers(prev => [payload, ...prev]);
+
+      try {
+         const savedOffer = await svc.placeOffer(payload);
+         if (!savedOffer) throw new Error('Offer not saved');
+         setOffers(prev => prev.map(o => o.id === offerId ? savedOffer : o));
+      } catch (err) {
+         console.error("Failed to place offer", err);
+         setOffers(prev => prev.filter(o => o.id !== offerId));
+         alert('Failed to place offer. This usually means the listing is not published to the server.');
+      }
+   };
 
    const handleAcceptOffer = async (offerId: string) => {
-      const offer = offers.find(o => o.id === offerId);
-      if (!offer) return;
-      const listing = listings.find(l => l.id === offer.listingId);
-      if (!listing) return;
+      console.log("Accepting offer:", offerId);
+      const currentOffers = await svc.getOffers();
+      const currentListings = await svc.getListings();
+      
+      const offer = currentOffers.find((o: any) => o.id === offerId);
+      if (!offer) {
+          console.error("Offer not found in fresh fetch", offerId);
+          alert('This offer is not saved on the server, so it cannot be accepted. Please re-place the offer.');
+          return;
+      }
+      const listing = currentListings.find((l: any) => l.id === offer.listingId);
+      if (!listing) {
+          console.error("Listing not found in fresh fetch", offer);
+          alert('This listing is not published on the server, so the offer cannot be accepted.');
+          return;
+      }
 
       const newOrder: Order = {
          id: `ord_${Date.now()}`,
          listingId: listing.id,
          cropName: listing.cropName,
-         quantity: offer.quantityRequested,
-         totalAmount: offer.offeredPrice * offer.quantityRequested,
+         quantity: offer.quantityRequested || offer.quantity,
+         totalAmount: (offer.offeredPrice || offer.pricePerKg) * (offer.quantityRequested || offer.quantity),
          status: 'confirmed',
          date: new Date().toISOString(),
          farmerName: listing.farmerName,
@@ -3939,14 +4064,42 @@ const App = () => {
          buyerLocation: offer.buyerLocation
       };
 
-      await svc.createOrder(newOrder);
-      await svc.setOfferStatus(offerId, 'accepted');
-      setOrders([newOrder, ...orders]);
-      setOffers(offers.map(o => o.id === offerId ? { ...o, status: 'accepted' } : o));
-      setListings(listings.map(l => l.id === listing.id ? { ...l, availableQuantity: l.availableQuantity - offer.quantityRequested } : l));
+      try {
+         const order = await svc.createOrder(newOrder);
+         if (!order) {
+            console.error("Order creation returned null (likely failed)");
+            return; 
+         }
+         
+         await svc.setOfferStatus(offerId, 'accepted');
+         
+         // Update listing quantity
+         const updatedListing = { ...listing, availableQuantity: listing.availableQuantity - offer.quantityRequested };
+         await svc.updateListing(updatedListing);
+
+         // Refresh local state with fresh data
+         setOrders(prev => [order, ...prev]);
+         setOffers(prev => prev.map(o => o.id === offerId ? { ...o, status: 'accepted' } : o));
+         setListings(prev => prev.map(l => l.id === listing.id ? updatedListing : l));
+         console.log("Offer accepted successfully");
+      } catch (error) {
+         console.error("Error accepting offer:", error);
+         alert('Failed to accept offer. Check console for the exact Supabase error.');
+      }
    };
 
-   const handleRejectOffer = async (offerId: string) => { await svc.setOfferStatus(offerId, 'rejected'); setOffers(offers.map(o => o.id === offerId ? { ...o, status: 'rejected' } : o)); };
+   const handleRejectOffer = async (offerId: string) => { 
+       console.log("Rejecting offer:", offerId);
+       try {
+          const updated = await svc.setOfferStatus(offerId, 'rejected'); 
+          if (!updated) throw new Error('Offer status not updated');
+          setOffers(prev => prev.map(o => o.id === offerId ? { ...o, status: 'rejected' } : o)); 
+          console.log("Offer rejected successfully");
+       } catch (error) {
+          console.error("Error rejecting offer:", error);
+          alert('Failed to reject offer. Check console for the exact Supabase error.');
+       }
+   };
 
    const handleUserStatusChange = (userId: string, newStatus: 'active' | 'suspended', approvalStatus?: string) => {
       setAllUsers(allUsers.map(u => {
@@ -4040,7 +4193,7 @@ const App = () => {
       <div className="min-h-screen font-sans text-slate-900 bg-slate-50">
          {screen === 'landing' && <LandingPage onGetStarted={handleGetStarted} onAdminLogin={() => setScreen('admin-login')} />}
          {screen === 'choose-role' && <ChooseRole onSelect={handleRoleSelect} onBack={() => setScreen('landing')} />}
-         {screen === 'auth' && <div className="min-h-screen bg-gradient-to-br from-nature-50 to-blue-50 flex items-center justify-center p-4"><AuthWizard initialRole={selectedRole} onComplete={handleAuthComplete} onBack={() => setScreen('landing')} existingUsers={allUsers} /></div>}
+         {screen === 'auth' && <div className="min-h-screen bg-gradient-to-br from-nature-50 to-blue-50 flex items-center justify-center p-4"><AuthWizard initialRole={selectedRole} initialMode={authMode} onComplete={handleAuthComplete} onBack={() => setScreen('landing')} existingUsers={allUsers} /></div>}
          {screen === 'admin-login' && <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4"><AdminLogin onLogin={handleAdminLogin} onBack={() => setScreen('landing')} /></div>}
 
          {screen === 'dashboard' && currentUser?.role === 'admin' && <AdminDashboard allUsers={allUsers} listings={listings} orders={orders} disputes={disputes} systemConfig={systemConfig} onUpdateConfig={setSystemConfig} onLogout={handleLogout} onUpdateUserStatus={handleUserStatusChange} onResolveDispute={handleResolveDispute} />}

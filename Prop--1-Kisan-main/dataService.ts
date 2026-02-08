@@ -99,86 +99,149 @@ export async function addUser(user: any) {
 }
 
 export async function addListing(payload: any) {
-  const c = getSupabase(); if (!c) return null
-  const { data, error } = await c.from('listings').insert(payload).select().single()
-  if (error) console.error('addListing error', error)
+  const c = getSupabase(); if (!c) throw new Error('Supabase not configured')
+  const listingData = {
+    id: payload.id,
+    farmerId: payload.farmerId,
+    farmerName: payload.farmerName,
+    cropName: payload.cropName,
+    grade: payload.grade,
+    quantity: payload.quantity,
+    availableQuantity: payload.availableQuantity,
+    pricePerKg: payload.pricePerKg,
+    description: payload.description,
+    imageUrls: payload.imageUrls,
+    location: payload.location,
+    status: payload.status,
+    harvestDate: payload.harvestDate,
+    createdAt: payload.createdAt
+  }
+  const { data, error } = await c.from('listings').insert(listingData).select().single()
+  if (error) { console.error('addListing error', error); throw error }
   return data
 }
 
 export async function updateListing(payload: any) {
-  const c = getSupabase(); if (!c) return null
-  const { data, error } = await c.from('listings').update(payload).eq('id', payload.id).select().single()
-  if (error) console.error('updateListing error', error)
+  const c = getSupabase(); if (!c) throw new Error('Supabase not configured')
+  const listingData = {
+    id: payload.id,
+    farmerId: payload.farmerId,
+    farmerName: payload.farmerName,
+    cropName: payload.cropName,
+    grade: payload.grade,
+    quantity: payload.quantity,
+    availableQuantity: payload.availableQuantity,
+    pricePerKg: payload.pricePerKg,
+    description: payload.description,
+    imageUrls: payload.imageUrls,
+    location: payload.location,
+    status: payload.status,
+    harvestDate: payload.harvestDate,
+    createdAt: payload.createdAt
+  }
+  const { data, error } = await c.from('listings').update(listingData).eq('id', payload.id).select().single()
+  if (error) { console.error('updateListing error', error); throw error }
   return data
 }
 
 export async function updateListingStatus(id: string, status: string) {
-  const c = getSupabase(); if (!c) return null
+  const c = getSupabase(); if (!c) throw new Error('Supabase not configured')
   const { data, error } = await c.from('listings').update({ status }).eq('id', id).select().single()
-  if (error) console.error('updateListingStatus error', error)
+  if (error) { console.error('updateListingStatus error', error); throw error }
   return data
 }
 
 export async function deleteListing(id: string) {
-  const c = getSupabase(); if (!c) return null
+  const c = getSupabase(); if (!c) throw new Error('Supabase not configured')
   const { error } = await c.from('listings').delete().eq('id', id)
-  if (error) console.error('deleteListing error', error)
+  if (error) { console.error('deleteListing error', error); throw error }
   return true
 }
 
 export async function placeOffer(payload: any) {
-  const c = getSupabase(); if (!c) return null
-  const { data, error } = await c.from('offers').insert(payload).select().single()
-  if (error) console.error('placeOffer error', error)
+  const c = getSupabase(); if (!c) throw new Error('Supabase not configured')
+  const offerData = {
+    id: payload.id,
+    listingId: payload.listingId,
+    cropName: payload.cropName,
+    buyerName: payload.buyerName,
+    buyerLocation: payload.buyerLocation,
+    pricePerKg: payload.pricePerKg,
+    quantity: payload.quantity,
+    quantityRequested: payload.quantityRequested,
+    offeredPrice: payload.offeredPrice,
+    totalAmount: payload.totalAmount,
+    status: payload.status,
+    createdAt: payload.createdAt
+  }
+  console.log("Placing offer with payload:", offerData);
+  const { data, error } = await c.from('offers').insert(offerData).select().single()
+  if (error) { console.error('placeOffer error', error); throw error }
   return data
 }
 
 export async function setOfferStatus(id: string, status: string) {
-  const c = getSupabase(); if (!c) return null
+  const c = getSupabase(); if (!c) throw new Error('Supabase not configured')
   const { data, error } = await c.from('offers').update({ status }).eq('id', id).select().single()
-  if (error) console.error('setOfferStatus error', error)
+  if (error) { console.error('setOfferStatus error', error); throw error }
   return data
 }
 
 export async function createOrder(payload: any) {
-  const c = getSupabase(); if (!c) return null
-  const { data, error } = await c.from('orders').insert(payload).select().single()
-  if (error) console.error('createOrder error', error)
+  const c = getSupabase(); if (!c) throw new Error('Supabase not configured')
+  const orderData = {
+    id: payload.id,
+    listingId: payload.listingId,
+    cropName: payload.cropName,
+    quantity: payload.quantity,
+    totalAmount: payload.totalAmount,
+    status: payload.status,
+    date: payload.date,
+    farmerName: payload.farmerName,
+    farmerLocation: payload.farmerLocation,
+    buyerName: payload.buyerName,
+    buyerLocation: payload.buyerLocation,
+    distanceKm: payload.distanceKm,
+    transporterId: payload.transporterId
+  }
+  console.log("Creating order with payload:", orderData);
+  const { data, error } = await c.from('orders').insert(orderData).select().single()
+  if (error) { console.error('createOrder error', error); throw error }
   return data
 }
 
 export async function setOrderStatus(id: string, status: string) {
-  const c = getSupabase(); if (!c) return null
+  const c = getSupabase(); if (!c) throw new Error('Supabase not configured')
   const { data, error } = await c.from('orders').update({ status }).eq('id', id).select().single()
-  if (error) console.error('setOrderStatus error', error)
+  if (error) { console.error('setOrderStatus error', error); throw error }
   return data
 }
 
 export async function addMessage(payload: any) {
-  const c = getSupabase(); if (!c) return null
+  const c = getSupabase(); if (!c) throw new Error('Supabase not configured')
   const { data, error } = await c.from('messages').insert(payload).select().single()
-  if (error) console.error('addMessage error', error)
+  if (error) { console.error('addMessage error', error); throw error }
   return data
 }
 
 export async function raiseDispute(payload: any) {
-  const c = getSupabase(); if (!c) return null
+  const c = getSupabase(); if (!c) throw new Error('Supabase not configured')
   const { data, error } = await c.from('disputes').insert(payload).select().single()
-  if (error) console.error('raiseDispute error', error)
+  if (error) { console.error('raiseDispute error', error); throw error }
   return data
 }
 
 export async function resolveDispute(id: string, status: string) {
-  const c = getSupabase(); if (!c) return null
+  const c = getSupabase(); if (!c) throw new Error('Supabase not configured')
   const { data, error } = await c.from('disputes').update({ status }).eq('id', id).select().single()
-  if (error) console.error('resolveDispute error', error)
+  if (error) { console.error('resolveDispute error', error); throw error }
   return data
 }
 
 export async function updateUserProfile(userId: string, profile: any) {
-  const c = getSupabase(); if (!c) return null
+  const c = getSupabase(); if (!c) throw new Error('Supabase not configured')
   const { data, error } = await c.from('users').update({ profile }).eq('id', userId).select().single()
-  if (error) console.error('updateUserProfile error', error)
+  if (error) { console.error('updateUserProfile error', error); throw error }
   return data
 }
 
