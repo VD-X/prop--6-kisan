@@ -91,6 +91,7 @@ import TradeAnimation from './components/TradeAnimation';
 import HarvestBackground from './components/HarvestBackground';
 import ChooseRole from './components/ChooseRole';
 import { analyzeCropImage } from './services/aiService';
+import { getSupabase } from './supabaseClient';
 import {
    User,
    UserRole,
@@ -102,6 +103,8 @@ import {
    Offer,
    Order,
    OrderStatus,
+   TransportRequest,
+   TransportBid,
    Dispute,
    SystemConfig,
    Transaction
@@ -683,7 +686,7 @@ const TransporterRegistration = ({ onSubmit }: { onSubmit: (profile: Transporter
 
 // --- 4. DASHBOARDS ---
 
-const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryItems, pricingRules, payouts, onAddInventoryItem, onAddPricingRule, onAddPayout, onSendMessage, onAddListing, onUpdateListing, onDeleteListing, onUpdateProfile, onUpdateListingStatus, onAcceptOffer, onRejectOffer, onRaiseDispute, onLogout }: any) => {
+const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryItems, payouts, transportRequests, allUsers, onAddInventoryItem, onAddPayout, onSendMessage, onAddListing, onUpdateListing, onDeleteListing, onUpdateProfile, onUpdateListingStatus, onAcceptOffer, onRejectOffer, onRaiseDispute, onLogout, onAcceptTransportRequest }: any) => {
    const [view, setView] = useState('home');
    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
    const myListings = listings.filter((l: any) => l.farmerId === user.id);
@@ -1027,7 +1030,6 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
                <SidebarItem id="offers" label="Offers" icon={ShoppingBag} badge={myOffers.length} />
                <SidebarItem id="orders" label="Orders" icon={Truck} badge={myOrders.length} />
                <SidebarItem id="inventory" label="Inventory" icon={Package} />
-               <SidebarItem id="pricing" label="Pricing" icon={IndianRupee} />
                <SidebarItem id="payments" label="Payments" icon={IndianRupee} />
                <SidebarItem id="history" label="History & Insights" icon={FileClock} />
                <SidebarItem id="messages" label="Messages" icon={MessageCircle} />
@@ -1059,7 +1061,6 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
                      <SidebarItem id="offers" label="Offers" icon={ShoppingBag} badge={myOffers.length} />
                      <SidebarItem id="orders" label="Orders" icon={Truck} badge={myOrders.length} />
                      <SidebarItem id="inventory" label="Inventory" icon={Package} />
-                     <SidebarItem id="pricing" label="Pricing" icon={IndianRupee} />
                      <SidebarItem id="payments" label="Payments" icon={IndianRupee} />
                      <SidebarItem id="history" label="History & Insights" icon={FileClock} />
                      <SidebarItem id="profile" label="Kisan Profile" icon={UserIcon} />
@@ -1140,42 +1141,6 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
                               </div>
                            ))}
                            {(inventoryItems || []).filter(i => listings.find((l: any) => l.id === i.listingId)?.farmerId === user.id).length === 0 && <div className="text-sm text-slate-400">No inventory yet.</div>}
-                        </div>
-                     </Card>
-                  </div>
-               )}
-
-               {view === 'pricing' && (
-                  <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                     <div><h2 className="text-2xl font-black text-slate-900">Dynamic Pricing</h2><p className="text-slate-500">Create rules to auto-adjust price.</p></div>
-                     <Card className="p-6 space-y-4">
-                        <div className="grid md:grid-cols-3 gap-4">
-                           <select className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-4 text-sm font-medium outline-nature-500" id="pr-listing">
-                              {listings.filter((l: any) => l.farmerId === user.id).map((l: any) => (<option key={l.id} value={l.id}>{l.cropName}</option>))}
-                           </select>
-                           <select className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-4 text-sm font-medium outline-nature-500" id="pr-type">
-                              <option value="age">By Age</option><option value="demand">By Demand</option><option value="market">By Market</option>
-                           </select>
-                           <Input id="pr-adj" type="number" placeholder="Adjustment (%)" />
-                        </div>
-                        <Button className="w-full md:w-auto" onClick={() => {
-                           const listingId = (document.getElementById('pr-listing') as HTMLSelectElement)?.value;
-                           const type = (document.getElementById('pr-type') as HTMLSelectElement)?.value as any;
-                           const adj = Number((document.getElementById('pr-adj') as HTMLInputElement)?.value || 0);
-                           if (!listingId || adj === 0) return;
-                           onAddPricingRule?.({ listingId, type, adjustmentPercent: adj, active: true });
-                        }}>Add Rule</Button>
-                     </Card>
-                     <Card className="p-6">
-                        <div className="grid md:grid-cols-2 gap-4">
-                           {(pricingRules || []).filter(r => listings.find((l: any) => l.id === r.listingId)?.farmerId === user.id).map(r => (
-                              <div key={r.id} className="p-4 bg-slate-50 rounded-xl">
-                                 <div className="text-xs text-slate-400 uppercase font-bold">Rule {r.type}</div>
-                                 <div className="font-bold text-slate-900">{listings.find((l: any) => l.id === r.listingId)?.cropName}</div>
-                                 <div className="text-sm text-slate-600">{r.adjustmentPercent}% • {r.active ? 'Active' : 'Inactive'}</div>
-                              </div>
-                           ))}
-                           {(pricingRules || []).filter(r => listings.find((l: any) => l.id === r.listingId)?.farmerId === user.id).length === 0 && <div className="text-sm text-slate-400">No pricing rules yet.</div>}
                         </div>
                      </Card>
                   </div>
@@ -1605,7 +1570,10 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
                      </div>
 
                      <div className="space-y-6">
-                        {myOrders.length > 0 ? myOrders.map((o: any) => (
+                        {myOrders.length > 0 ? myOrders.map((o: any) => {
+                           const req = (transportRequests || []).find((r: any) => r.orderId === o.id);
+                           const transporter = req?.transporterId ? (allUsers || []).find((u: any) => u.id === req.transporterId) : null;
+                           return (
                            <Card key={o.id} className="p-6 border-purple-100 bg-white">
                               <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
                                  <div>
@@ -1654,20 +1622,39 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
                               </div>
 
                               {/* Logistics Helper */}
-                              <div className="mt-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
+                              <div className="mt-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                  <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm"><UserIcon className="w-5 h-5 text-slate-400" /></div>
+                                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm"><Truck className="w-5 h-5 text-slate-400" /></div>
                                     <div>
-                                       <div className="text-[10px] text-slate-400 font-black uppercase">Assigned Transporter</div>
-                                       <div className="text-sm font-bold text-slate-700">Ramesh Singh (MP-04-1234)</div>
+                                       <div className="text-[10px] text-slate-400 font-black uppercase">Transport</div>
+                                       {!req && <div className="text-sm font-bold text-slate-700">Not requested yet</div>}
+                                       {req && (
+                                          <div className="text-sm font-bold text-slate-700">
+                                             {String(req.mode).replace('_', ' ')} • {String(req.status).replace('_', ' ')} • ₹{req.finalFare ?? req.estimatedFare}
+                                          </div>
+                                       )}
+                                       {req?.deliveryOtp && req.status !== 'delivered' && <div className="text-xs text-slate-500 mt-1">Delivery OTP: <span className="font-black text-slate-800">{req.deliveryOtp}</span></div>}
+                                       {transporter && <div className="text-xs text-slate-500 mt-1">Assigned: <span className="font-bold text-slate-700">{transporter.profile?.fullName || transporter.phone}</span></div>}
                                     </div>
                                  </div>
-                                 <button className="flex items-center gap-2 px-4 py-2 bg-nature-100 text-nature-700 rounded-xl text-xs font-black hover:bg-nature-200 transition-colors">
-                                    <Phone className="w-4 h-4" /> Call Transporter
-                                 </button>
+                                 {req?.status === 'awaiting_farmer' && (
+                                    <Button className="h-10 bg-nature-600 hover:bg-nature-700 text-xs font-black" onClick={() => {
+                                       const transporters = (allUsers || []).filter((u: any) => u.role === 'transporter');
+                                       const promptText = [
+                                          'Choose transporter id (or type "self")',
+                                          ...transporters.map((t: any) => `${t.id} - ${t.profile?.fullName || t.phone}`)
+                                       ].join('\n');
+                                       const choice = prompt(promptText);
+                                       if (!choice) return;
+                                       const selectedId = choice === 'self' ? user.id : choice;
+                                       const rawFare = prompt('Enter transport price (₹). Leave blank to use estimate.');
+                                       const fare = rawFare ? Number(rawFare) : (req.estimatedFare || 0);
+                                       onAcceptTransportRequest?.(req.id, selectedId, Number.isFinite(fare) && fare > 0 ? fare : (req.estimatedFare || 0));
+                                    }}>Assign Transporter</Button>
+                                 )}
                               </div>
                            </Card>
-                        )) : (
+                        )}) : (
                            <div className="py-24 text-center border-2 border-dashed border-slate-200 rounded-3xl bg-white/50 backdrop-blur-sm">
                               <div className="w-20 h-20 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-6 text-purple-300">
                                  <Truck className="w-10 h-10" />
@@ -2412,12 +2399,14 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
 };
 
 // Buyer and Transporter Dashboards remain the same
-const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, onAddRfq, onSendMessage, onPlaceOffer, onLogout, onUpdateProfile, onRaiseDispute }: any) => {
+const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, transportRequests, transportBids, onAddRfq, onSendMessage, onPlaceOffer, onLogout, onUpdateProfile, onRaiseDispute, onCreateTransportRequest, onAcceptTransportBid }: any) => {
    const [view, setView] = useState('home');
    const [searchTerm, setSearchTerm] = useState('');
    const [selectedListing, setSelectedListing] = useState<any>(null);
    const [showOfferModal, setShowOfferModal] = useState(false);
    const [offerData, setOfferData] = useState({ quantity: 0, price: 0 });
+   const [showTransportModal, setShowTransportModal] = useState(false);
+   const [transportOrderId, setTransportOrderId] = useState<string | null>(null);
 
    // Buyer Profile State
    const [profileData, setProfileData] = useState<BuyerProfile>(user.profile || { fullName: user.phone, city: '', state: '', language: 'English' });
@@ -2694,7 +2683,10 @@ const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, onAddR
                <div className="space-y-6 animate-in slide-in-from-right-4">
                   <h2 className="text-2xl font-bold text-slate-900">Purchase Orders</h2>
                   <div className="grid gap-6">
-                     {myOrders.map(o => (
+                     {myOrders.map(o => {
+                        const req = (transportRequests || []).find((r: any) => r.orderId === o.id);
+                        const bids = req ? (transportBids || []).filter((b: any) => b.requestId === req.id) : [];
+                        return (
                         <Card key={o.id} className="p-6 border-blue-100 bg-white">
                            <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-4">
                               <div className="flex gap-4">
@@ -2711,6 +2703,38 @@ const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, onAddR
                                  <div className="text-xl font-black text-slate-900">₹{o.totalAmount.toLocaleString()}</div>
                                  <div className="text-xs text-slate-400 font-bold">{o.quantity} kg @ ₹{o.totalAmount / o.quantity}/kg</div>
                               </div>
+                           </div>
+                           <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-4">
+                              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                                 <div>
+                                    <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Transport</div>
+                                    {!req && <div className="text-sm font-bold text-slate-800">Not arranged yet</div>}
+                                    {req && <div className="text-sm font-bold text-slate-800">{req.mode.replace('_', ' ')} • {req.status.replace('_', ' ')}</div>}
+                                    {req?.deliveryOtp && req.status !== 'delivered' && <div className="text-xs text-slate-500 mt-1">Delivery OTP: <span className="font-black text-slate-800">{req.deliveryOtp}</span></div>}
+                                 </div>
+                                 {!req && (
+                                    <Button className="h-10 bg-blue-600 hover:bg-blue-700 text-xs font-black" onClick={() => { setTransportOrderId(o.id); setShowTransportModal(true); }}>Arrange Transport</Button>
+                                 )}
+                              </div>
+                              {req && req.mode === 'marketplace' && req.status === 'open' && (
+                                 <div className="mt-4 space-y-2">
+                                    <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Transporter Offers</div>
+                                    {bids.length === 0 && <div className="text-xs text-slate-500">Waiting for transporter bids...</div>}
+                                    {bids.length > 0 && (
+                                       <div className="grid md:grid-cols-2 gap-2">
+                                          {bids.map((b: any) => (
+                                             <div key={b.id} className="p-3 bg-white rounded-xl border border-slate-200 flex items-center justify-between gap-3">
+                                                <div className="min-w-0">
+                                                   <div className="text-sm font-black text-slate-900">₹{b.amount}</div>
+                                                   <div className="text-[10px] text-slate-400 font-bold truncate">Bid {b.status}</div>
+                                                </div>
+                                                <Button className="h-9 text-xs font-black bg-blue-600 hover:bg-blue-700" onClick={() => onAcceptTransportBid?.(b.id)}>Accept</Button>
+                                             </div>
+                                          ))}
+                                       </div>
+                                    )}
+                                 </div>
+                              )}
                            </div>
                            <div className="pt-4 border-t border-slate-50">
                               <div className="flex justify-between items-center mb-4">
@@ -2733,7 +2757,7 @@ const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, onAddR
                               </div>
                            </div>
                         </Card>
-                     ))}
+                     )})}
                      {myOrders.length === 0 && <div className="text-center py-20 text-slate-400 bg-white rounded-3xl border border-dashed border-slate-200">No active orders. Finalize a deal to see them here.</div>}
                   </div>
                </div>
@@ -3052,12 +3076,27 @@ const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, onAddR
                </Card>
             </div>
          )}
+
+         {showTransportModal && transportOrderId && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+               <Card className="w-full max-w-lg p-8 shadow-2xl relative overflow-hidden bg-white">
+                  <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-600" />
+                  <button onClick={() => setShowTransportModal(false)} className="absolute top-4 right-4 p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-900 transition-all"><X className="w-5 h-5" /></button>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-2">Arrange Transport</h3>
+                  <p className="text-sm text-slate-500 mb-8 border-b border-slate-100 pb-4">Choose how you want transport for <span className="text-slate-900 font-bold">Order #{transportOrderId}</span></p>
+                  <div className="grid md:grid-cols-3 gap-3">
+                     <Button className="h-12 bg-slate-900 hover:bg-slate-800 font-bold" onClick={() => { onCreateTransportRequest?.(transportOrderId, 'farmer_arranged'); setShowTransportModal(false); }}>Farmer Arranged</Button>
+                     <Button className="h-12 bg-blue-600 hover:bg-blue-700 font-bold" onClick={() => { onCreateTransportRequest?.(transportOrderId, 'marketplace'); setShowTransportModal(false); }}>Marketplace</Button>
+                     <Button variant="outline" className="h-12 font-bold border-slate-200" onClick={() => { onCreateTransportRequest?.(transportOrderId, 'buyer_own'); setShowTransportModal(false); }}>I Will Arrange</Button>
+                  </div>
+               </Card>
+            </div>
+         )}
       </div>
    );
 };
 
-/* Re-adding Transporter Dashboard */
-const TransporterDashboard = ({ user, orders, messages, routePlans, onAddRoutePlan, onSendMessage, onLogout, onAcceptJob, onUpdateOrderStatus, onUpdateProfile, onRaiseDispute }: any) => {
+const TransporterDashboard = ({ user, orders, messages, routePlans, transportRequests, transportBids, onAddRoutePlan, onSendMessage, onLogout, onUpdateOrderStatus, onUpdateProfile, onRaiseDispute, onAcceptTransportRequest, onAddTransportBid, onUpdateTransportRequestStatus }: any) => {
    const [view, setView] = useState('home');
 
    // Vehicle & Profile State
@@ -3106,12 +3145,12 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, onAddRoutePl
    const [issueOrderId, setIssueOrderId] = useState<string | null>(null);
    const [issueText, setIssueText] = useState('');
 
-   const availableJobs = orders.filter((o: any) => o.status === 'confirmed' && !o.transporterId);
-   const myDeliveries = orders.filter((o: any) => o.transporterId === user.id);
-   const completedDeliveries = myDeliveries.filter((o: any) => o.status === 'delivered');
-   const activeDeliveries = myDeliveries.filter((o: any) => o.status !== 'delivered');
+   const availableJobs = (transportRequests || []).filter((r: any) => r.status === 'open' && !r.transporterId);
+   const myDeliveries = (transportRequests || []).filter((r: any) => r.transporterId === user.id);
+   const completedDeliveries = myDeliveries.filter((r: any) => r.status === 'delivered');
+   const activeDeliveries = myDeliveries.filter((r: any) => r.status !== 'delivered' && r.status !== 'cancelled');
 
-   const totalEarnings = completedDeliveries.reduce((sum: number, o: any) => sum + (o.distanceKm || 0) * 15, 0); // Mock rate ₹15/km
+   const totalEarnings = completedDeliveries.reduce((sum: number, r: any) => sum + (r.finalFare ?? r.estimatedFare ?? 0), 0);
 
    return (
       <div className="flex h-screen bg-slate-50 overflow-hidden text-slate-900">
@@ -3173,8 +3212,13 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, onAddRoutePl
                   </div>
 
                   <div className="grid gap-6">
-                     {availableJobs.map(o => (
-                        <Card key={o.id} className="p-0 overflow-hidden border-orange-100 group hover:shadow-2xl transition-all duration-500">
+                     {availableJobs.map((r: any) => {
+                        const order = orders.find((o: any) => o.id === r.orderId);
+                        const distanceKm = Number(order?.distanceKm || 45);
+                        const cropName = order?.cropName || 'Crop';
+                        const quantity = Number(order?.quantity || r.weightKg || 0);
+                        return (
+                        <Card key={r.id} className="p-0 overflow-hidden border-orange-100 group hover:shadow-2xl transition-all duration-500">
                            <div className="flex flex-col md:flex-row">
                               <div className="p-6 md:p-8 flex-1">
                                  <div className="flex justify-between items-start mb-6">
@@ -3182,11 +3226,11 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, onAddRoutePl
                                        <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-orange-600 transition-colors"><MapPin className="w-7 h-7" /></div>
                                        <div>
                                           <div className="text-xs text-orange-600 font-black uppercase tracking-widest mb-1">New Load Available</div>
-                                          <h4 className="font-bold text-xl text-slate-800">{o.cropName} • {o.quantity} kg</h4>
+                                          <h4 className="font-bold text-xl text-slate-800">{cropName} • {quantity} kg</h4>
                                        </div>
                                     </div>
                                     <div className="text-right">
-                                       <div className="text-2xl font-black text-slate-900">₹{(o.distanceKm || 45) * 15}</div>
+                                       <div className="text-2xl font-black text-slate-900">₹{r.estimatedFare}</div>
                                        <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Est. Payout</div>
                                     </div>
                                  </div>
@@ -3196,33 +3240,39 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, onAddRoutePl
                                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs">A</div>
                                        <div>
                                           <div className="text-[10px] text-slate-400 uppercase font-black">Pickup</div>
-                                          <div className="text-sm font-bold truncate">{o.farmerLocation}</div>
+                                          <div className="text-sm font-bold truncate">{r.pickupLocation}</div>
                                        </div>
                                     </div>
                                     <div className="flex justify-center items-center py-2 md:py-0">
                                        <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 rounded-full border border-slate-100 text-[10px] font-black text-slate-500 uppercase">
-                                          <Timer className="w-3 h-3" /> {o.distanceKm || 45} KM
+                                          <Timer className="w-3 h-3" /> {distanceKm} KM
                                        </div>
                                     </div>
                                     <div className="flex gap-3 items-center">
                                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs">B</div>
                                        <div className="text-right md:text-left flex-1">
                                           <div className="text-[10px] text-slate-400 uppercase font-black">Delivery</div>
-                                          <div className="text-sm font-bold truncate">{o.buyerLocation}</div>
+                                          <div className="text-sm font-bold truncate">{r.dropLocation}</div>
                                        </div>
                                     </div>
                                  </div>
 
                                  <div className="flex gap-4">
-                                    <Button variant="outline" className="flex-1 h-12 font-bold border-slate-200">View Map Route</Button>
-                                    <Button className="flex-[2] h-12 bg-orange-600 hover:bg-orange-700 shadow-xl shadow-orange-600/20 font-black" onClick={() => onAcceptJob(o.id, user.id)}>
+                                    <Button variant="outline" className="flex-1 h-12 font-bold border-slate-200" onClick={() => {
+                                       const raw = prompt('Enter your bid amount (₹). Leave blank to cancel.');
+                                       if (!raw) return;
+                                       const amt = Number(raw);
+                                       if (!Number.isFinite(amt) || amt <= 0) return;
+                                       onAddTransportBid?.(r.id, user.id, amt);
+                                    }}>Bid Fare</Button>
+                                    <Button className="flex-[2] h-12 bg-orange-600 hover:bg-orange-700 shadow-xl shadow-orange-600/20 font-black" onClick={() => onAcceptTransportRequest?.(r.id, user.id)}>
                                        Accept Job
                                     </Button>
                                  </div>
                               </div>
                            </div>
                         </Card>
-                     ))}
+                     )})}
                      {availableJobs.length === 0 && <div className="py-24 text-center border-2 border-dashed border-slate-200 rounded-3xl bg-white/50">No loads currently available in your region. Check back soon.</div>}
                   </div>
                </div>
@@ -3232,59 +3282,61 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, onAddRoutePl
                <div className="space-y-6 animate-in slide-in-from-right-4">
                   <h2 className="text-2xl font-bold text-slate-900">My Active Shipments</h2>
                   <div className="grid gap-6">
-                     {activeDeliveries.map(o => (
-                        <Card key={o.id} className="p-6 border-orange-100 bg-white">
+                     {activeDeliveries.map((r: any) => {
+                        const order = orders.find((o: any) => o.id === r.orderId);
+                        return (
+                        <Card key={r.id} className="p-6 border-orange-100 bg-white">
                            <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-8">
                               <div className="flex gap-4">
                                  <div className="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 shadow-sm"><Route className="w-8 h-8" /></div>
                                  <div>
-                                    <h3 className="text-lg font-bold text-slate-900">Order #{o.id} • {o.cropName}</h3>
+                                    <h3 className="text-lg font-bold text-slate-900">Order #{order?.id || r.orderId} • {order?.cropName || 'Crop'}</h3>
                                     <div className="flex items-center gap-2 mt-1">
-                                       <span className="px-3 py-1 bg-orange-100 text-orange-800 text-[10px] font-black rounded-full uppercase tracking-widest">{o.status.replace('_', ' ')}</span>
-                                       <span className="text-xs text-slate-400 font-medium">{o.quantity}kg • To {o.buyerLocation}</span>
+                                       <span className="px-3 py-1 bg-orange-100 text-orange-800 text-[10px] font-black rounded-full uppercase tracking-widest">{String(r.status).replace('_', ' ')}</span>
+                                       <span className="text-xs text-slate-400 font-medium">{order?.quantity || r.weightKg}kg • {r.pickupLocation} → {r.dropLocation}</span>
                                     </div>
                                  </div>
                               </div>
                               <div className="text-right w-full md:w-auto">
                                  <div className="text-xs text-slate-400 font-bold uppercase mb-1">Status Update</div>
                                  <select
-                                    className="w-full md:w-48 h-10 bg-slate-100 border-none rounded-xl px-3 text-xs font-bold outline-orange-500"
-                                    value={o.status}
-                                    onChange={(e) => onUpdateOrderStatus(o.id, e.target.value as OrderStatus)}
+                                    className="w-full md:w-56 h-10 bg-slate-100 border-none rounded-xl px-3 text-xs font-bold outline-orange-500"
+                                    value={r.status}
+                                    onChange={(e) => {
+                                       const next = e.target.value as any;
+                                       if (next === 'delivered') {
+                                          const otp = prompt('Enter delivery OTP');
+                                          if (!otp || otp !== String(r.deliveryOtp || '')) {
+                                             alert('Invalid OTP');
+                                             return;
+                                          }
+                                       }
+                                       onUpdateTransportRequestStatus?.(r.id, next);
+                                    }}
                                  >
-                                    <option value="confirmed">Waiting Pickup</option>
+                                    <option value="assigned">Assigned</option>
+                                    <option value="picked_up">Picked Up</option>
                                     <option value="in_transit">In Transit</option>
                                     <option value="delivered">Delivered</option>
                                  </select>
                               </div>
                            </div>
 
-                           {/* Step Progress Mock */}
-                           <div className="relative pt-2 pb-6 px-1">
-                              <div className="absolute top-6 left-0 right-0 h-1 bg-slate-100 -z-10" />
-                              <div className="absolute top-6 left-0 h-1 bg-orange-500 -z-10 transition-all duration-700" style={{ width: o.status === 'in_transit' ? '50%' : '5%' }} />
-                              <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase tracking-tighter">
-                                 <div className={o.status !== 'confirmed' ? 'text-orange-600' : ''}>Confirmed</div>
-                                 <div className={o.status === 'in_transit' || o.status === 'delivered' ? 'text-orange-600' : ''}>In Transit</div>
-                                 <div className={o.status === 'delivered' ? 'text-orange-600' : ''}>Delivered</div>
-                              </div>
-                           </div>
-
-                           <div className="flex gap-3 mt-4">
-                              <Button variant="outline" className="flex-1 h-10 text-xs font-bold border-dashed border-slate-300 hover:border-orange-500 hover:text-orange-600 transition-colors"><FileText className="w-4 h-4 mr-2" /> Upload POD</Button>
-                              <Button className="flex-1 h-10 text-xs font-bold bg-orange-600 hover:bg-orange-700"><Phone className="w-4 h-4 mr-2" /> Contact Farmer</Button>
-                              <Button variant="outline" className="flex-1 h-10 text-xs font-bold" onClick={() => {
-                                 setIssueOrderId(o.id);
+                           <div className="flex gap-3 mt-4 flex-wrap">
+                              <Button variant="outline" className="h-10 text-xs font-bold border-dashed border-slate-300 hover:border-orange-500 hover:text-orange-600 transition-colors">POD</Button>
+                              <Button className="h-10 text-xs font-bold bg-orange-600 hover:bg-orange-700" onClick={() => {
+                                 const farmerName = order?.farmerName;
+                                 const toUserId = farmerName ? '' : '';
+                                 if (toUserId) onSendMessage?.({ toUserId, text: `Update on shipment ${order?.id || r.orderId}` });
+                              }}>Message</Button>
+                              <Button variant="outline" className="h-10 text-xs font-bold" onClick={() => {
+                                 setIssueOrderId(order?.id || r.orderId);
                                  setIssueText('');
                                  setIssueModalOpen(true);
                               }}>Report Issue</Button>
-                              <Button variant="outline" className="flex-1 h-10 text-xs font-bold" onClick={() => {
-                                 const stops = [{ name: 'Pickup', eta: new Date().toLocaleTimeString() }, { name: 'Drop', eta: new Date(Date.now() + 3600000).toLocaleTimeString() }];
-                                 onAddRoutePlan?.({ transporterId: user.id, orderId: o.id, stops });
-                              }}>Create Route</Button>
                            </div>
                         </Card>
-                     ))}
+                     )})}
                      {activeDeliveries.length === 0 && <div className="py-24 text-center border-2 border-dashed border-slate-200 rounded-3xl bg-white/50">No active shipments. Accept a job from the board to start.</div>}
                   </div>
                </div>
@@ -3914,6 +3966,7 @@ const App = () => {
    const [screen, setScreen] = useState<'landing' | 'choose-role' | 'auth' | 'admin-login' | 'dashboard'>('landing');
    const [selectedRole, setSelectedRole] = useState<UserRole>(null);
    const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+   const supabaseAvailable = !!getSupabase();
 
    // STATE
    const [allUsers, setAllUsers] = useState<User[]>(INITIAL_USERS);
@@ -3925,15 +3978,29 @@ const App = () => {
    const [systemConfig, setSystemConfig] = useState<SystemConfig>({ offerExpiryHours: 24, maxListingsPerFarmer: 20, maxActiveJobsPerTransporter: 3, platformFeePercent: 2 });
    const [currentUser, setCurrentUser] = useState<User | null>(null);
    const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
-   const [pricingRules, setPricingRules] = useState<PricingRule[]>([]);
    const [payouts, setPayouts] = useState<Payout[]>([]);
    const [rfqs, setRfqs] = useState<RFQ[]>([]);
    const [routePlans, setRoutePlans] = useState<RoutePlan[]>([]);
+   const [transportRequests, setTransportRequests] = useState<TransportRequest[]>([]);
+   const [transportBids, setTransportBids] = useState<TransportBid[]>([]);
 
    // Load data from Supabase on mount
    React.useEffect(() => {
+      if (!supabaseAvailable) {
+         try {
+            const savedOrders = localStorage.getItem('kisansetu_orders');
+            const savedTransportRequests = localStorage.getItem('kisansetu_transport_requests');
+            const savedTransportBids = localStorage.getItem('kisansetu_transport_bids');
+            if (savedOrders) setOrders(JSON.parse(savedOrders));
+            if (savedTransportRequests) setTransportRequests(JSON.parse(savedTransportRequests));
+            if (savedTransportBids) setTransportBids(JSON.parse(savedTransportBids));
+         } catch (e) {
+            console.error('Failed to load local data', e);
+         }
+         return;
+      }
       const loadData = async () => {
-         const [u, l, off, ord, d, m, inv, pr, pay, r, rp] = await Promise.all([
+         const [u, l, off, ord, d, m, inv, pay, r, rp, tr, tb] = await Promise.all([
             svc.getUsers(),
             svc.getListings(),
             svc.getOffers(),
@@ -3941,10 +4008,11 @@ const App = () => {
             svc.getDisputes(),
             svc.getMessages(),
             svc.getInventoryItems(),
-            svc.getPricingRules(),
             svc.getPayouts(),
             svc.getRfqs(),
-            svc.getRoutePlans()
+            svc.getRoutePlans(),
+            svc.getTransportRequests(),
+            svc.getTransportBids()
          ]);
          
          if (u) setAllUsers(u);
@@ -3954,13 +4022,25 @@ const App = () => {
          if (d) setDisputes(d);
          if (m) setMessages(m);
          if (inv) setInventoryItems(inv);
-         if (pr) setPricingRules(pr);
          if (pay) setPayouts(pay);
          if (r) setRfqs(r);
          if (rp) setRoutePlans(rp);
+         if (tr) setTransportRequests(tr);
+         if (tb) setTransportBids(tb);
       };
       loadData();
-   }, []);
+   }, [supabaseAvailable]);
+
+   React.useEffect(() => {
+      if (supabaseAvailable) return;
+      try {
+         localStorage.setItem('kisansetu_orders', JSON.stringify(orders));
+         localStorage.setItem('kisansetu_transport_requests', JSON.stringify(transportRequests));
+         localStorage.setItem('kisansetu_transport_bids', JSON.stringify(transportBids));
+      } catch (e) {
+         console.error('Failed to save local data', e);
+      }
+   }, [supabaseAvailable, orders, transportRequests, transportBids]);
 
    const handleGetStarted = (role: UserRole | null = null, mode: 'login' | 'register' = 'register') => {
       setSelectedRole(role);
@@ -4114,9 +4194,119 @@ const App = () => {
       }));
    };
 
-   const handleAcceptJob = (orderId: string, transporterId: string) => {
-      setOrders(orders.map(o => o.id === orderId ? { ...o, transporterId } : o));
-   };
+  const recommendVehicleType = (weightKg: number) => {
+     if (weightKg <= 150) return 'Bike' as const;
+     if (weightKg <= 400) return 'Auto' as const;
+     if (weightKg <= 2000) return 'Mini Truck' as const;
+     if (weightKg <= 5000) return 'Pickup' as const;
+     return 'Truck' as const;
+  };
+
+  const estimateTransportFare = (distanceKm: number, vehicleType: TransportRequest['vehicleType']) => {
+     const km = Math.max(1, distanceKm || 1);
+     const table: Record<TransportRequest['vehicleType'], { ratePerKm: number; min: number }> = {
+        Bike: { ratePerKm: 8, min: 80 },
+        Auto: { ratePerKm: 12, min: 150 },
+        'Mini Truck': { ratePerKm: 18, min: 400 },
+        Pickup: { ratePerKm: 25, min: 800 },
+        Truck: { ratePerKm: 35, min: 1200 }
+     };
+     const calc = Math.round(km * table[vehicleType].ratePerKm);
+     return Math.max(calc, table[vehicleType].min);
+  };
+
+  const generateOtp = () => String(Math.floor(100000 + Math.random() * 900000));
+
+  const handleCreateTransportRequest = async (orderId: string, mode: TransportRequest['mode']) => {
+     const order = orders.find(o => o.id === orderId);
+     if (!order) return;
+     const buyerId = currentUser?.id || '';
+     const farmerId = (allUsers.find(u => u.profile?.fullName === order.farmerName)?.id) || '';
+     const weightKg = Number(order.quantity || 0);
+     const vehicleType = recommendVehicleType(weightKg);
+     const estimatedFare = estimateTransportFare(Number(order.distanceKm || 45), vehicleType);
+     const status: TransportRequest['status'] =
+        mode === 'farmer_arranged' ? 'awaiting_farmer' : mode === 'buyer_own' ? 'assigned' : 'open';
+
+     const newReq: TransportRequest = {
+        id: `tr_${Date.now()}`,
+        orderId: order.id,
+        buyerId,
+        farmerId,
+        pickupLocation: order.farmerLocation,
+        dropLocation: order.buyerLocation,
+        weightKg,
+        vehicleType,
+        mode,
+        status,
+        estimatedFare,
+        deliveryOtp: generateOtp(),
+        createdAt: new Date().toISOString()
+     };
+
+     await svc.addTransportRequest(newReq);
+     setTransportRequests([newReq, ...transportRequests]);
+  };
+
+  const handleAddTransportBid = async (requestId: string, transporterId: string, amount: number, message?: string) => {
+     const bid: TransportBid = {
+        id: `tb_${Date.now()}`,
+        requestId,
+        transporterId,
+        amount,
+        message,
+        status: 'pending',
+        createdAt: new Date().toISOString()
+     };
+     await svc.addTransportBid(bid);
+     setTransportBids([bid, ...transportBids]);
+  };
+
+  const handleAcceptTransportBid = async (bidId: string) => {
+     const bid = transportBids.find(b => b.id === bidId);
+     if (!bid) return;
+     const req = transportRequests.find(r => r.id === bid.requestId);
+     if (!req) return;
+
+     const requestBids = transportBids.filter(b => b.requestId === req.id);
+     await Promise.all(requestBids.map(b => svc.setTransportBidStatus(b.id, b.id === bid.id ? 'accepted' : 'rejected')));
+     setTransportBids(prev => prev.map(b => b.requestId !== req.id ? b : { ...b, status: b.id === bid.id ? 'accepted' : 'rejected' }));
+
+     const patch = { transporterId: bid.transporterId, finalFare: bid.amount, status: 'assigned' };
+     const saved = await svc.updateTransportRequest(req.id, patch);
+     const updatedReq = saved ? saved : ({ ...req, ...patch } as TransportRequest);
+     setTransportRequests(prev => prev.map(r => r.id === updatedReq.id ? updatedReq : r));
+
+     await svc.setOrderTransporter(req.orderId, bid.transporterId);
+     setOrders(prev => prev.map(o => o.id === req.orderId ? { ...o, transporterId: bid.transporterId } : o));
+  };
+
+  const handleAcceptTransportRequest = async (requestId: string, transporterId: string, finalFare?: number) => {
+     const req = transportRequests.find(r => r.id === requestId);
+     if (!req) return;
+     const patch = { transporterId, finalFare: finalFare ?? req.estimatedFare, status: 'assigned' };
+     const saved = await svc.updateTransportRequest(req.id, patch);
+     const updatedReq = saved ? saved : ({ ...req, ...patch } as TransportRequest);
+     setTransportRequests(prev => prev.map(r => r.id === updatedReq.id ? updatedReq : r));
+
+     await svc.setOrderTransporter(req.orderId, transporterId);
+     setOrders(prev => prev.map(o => o.id === req.orderId ? { ...o, transporterId } : o));
+  };
+
+  const handleUpdateTransportRequestStatus = async (requestId: string, status: TransportRequest['status']) => {
+     const req = transportRequests.find(r => r.id === requestId);
+     if (!req) return;
+     const saved = await svc.updateTransportRequest(requestId, { status });
+     const updatedReq = saved ? saved : ({ ...req, status } as TransportRequest);
+     setTransportRequests(prev => prev.map(r => r.id === updatedReq.id ? updatedReq : r));
+
+     const orderStatus: OrderStatus | null =
+        status === 'picked_up' ? 'picked_up' : status === 'in_transit' ? 'in_transit' : status === 'delivered' ? 'delivered' : null;
+     if (orderStatus) {
+        await svc.setOrderStatus(req.orderId, orderStatus);
+        setOrders(prev => prev.map(o => o.id === req.orderId ? { ...o, status: orderStatus } : o));
+     }
+  };
 
    const handleUpdateOrderStatus = async (orderId: string, newStatus: OrderStatus) => { await svc.setOrderStatus(orderId, newStatus); setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o)); };
 
@@ -4126,11 +4316,6 @@ const App = () => {
       const newItem: InventoryItem = { ...item, id: `inv_${Date.now()}`, createdAt: new Date().toISOString() };
       await svc.addInventoryItem(newItem);
       setInventoryItems([newItem, ...inventoryItems]);
-   };
-   const handleAddPricingRule = async (rule: Omit<PricingRule, 'id' | 'createdAt'>) => {
-      const newRule: PricingRule = { ...rule, id: `pr_${Date.now()}`, createdAt: new Date().toISOString() };
-      await svc.addPricingRule(newRule);
-      setPricingRules([newRule, ...pricingRules]);
    };
    const handleAddPayout = async (p: Omit<Payout, 'id' | 'createdAt'>) => {
       const newP: Payout = { ...p, id: `pay_${Date.now()}`, createdAt: new Date().toISOString() };
@@ -4197,9 +4382,9 @@ const App = () => {
          {screen === 'admin-login' && <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4"><AdminLogin onLogin={handleAdminLogin} onBack={() => setScreen('landing')} /></div>}
 
          {screen === 'dashboard' && currentUser?.role === 'admin' && <AdminDashboard allUsers={allUsers} listings={listings} orders={orders} disputes={disputes} systemConfig={systemConfig} onUpdateConfig={setSystemConfig} onLogout={handleLogout} onUpdateUserStatus={handleUserStatusChange} onResolveDispute={handleResolveDispute} />}
-         {screen === 'dashboard' && currentUser?.role === 'farmer' && <FarmerDashboard user={currentUser} listings={listings} offers={offers} orders={orders} messages={messages} inventoryItems={inventoryItems} pricingRules={pricingRules} payouts={payouts} onAddInventoryItem={handleAddInventoryItem} onAddPricingRule={handleAddPricingRule} onAddPayout={handleAddPayout} onSendMessage={handleSendMessage} onAddListing={handleAddListing} onUpdateListing={handleUpdateListing} onUpdateListingStatus={handleUpdateListingStatus} onDeleteListing={handleDeleteListing} onAcceptOffer={handleAcceptOffer} onRejectOffer={handleRejectOffer} onUpdateProfile={handleUpdateProfile} onRaiseDispute={handleRaiseDispute} onLogout={handleLogout} />}
-         {screen === 'dashboard' && currentUser?.role === 'buyer' && <BuyerDashboard user={currentUser} listings={listings} offers={offers} orders={orders} messages={messages} rfqs={rfqs} onAddRfq={handleAddRfq} onSendMessage={handleSendMessage} onPlaceOffer={handlePlaceOffer} onUpdateProfile={handleUpdateProfile} onRaiseDispute={handleRaiseDispute} onLogout={handleLogout} />}
-         {screen === 'dashboard' && currentUser?.role === 'transporter' && <TransporterDashboard user={currentUser} orders={orders} messages={messages} routePlans={routePlans} onAddRoutePlan={handleAddRoutePlan} onSendMessage={handleSendMessage} onRaiseDispute={handleRaiseDispute} onLogout={handleLogout} onAcceptJob={handleAcceptJob} onUpdateOrderStatus={handleUpdateOrderStatus} onUpdateProfile={handleUpdateProfile} />}
+        {screen === 'dashboard' && currentUser?.role === 'farmer' && <FarmerDashboard user={currentUser} listings={listings} offers={offers} orders={orders} messages={messages} inventoryItems={inventoryItems} payouts={payouts} transportRequests={transportRequests} allUsers={allUsers} onAddInventoryItem={handleAddInventoryItem} onAddPayout={handleAddPayout} onSendMessage={handleSendMessage} onAddListing={handleAddListing} onUpdateListing={handleUpdateListing} onUpdateListingStatus={handleUpdateListingStatus} onDeleteListing={handleDeleteListing} onAcceptOffer={handleAcceptOffer} onRejectOffer={handleRejectOffer} onUpdateProfile={handleUpdateProfile} onRaiseDispute={handleRaiseDispute} onLogout={handleLogout} onAcceptTransportRequest={handleAcceptTransportRequest} />}
+         {screen === 'dashboard' && currentUser?.role === 'buyer' && <BuyerDashboard user={currentUser} listings={listings} offers={offers} orders={orders} messages={messages} rfqs={rfqs} transportRequests={transportRequests} transportBids={transportBids} onAddRfq={handleAddRfq} onSendMessage={handleSendMessage} onPlaceOffer={handlePlaceOffer} onUpdateProfile={handleUpdateProfile} onRaiseDispute={handleRaiseDispute} onLogout={handleLogout} onCreateTransportRequest={handleCreateTransportRequest} onAcceptTransportBid={handleAcceptTransportBid} />}
+         {screen === 'dashboard' && currentUser?.role === 'transporter' && <TransporterDashboard user={currentUser} orders={orders} messages={messages} routePlans={routePlans} transportRequests={transportRequests} transportBids={transportBids} onAddRoutePlan={handleAddRoutePlan} onSendMessage={handleSendMessage} onRaiseDispute={handleRaiseDispute} onLogout={handleLogout} onUpdateOrderStatus={handleUpdateOrderStatus} onUpdateProfile={handleUpdateProfile} onAcceptTransportRequest={handleAcceptTransportRequest} onAddTransportBid={handleAddTransportBid} onUpdateTransportRequestStatus={handleUpdateTransportRequestStatus} />}
       </div>
    );
 };

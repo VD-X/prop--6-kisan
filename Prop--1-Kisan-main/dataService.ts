@@ -59,16 +59,9 @@ export async function getInventoryItems() {
   return data
 }
 
-export async function getPricingRules() {
-  const c = getSupabase(); if (!c) return []
-  const { data, error } = await c.from('pricing_rules').select('*').order('createdAt', { ascending: false })
-  if (error) { console.error('getPricingRules error', error); return [] }
-  return data
-}
-
 export async function getPayouts() {
   const c = getSupabase(); if (!c) return []
-  const { data, error } = await c.from('payouts').select('*').order('date', { ascending: false })
+  const { data, error } = await c.from('payouts').select('*').order('createdAt', { ascending: false })
   if (error) { console.error('getPayouts error', error); return [] }
   return data
 }
@@ -84,6 +77,20 @@ export async function getRoutePlans() {
   const c = getSupabase(); if (!c) return []
   const { data, error } = await c.from('route_plans').select('*').order('createdAt', { ascending: false })
   if (error) { console.error('getRoutePlans error', error); return [] }
+  return data
+}
+
+export async function getTransportRequests() {
+  const c = getSupabase(); if (!c) return []
+  const { data, error } = await c.from('transport_requests').select('*').order('createdAt', { ascending: false })
+  if (error) { console.error('getTransportRequests error', error); return [] }
+  return data
+}
+
+export async function getTransportBids() {
+  const c = getSupabase(); if (!c) return []
+  const { data, error } = await c.from('transport_bids').select('*').order('createdAt', { ascending: false })
+  if (error) { console.error('getTransportBids error', error); return [] }
   return data
 }
 
@@ -217,6 +224,13 @@ export async function setOrderStatus(id: string, status: string) {
   return data
 }
 
+export async function setOrderTransporter(id: string, transporterId: string) {
+  const c = getSupabase(); if (!c) throw new Error('Supabase not configured')
+  const { data, error } = await c.from('orders').update({ transporterId }).eq('id', id).select().single()
+  if (error) { console.error('setOrderTransporter error', error); throw error }
+  return data
+}
+
 export async function addMessage(payload: any) {
   const c = getSupabase(); if (!c) throw new Error('Supabase not configured')
   const { data, error } = await c.from('messages').insert(payload).select().single()
@@ -252,16 +266,18 @@ export async function addInventoryItem(payload: any) {
   return data
 }
 
-export async function addPricingRule(payload: any) {
-  const c = getSupabase(); if (!c) return null
-  const { data, error } = await c.from('pricing_rules').insert(payload).select().single()
-  if (error) console.error('addPricingRule error', error)
-  return data
-}
-
 export async function addPayout(payload: any) {
   const c = getSupabase(); if (!c) return null
-  const { data, error } = await c.from('payouts').insert(payload).select().single()
+  const payoutData = {
+    id: payload.id,
+    userId: payload.userId,
+    listingId: payload.listingId,
+    orderId: payload.orderId,
+    amount: payload.amount,
+    status: payload.status,
+    createdAt: payload.createdAt
+  }
+  const { data, error } = await c.from('payouts').insert(payoutData).select().single()
   if (error) console.error('addPayout error', error)
   return data
 }
@@ -277,5 +293,33 @@ export async function addRoutePlan(payload: any) {
   const c = getSupabase(); if (!c) return null
   const { data, error } = await c.from('route_plans').insert(payload).select().single()
   if (error) console.error('addRoutePlan error', error)
+  return data
+}
+
+export async function addTransportRequest(payload: any) {
+  const c = getSupabase(); if (!c) return null
+  const { data, error } = await c.from('transport_requests').insert(payload).select().single()
+  if (error) console.error('addTransportRequest error', error)
+  return data
+}
+
+export async function updateTransportRequest(id: string, patch: any) {
+  const c = getSupabase(); if (!c) return null
+  const { data, error } = await c.from('transport_requests').update(patch).eq('id', id).select().single()
+  if (error) console.error('updateTransportRequest error', error)
+  return data
+}
+
+export async function addTransportBid(payload: any) {
+  const c = getSupabase(); if (!c) return null
+  const { data, error } = await c.from('transport_bids').insert(payload).select().single()
+  if (error) console.error('addTransportBid error', error)
+  return data
+}
+
+export async function setTransportBidStatus(id: string, status: string) {
+  const c = getSupabase(); if (!c) return null
+  const { data, error } = await c.from('transport_bids').update({ status }).eq('id', id).select().single()
+  if (error) console.error('setTransportBidStatus error', error)
   return data
 }

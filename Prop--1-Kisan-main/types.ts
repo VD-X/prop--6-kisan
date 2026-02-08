@@ -33,15 +33,6 @@ export interface InventoryItem {
   createdAt: string;
 }
 
-export interface PricingRule {
-  id: string;
-  listingId: string;
-  type: 'age' | 'demand' | 'market';
-  adjustmentPercent: number;
-  active: boolean;
-  createdAt: string;
-}
-
 export interface Payout {
   id: string;
   userId: string;
@@ -254,6 +245,38 @@ export interface Order {
   buyerLocation: string;
   transporterId?: string;
   distanceKm?: number; // Simulated
+}
+
+export type TransportMode = 'farmer_arranged' | 'marketplace' | 'buyer_own';
+export type TransportRequestStatus = 'draft' | 'open' | 'awaiting_farmer' | 'assigned' | 'picked_up' | 'in_transit' | 'delivered' | 'cancelled';
+export type TransportBidStatus = 'pending' | 'accepted' | 'rejected' | 'withdrawn';
+
+export interface TransportRequest {
+  id: string;
+  orderId: string;
+  buyerId: string;
+  farmerId: string;
+  pickupLocation: string;
+  dropLocation: string;
+  weightKg: number;
+  vehicleType: 'Bike' | 'Auto' | 'Mini Truck' | 'Pickup' | 'Truck';
+  mode: TransportMode;
+  status: TransportRequestStatus;
+  estimatedFare: number;
+  finalFare?: number;
+  transporterId?: string;
+  deliveryOtp?: string;
+  createdAt: string;
+}
+
+export interface TransportBid {
+  id: string;
+  requestId: string;
+  transporterId: string;
+  amount: number;
+  message?: string;
+  status: TransportBidStatus;
+  createdAt: string;
 }
 
 export interface Transaction {

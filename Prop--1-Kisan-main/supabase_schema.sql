@@ -70,6 +70,34 @@ create table if not exists orders (
   "transporterId" text references users("id")
 );
 
+create table if not exists transport_requests (
+  "id" text primary key,
+  "orderId" text references orders("id"),
+  "buyerId" text references users("id"),
+  "farmerId" text references users("id"),
+  "pickupLocation" text,
+  "dropLocation" text,
+  "weightKg" numeric,
+  "vehicleType" text,
+  "mode" text,
+  "status" text,
+  "estimatedFare" numeric,
+  "finalFare" numeric,
+  "transporterId" text references users("id"),
+  "deliveryOtp" text,
+  "createdAt" timestamp with time zone default timezone('utc'::text, now())
+);
+
+create table if not exists transport_bids (
+  "id" text primary key,
+  "requestId" text references transport_requests("id"),
+  "transporterId" text references users("id"),
+  "amount" numeric,
+  "message" text,
+  "status" text default 'pending',
+  "createdAt" timestamp with time zone default timezone('utc'::text, now())
+);
+
 -- DISPUTES TABLE
 create table if not exists disputes (
   "id" text primary key,
@@ -107,25 +135,15 @@ create table if not exists inventory_items (
   "createdAt" timestamp with time zone default timezone('utc'::text, now())
 );
 
--- PRICING RULES TABLE
-create table if not exists pricing_rules (
-  "id" text primary key,
-  "farmerId" text references users("id"),
-  "cropName" text,
-  "minQuantity" numeric,
-  "pricePerKg" numeric,
-  "effectiveDate" date,
-  "createdAt" timestamp with time zone default timezone('utc'::text, now())
-);
-
 -- PAYOUTS TABLE
 create table if not exists payouts (
   "id" text primary key,
   "userId" text references users("id"),
+  "listingId" text,
+  "orderId" text,
   "amount" numeric,
   "status" text,
-  "date" timestamp with time zone default timezone('utc'::text, now()),
-  "transactionId" text
+  "createdAt" timestamp with time zone default timezone('utc'::text, now())
 );
 
 -- RFQS TABLE
@@ -167,6 +185,12 @@ create policy "Public offers access" on offers for all using (true);
 alter table orders enable row level security;
 create policy "Public orders access" on orders for all using (true);
 
+alter table transport_requests enable row level security;
+create policy "Public transport requests access" on transport_requests for all using (true);
+
+alter table transport_bids enable row level security;
+create policy "Public transport bids access" on transport_bids for all using (true);
+
 alter table disputes enable row level security;
 create policy "Public disputes access" on disputes for all using (true);
 
@@ -175,9 +199,6 @@ create policy "Public messages access" on messages for all using (true);
 
 alter table inventory_items enable row level security;
 create policy "Public inventory access" on inventory_items for all using (true);
-
-alter table pricing_rules enable row level security;
-create policy "Public pricing access" on pricing_rules for all using (true);
 
 alter table payouts enable row level security;
 create policy "Public payouts access" on payouts for all using (true);
