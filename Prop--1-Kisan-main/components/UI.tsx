@@ -55,6 +55,71 @@ export const Input: React.FC<React.InputHTMLAttributes<HTMLInputElement> & { lab
   );
 };
 
+export const OTPInput: React.FC<{
+  length?: number;
+  onComplete: (otp: string) => void;
+  disabled?: boolean;
+}> = ({ length = 6, onComplete, disabled }) => {
+  const [otp, setOtp] = React.useState<string[]>(new Array(length).fill(""));
+  const inputRefs = React.useRef<(HTMLInputElement | null)[]>([]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const val = e.target.value;
+    if (isNaN(Number(val))) return;
+
+    const newOtp = [...otp];
+    // Allow pasting
+    if (val.length > 1) {
+      const pastedData = val.slice(0, length).split("");
+      for (let i = 0; i < length; i++) {
+        newOtp[i] = pastedData[i] || "";
+      }
+      setOtp(newOtp);
+      if (newOtp.every(digit => digit !== "")) {
+        onComplete(newOtp.join(""));
+      }
+      inputRefs.current[Math.min(val.length, length - 1)]?.focus();
+      return;
+    }
+
+    newOtp[index] = val;
+    setOtp(newOtp);
+
+    // Move to next input if value is entered
+    if (val && index < length - 1) {
+      inputRefs.current[index + 1]?.focus();
+    }
+
+    if (newOtp.every(digit => digit !== "")) {
+      onComplete(newOtp.join(""));
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  return (
+    <div className="flex gap-2 justify-center">
+      {otp.map((digit, index) => (
+        <input
+          key={index}
+          ref={(el) => { inputRefs.current[index] = el; }}
+          type="text"
+          maxLength={length}
+          value={digit}
+          disabled={disabled}
+          onChange={e => handleChange(e, index)}
+          onKeyDown={e => handleKeyDown(e, index)}
+          className="w-12 h-14 text-center text-xl font-bold border-2 border-slate-200 rounded-xl focus:border-nature-600 focus:ring-4 focus:ring-nature-600/20 outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-white"
+        />
+      ))}
+    </div>
+  );
+};
+
 export const Card: React.FC<{ children: React.ReactNode; className?: string; onClick?: () => void }> = ({ children, className = '', onClick }) => (
   <div 
     onClick={onClick}

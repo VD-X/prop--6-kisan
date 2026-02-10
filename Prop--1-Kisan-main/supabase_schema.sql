@@ -25,9 +25,24 @@ create table if not exists listings (
   "pricePerKg" numeric,
   "description" text,
   "imageUrls" text[],
+  "videoUrl" text,
+  "videoDurationSec" numeric,
+  "videoSizeBytes" numeric,
+  "videoType" text,
+  "videoThumbnail" text,
   "location" text,
   "status" text default 'active',
   "harvestDate" date,
+  "variety" text,
+  "quantityUnit" text,
+  "priceUnit" text,
+  "availableDate" date,
+  "storageType" text,
+  "moistureContent" numeric,
+  "minOrderQuantity" numeric,
+  "minOrderQuantityUnit" text,
+  "packagingDetails" text,
+  "certification" text[],
   "createdAt" timestamp with time zone default timezone('utc'::text, now())
 );
 
@@ -37,6 +52,7 @@ create table if not exists offers (
   "listingId" text references listings("id"),
   "cropName" text,
   "buyerName" text,
+  "buyerId" text references users("id"), -- Added for RLS
   "buyerLocation" text,
   "pricePerKg" numeric,
   "quantity" numeric, 
@@ -65,11 +81,15 @@ create table if not exists orders (
   "status" text,
   "date" timestamp with time zone default timezone('utc'::text, now()),
   "farmerName" text,
+  "farmerId" text references users("id"), -- Added for RLS
   "farmerLocation" text,
   "buyerName" text,
+  "buyerId" text references users("id"), -- Added for RLS
   "buyerLocation" text,
   "distanceKm" numeric,
-  "transporterId" text references users("id")
+  "transporterId" text references users("id"),
+  "paymentStatus" text,
+  "paymentProof" text
 );
 
 create table if not exists transport_requests (
@@ -180,42 +200,163 @@ insert into storage.buckets (id, name, public) values ('media', 'media', true)
 on conflict (id) do nothing;
 
 -- RLS POLICIES
-alter table users enable row level security;
-create policy "Public users access" on users for all using (true);
 
-alter table listings enable row level security;
-create policy "Public listings access" on listings for all using (true);
+-- 1. USERS
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public users access" ON users;
+DROP POLICY IF EXISTS "Public read access" ON users;
+DROP POLICY IF EXISTS "User update own profile" ON users;
+DROP POLICY IF EXISTS "User insert own profile" ON users;
 
-alter table offers enable row level security;
-create policy "Public offers access" on offers for all using (true);
+CREATE POLICY "Public read access" ON users FOR SELECT USING (true);
+CREATE POLICY "User update own profile" ON users FOR UPDATE USING (auth.uid()::text = id);
+CREATE POLICY "User insert own profile" ON users FOR INSERT WITH CHECK (auth.uid()::text = id);
 
-alter table orders enable row level security;
-create policy "Public orders access" on orders for all using (true);
+-- 2. LISTINGS
+ALTER TABLE listings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public listings access" ON listings;
+DROP POLICY IF EXISTS "Public read listings" ON listings;
+DROP POLICY IF EXISTS "Farmer insert listings" ON listings;
+DROP POLICY IF EXISTS "Farmer update listings" ON listings;
+DROP POLICY IF EXISTS "Farmer delete listings" ON listings;
 
-alter table transport_requests enable row level security;
-create policy "Public transport requests access" on transport_requests for all using (true);
+CREATE POLICY "Public read listings" ON listings FOR SELECT USING (true);
+CREATE POLICY "Farmer insert listings" ON listings FOR INSERT WITH CHECK (auth.uid()::text = "farmerId");
+CREATE POLICY "Farmer update listings" ON listings FOR UPDATE USING (auth.uid()::text = "farmerId");
+CREATE POLICY "Farmer delete listings" ON listings FOR DELETE USING (auth.uid()::text = "farmerId");
 
-alter table transport_bids enable row level security;
-create policy "Public transport bids access" on transport_bids for all using (true);
+-- 3. OFFERS
+ALTER TABLE offers ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public offers access" ON offers;
+DROP POLICY IF EXISTS "Read offers" ON offers;
+DROP POLICY IF EXISTS "Buyer create offer" ON offers;
+DROP POLICY IF EXISTS "Update offer" ON offers;
 
-alter table disputes enable row level security;
+CREATE POLICY "Read offers" ON offers FOR SELECT USING (
+  auth.uid()::text = "buyerId" OR 
+  EXISTS (SELECT 1 FROM listings WHERE listings.id = offers."listingId" AND listings."farmerId" = auth.uid()::text)
+);
+CREATE POLICY "Buyer create offer" ON offers FOR INSERT WITH CHECK (auth.uid()::text = "buyerId");
+CREATE POLICY "Update offer" ON offers FOR UPDATE USING (
+  auth.uid()::text = "buyerId" OR 
+  EXISTS (SELECT 1 FROM listings WHERE listings.id = offers."listingId" AND listings."farmerId" = auth.uid()::text)
+);
+
+-- 4. ORDERS
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public orders access" ON orders;
+DROP POLICY IF EXISTS "Read orders" ON orders;
+DROP POLICY IF EXISTS "Create orders" ON orders;
+DROP POLICY IF EXISTS "Update orders" ON orders;
+
+CREATE POLICY "Read orders" ON orders FOR SELECT USING (
+  auth.uid()::text = "buyerId" OR 
+  auth.uid()::text = "farmerId" OR 
+  auth.uid()::text = "transporterId"
+);
+CREATE POLICY "Create orders" ON orders FOR INSERT WITH CHECK (
+  auth.uid()::text = "buyerId" OR auth.uid()::text = "farmerId"
+);
+CREATE POLICY "Update orders" ON orders FOR UPDATE USING (
+  auth.uid()::text = "buyerId" OR 
+  auth.uid()::text = "farmerId" OR 
+  auth.uid()::text = "transporterId"
+);
+
+-- 5. TRANSPORT REQUESTS
+ALTER TABLE transport_requests ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public transport requests access" ON transport_requests;
+DROP POLICY IF EXISTS "Read transport requests" ON transport_requests;
+DROP POLICY IF EXISTS "Transporter view open requests" ON transport_requests;
+DROP POLICY IF EXISTS "Involved parties view requests" ON transport_requests;
+DROP POLICY IF EXISTS "Create transport requests" ON transport_requests;
+DROP POLICY IF EXISTS "Update transport requests" ON transport_requests;
+
+CREATE POLICY "Transporter view open requests" ON transport_requests FOR SELECT USING (
+   "transporterId" IS NULL
+);
+CREATE POLICY "Involved parties view requests" ON transport_requests FOR SELECT USING (
+  auth.uid()::text = "buyerId" OR 
+  auth.uid()::text = "farmerId" OR 
+  auth.uid()::text = "transporterId"
+);
+CREATE POLICY "Create transport requests" ON transport_requests FOR INSERT WITH CHECK (
+  auth.uid()::text = "buyerId" OR auth.uid()::text = "farmerId"
+);
+CREATE POLICY "Update transport requests" ON transport_requests FOR UPDATE USING (
+  auth.uid()::text = "buyerId" OR 
+  auth.uid()::text = "farmerId" OR 
+  auth.uid()::text = "transporterId"
+);
+
+-- 6. TRANSPORT BIDS
+ALTER TABLE transport_bids ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public transport bids access" ON transport_bids;
+DROP POLICY IF EXISTS "Read transport bids" ON transport_bids;
+DROP POLICY IF EXISTS "Transporter create bid" ON transport_bids;
+DROP POLICY IF EXISTS "Transporter update bid" ON transport_bids;
+
+CREATE POLICY "Read transport bids" ON transport_bids FOR SELECT USING (
+  auth.uid()::text = "transporterId" OR
+  EXISTS (SELECT 1 FROM transport_requests WHERE transport_requests.id = transport_bids."requestId" AND (transport_requests."buyerId" = auth.uid()::text OR transport_requests."farmerId" = auth.uid()::text))
+);
+CREATE POLICY "Transporter create bid" ON transport_bids FOR INSERT WITH CHECK (
+  auth.uid()::text = "transporterId"
+);
+CREATE POLICY "Transporter update bid" ON transport_bids FOR UPDATE USING (
+  auth.uid()::text = "transporterId"
+);
+
+-- 7. DISPUTES
+ALTER TABLE disputes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public disputes access" ON disputes;
+-- Only admin or involved parties (TODO: Link dispute to user more explicitly)
+-- For now, open access to allow functionality as user ID is not in dispute table directly (only raisedBy name/role?)
+-- Actually, we should add userId to disputes. But for now, let's keep it simple or allow public read for demo?
+-- Let's stick to Public for disputes for now as it needs schema change to secure properly.
 create policy "Public disputes access" on disputes for all using (true);
 
-alter table messages enable row level security;
-create policy "Public messages access" on messages for all using (true);
+-- 8. MESSAGES
+ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public messages access" ON messages;
+DROP POLICY IF EXISTS "Read messages" ON messages;
+DROP POLICY IF EXISTS "Send messages" ON messages;
 
-alter table inventory_items enable row level security;
-create policy "Public inventory access" on inventory_items for all using (true);
+CREATE POLICY "Read messages" ON messages FOR SELECT USING (
+  auth.uid()::text = "fromUserId" OR auth.uid()::text = "toUserId"
+);
+CREATE POLICY "Send messages" ON messages FOR INSERT WITH CHECK (
+  auth.uid()::text = "fromUserId"
+);
 
-alter table payouts enable row level security;
-create policy "Public payouts access" on payouts for all using (true);
+-- 9. INVENTORY ITEMS
+ALTER TABLE inventory_items ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public inventory access" ON inventory_items;
+DROP POLICY IF EXISTS "Farmer manage inventory" ON inventory_items;
 
-alter table rfqs enable row level security;
-create policy "Public rfqs access" on rfqs for all using (true);
+CREATE POLICY "Farmer manage inventory" ON inventory_items FOR ALL USING (
+  auth.uid()::text = "farmerId"
+);
 
-alter table route_plans enable row level security;
-create policy "Public route_plans access" on route_plans for all using (true);
+-- 10. PAYOUTS
+ALTER TABLE payouts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public payouts access" ON payouts;
+CREATE POLICY "User view payouts" ON payouts FOR SELECT USING (auth.uid()::text = "userId");
+
+-- 11. RFQS
+ALTER TABLE rfqs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public rfqs access" ON rfqs;
+CREATE POLICY "Public read rfqs" ON rfqs FOR SELECT USING (true);
+CREATE POLICY "Buyer manage rfqs" ON rfqs FOR ALL USING (auth.uid()::text = "buyerId");
+
+-- 12. ROUTE PLANS
+ALTER TABLE route_plans ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public route_plans access" ON route_plans;
+CREATE POLICY "Public read route plans" ON route_plans FOR SELECT USING (true);
+CREATE POLICY "Transporter manage routes" ON route_plans FOR ALL USING (auth.uid()::text = "transporterId");
 
 -- STORAGE POLICIES
+DROP POLICY IF EXISTS "Public Media Access" ON storage.objects;
+DROP POLICY IF EXISTS "Public Media Upload" ON storage.objects;
 create policy "Public Media Access" on storage.objects for select using ( bucket_id = 'media' );
 create policy "Public Media Upload" on storage.objects for insert with check ( bucket_id = 'media' );

@@ -88,7 +88,7 @@ import {
    CreditCard,
    Upload
 } from 'lucide-react';
-import { Button, Input, Card } from './components/UI';
+import { Button, Input, Card, OTPInput } from './components/UI';
 import VoiceInput from './components/VoiceInput';
 // import TradeAnimation from './components/TradeAnimation';
 // import HarvestBackground from './components/HarvestBackground';
@@ -123,110 +123,15 @@ import {
 } from './types';
 
 // --- MOCK DATA ---
-const INITIAL_USERS: User[] = [
-   {
-      id: 'f1',
-      phone: '9999999999',
-      email: 'farmer@kisan.com',
-      role: 'farmer',
-      status: 'active',
-      createdAt: '2023-01-15',
-      profile: {
-         fullName: 'Rajesh Kumar',
-         village: 'Sehore',
-         district: 'Sehore',
-         state: 'Madhya Pradesh',
-         language: 'Hindi',
-         rating: 4.8,
-         totalSales: 24,
-         memberSince: '2023-01-15',
-         totalLandArea: '5',
-         landUnit: 'Acres',
-         landType: 'Owned',
-         irrigationSource: 'Borewell',
-         currentCrops: ['Wheat', 'Soybean'],
-         farmingPractices: ['Organic']
-      } as FarmerProfile
-   },
-   {
-      id: 'b1',
-      phone: '8888888888',
-      email: 'buyer@kisan.com',
-      role: 'buyer',
-      status: 'active',
-      createdAt: '2023-02-20',
-      profile: {
-         fullName: 'Amit Verma',
-         businessName: 'Verma Traders',
-         city: 'Indore',
-         state: 'Madhya Pradesh',
-         language: 'Hindi',
-         rating: 4.5,
-         completedDeals: 15,
-         memberSince: '2023-02-20',
-         buyerType: 'Wholesaler',
-         procurementRegions: ['Indore', 'Ujjain'],
-         preferredCrops: ['Wheat', 'Soybean', 'Maize'],
-         purchaseCapacity: 'Medium (1–5 tons)',
-         purchaseFrequency: 'Weekly'
-      } as BuyerProfile
-   },
-   {
-      id: 't1',
-      phone: '7777777777',
-      email: 'transport@kisan.com',
-      role: 'transporter',
-      status: 'active',
-      createdAt: '2023-03-10',
-      profile: {
-         fullName: 'Sartaj Singh',
-         vehicleType: 'Pickup Truck',
-         maxCapacity: '1500',
-         approvalStatus: 'approved',
-         city: 'Bhopal',
-         state: 'Madhya Pradesh',
-         language: 'Hindi',
-         vehicleNumber: 'MP04GA1234',
-         operatingRegions: ['Bhopal', 'Sehore', 'Indore'],
-         routeType: 'Inter-district',
-         canHandlePerishables: true,
-         canHandleBulk: false,
-         isCoveredVehicle: true,
-         availability: 'Full-time',
-         rating: 4.9,
-         totalDeliveries: 42,
-         onTimeDeliveryRate: 98,
-         memberSince: '2023-03-10'
-      } as TransporterProfile
-   },
-];
+const INITIAL_USERS: User[] = [];
 
-const INITIAL_LISTINGS: CropListing[] = [
-   { id: '1', farmerId: 'f1', farmerName: 'Rajesh Kumar', cropName: 'Wheat (Sharbati)', grade: 'A', quantity: 500, availableQuantity: 500, pricePerKg: 28, description: 'High quality Sharbati wheat, freshly harvested.', imageUrls: ['https://picsum.photos/400/300?random=1'], location: 'Sehore, MP', status: 'active', harvestDate: '2023-10-15', createdAt: new Date().toISOString() },
-   { id: '2', farmerId: 'f2', farmerName: 'Sunita Devi', cropName: 'Tomato (Hybrid)', grade: 'B', quantity: 200, availableQuantity: 200, pricePerKg: 15, description: 'Red ripe tomatoes, suitable for processing.', imageUrls: ['https://picsum.photos/400/300?random=2'], location: 'Nashik, MH', status: 'active', harvestDate: '2023-10-20', createdAt: new Date().toISOString() },
-];
+const INITIAL_LISTINGS: CropListing[] = [];
 
-const INITIAL_ORDERS: Order[] = [
-   { id: 'o1', listingId: '1', cropName: 'Wheat (Sharbati)', quantity: 100, totalAmount: 2800, status: 'in_transit', date: '2023-10-25', farmerName: 'Rajesh Kumar', farmerLocation: 'Sehore', buyerName: 'Verma Traders', buyerLocation: 'Indore', distanceKm: 45, transporterId: 't1', paymentStatus: 'pending' },
-   { id: 'o2', listingId: '2', cropName: 'Tomato (Hybrid)', quantity: 500, totalAmount: 7500, status: 'confirmed', date: '2023-10-26', farmerName: 'Sunita Devi', farmerLocation: 'Nashik', buyerName: 'Fresh Mart', buyerLocation: 'Mumbai', distanceKm: 160, paymentStatus: 'paid' }
-];
+const INITIAL_ORDERS: Order[] = [];
 
-const MOCK_HISTORY: Transaction[] = [
-   { id: 'h1', date: '2023-09-15', type: 'sale', itemName: 'Wheat (Sharbati)', counterpartyName: 'Verma Traders', amount: 28000, quantity: 1000, status: 'completed', rating: 5 },
-   { id: 'h2', date: '2023-08-10', type: 'sale', itemName: 'Soybean', counterpartyName: 'Agro Corp', amount: 45000, quantity: 900, status: 'completed', rating: 4 },
-   { id: 'h3', date: '2023-07-22', type: 'sale', itemName: 'Tomato', counterpartyName: 'Fresh Mart', amount: 12000, quantity: 400, status: 'completed', rating: 5 },
-   { id: 'h4', date: '2023-09-01', type: 'purchase', itemName: 'Wheat (Sharbati)', counterpartyName: 'Rajesh Kumar', amount: 28000, quantity: 1000, status: 'completed', rating: 5 },
-   { id: 'h5', date: '2023-09-20', type: 'delivery', itemName: 'Sehore to Indore', counterpartyName: 'Verma Traders', amount: 1200, status: 'completed', rating: 5 }
-];
+const MOCK_HISTORY: Transaction[] = [];
 
-const MOCK_NOTIFICATIONS = [
-   { id: 'n1', type: 'offer' as const, title: 'New Offer Received', message: 'Verma Traders offered ₹32/kg for your Wheat listing (500 kg).', timestamp: '2 hours ago', isRead: false },
-   { id: 'n2', type: 'order' as const, title: 'Order Confirmed', message: 'Your order #ORD-2023-456 has been confirmed and is ready for pickup.', timestamp: '5 hours ago', isRead: false },
-   { id: 'n3', type: 'price' as const, title: 'Price Alert: Wheat', message: 'Wheat prices have increased by 8% in your district. Current rate: ₹34/kg.', timestamp: '1 day ago', isRead: true },
-   { id: 'n4', type: 'system' as const, title: 'Profile Incomplete', message: 'Complete your profile to get 20% more visibility to buyers.', timestamp: '2 days ago', isRead: true },
-   { id: 'n5', type: 'offer' as const, title: 'Counter Offer', message: 'Agro Corp countered your price for Soybean at ₹48/kg.', timestamp: '3 days ago', isRead: true },
-   { id: 'n6', type: 'order' as const, title: 'Payment Received', message: 'You received ₹28,000 for Order #ORD-2023-321. Check your bank.', timestamp: '5 days ago', isRead: true },
-];
+const MOCK_NOTIFICATIONS = [];
 
 const FAQ_DATA = [
    { q: 'How do I list my crops for sale?', a: 'Go to "My Crops" section and click "Add New Crop". Upload photos, enter quantity and price, and publish your listing.' },
@@ -236,19 +141,7 @@ const FAQ_DATA = [
    { q: 'Is my data secure?', a: 'Yes, we use bank-grade encryption to protect your personal and financial information. We never share your data with third parties.' },
 ];
 
-const INITIAL_DISPUTES: Dispute[] = [
-   {
-      id: 'd1',
-      orderId: 'o1',
-      raisedBy: 'Amit Verma',
-      role: 'buyer',
-      issue: 'Quality mismatch: Received Grade C instead of A',
-      details: 'The wheat delivered contains higher moisture content than agreed (14% vs 10%). Also found foreign matter in 2 bags.',
-      amount: 2800,
-      status: 'open',
-      createdAt: new Date().toISOString()
-   }
-];
+const INITIAL_DISPUTES: Dispute[] = [];
 
 // --- 1. LANDING PAGE ---
 const LandingPage = ({ onGetStarted, onAdminLogin }: { onGetStarted: (role?: UserRole, mode?: 'login' | 'register') => void, onAdminLogin: () => void }) => {
@@ -361,73 +254,138 @@ const AdminLogin = ({ onLogin, onBack }: { onLogin: () => void, onBack: () => vo
    );
 };
 
-const AuthWizard = ({ initialRole, initialMode = 'login', onComplete, onBack, existingUsers }: { initialRole: UserRole | null, initialMode?: 'login' | 'register', onComplete: (user: any) => void, onBack: () => void, existingUsers: User[] }) => {
-   const [step, setStep] = useState<'identity' | 'verify' | 'password' | 'role-confirm' | 'profile'>('identity');
-   const [isLoginMode, setIsLoginMode] = useState(initialMode === 'login');
+const AuthWizard = ({ initialRole, initialMode = 'login', onComplete, onBack }: { initialRole: UserRole | null, initialMode?: 'login' | 'register', onComplete: (user: any) => void, onBack: () => void }) => {
+   const [step, setStep] = useState<'role-select' | 'auth' | 'profile'>(initialRole ? 'auth' : 'role-select');
+   const [isLoginMode, setAuthMode] = useState<'login' | 'register'>(initialMode);
+   const [isLoading, setIsLoading] = useState(false);
    const [formData, setFormData] = useState({
       role: initialRole,
-      phone: '',
       email: '',
+      phone: '',
       password: '',
       confirmPassword: '',
+      userId: '',
       profile: {} as any
    });
 
-   // If explicitly set to 'register' mode, ensure we show registration fields immediately or adjust flow
-   // However, our flow relies on Phone Check first.
-   // To "separate" them, we can enforce the mode:
-   // If isLoginMode is true, we expect the user to exist.
-   // If isLoginMode is false, we expect the user to be new.
+   const getAuthErrorMessage = (err: any) => {
+      const code = err?.code as string | undefined;
+      const msg = (err?.message || '').toString();
+      const msgLower = msg.toLowerCase();
+      if (code === 'user_already_exists' || msgLower.includes('already registered') || msgLower.includes('already been registered') || msgLower.includes('already exists')) {
+         return "An account already exists for this number. Please login instead.";
+      }
+      if (code === 'invalid_credentials' || msgLower.includes('invalid login')) {
+         return "Invalid number or password.";
+      }
+      if (code === 'password_not_set') {
+         return "Password login is not enabled for this user.";
+      }
+      return msg || "Authentication failed";
+   };
 
-   const [otp, setOtp] = useState('');
-   const [emailVerified, setEmailVerified] = useState(false);
+   const withTimeout = async <T,>(label: string, promise: Promise<T>, ms = 20000) => {
+      let timer: any;
+      try {
+         return await Promise.race([
+            promise,
+            new Promise<T>((_, reject) => {
+               timer = setTimeout(() => reject(new Error(`request_timeout:${label}`)), ms);
+            })
+         ]);
+      } finally {
+         if (timer) clearTimeout(timer);
+      }
+   };
 
-   const checkIdentity = async () => {
-      const users = await svc.getUsers();
-      const existingUser = users.find((u: any) => u.phone === formData.phone);
+   const handleRoleSelect = (role: UserRole) => {
+      setFormData(prev => ({ ...prev, role }));
+      setStep('auth');
+   };
+
+   const handleSubmit = async () => {
+      if (!formData.phone || !formData.password) {
+         alert("Please enter mobile number and password");
+         return;
+      }
       
-      if (isLoginMode) {
-         if (existingUser) {
-             setStep('password');
-         } else {
-             alert("Account not found. Please register first.");
-         }
-      } else {
-         if (existingUser) {
-             alert("Account already exists. Please login.");
-             setIsLoginMode(true);
-         } else {
-             setStep('verify');
-         }
-      }
-   };
+      setIsLoading(true);
 
-   const handleVerify = () => {
-      if (otp === '1234' && emailVerified) {
-         setStep('password');
-      } else {
-         alert("Please enter OTP '1234' and verify email.");
-      }
-   };
-
-   const handlePasswordSubmit = async () => {
-      if (isLoginMode) {
-         const loggedInUser = await svc.loginUser(formData.phone);
-         
-         if (loggedInUser) {
-            if (loggedInUser.status === 'suspended') {
-               alert("Account suspended. Please contact admin.");
+      try {
+         if (isLoginMode === 'register') {
+            if (formData.password !== formData.confirmPassword) {
+               alert("Passwords do not match");
                return;
             }
-            // Verify password (mock check since we don't store passwords securely in this demo)
-            // In a real app, this would be handled by Supabase Auth or a backend check
-            onComplete(loggedInUser);
+            if (formData.password.length < 6) {
+               alert("Password must be at least 6 characters");
+               return;
+            }
+
+            const res: any = await withTimeout('register', svc.registerWithPhonePassword(formData.phone, formData.password, { role: formData.role || undefined, email: null }), 25000);
+            if (res?.error) {
+               const friendly = getAuthErrorMessage(res.error);
+               alert(friendly);
+               if (friendly.toLowerCase().includes('already exists')) setAuthMode('login');
+               return;
+            }
+
+            const userId = res?.data?.id;
+            if (!userId) return;
+
+            setFormData(prev => ({ ...prev, userId }));
+            setStep('profile');
+         } else {
+            const res: any = await withTimeout('login', svc.loginWithPhonePassword(formData.phone, formData.password), 25000);
+            if (res?.error) { alert(getAuthErrorMessage(res.error)); return; }
+
+            const userId = res?.data?.id;
+            if (!userId) return;
+
+            const hasProfile = !!res?.data?.profile && !!res?.data?.role
+            if (hasProfile) {
+               onComplete(res.data);
+               return;
+            }
+
+            alert("Login successful. Please complete your profile to continue.");
+            setFormData(prev => ({ ...prev, userId, role: (res?.data?.role as any) || prev.role, email: (res?.data?.email as any) || '' }));
+            setStep('profile');
          }
-         else alert("User not found or password incorrect");
-      } else {
-         setStep('role-confirm');
+      } catch (e: any) {
+         const message = (e?.message || '').toString();
+         if (message.startsWith('request_timeout:')) {
+            const label = message.split(':')[1] || 'request'
+            const c = getSupabase()
+            const session = c ? (await c.auth.getSession()).data.session : null
+            const sessionUserId = session?.user?.id
+            if (label === 'sign_in' && sessionUserId) {
+               const profile = await withTimeout('fetch_profile', svc.getUserById(sessionUserId), 25000)
+               if (profile) {
+                  onComplete(profile)
+                  return
+               }
+               alert("Login succeeded, but your profile is not set up yet. Please complete your profile to continue.");
+               setFormData(prev => ({ ...prev, userId: sessionUserId }));
+               setStep('profile');
+               return
+            }
+
+            const net = await svc.checkSupabaseConnectivity(8000)
+            const authPart = net?.auth?.ok ? `auth=${net.auth.status}` : `auth_error=${net?.auth?.error || 'unknown'}`
+            const restPart = net?.rest?.ok ? `rest=${net.rest.status}` : `rest_error=${net?.rest?.error || 'unknown'}`
+            alert(`Request timed out during ${label}. Connectivity: ${authPart}, ${restPart}. If rest/auth are failing, disable AdBlock/VPN, try Incognito, and allow requests to *.supabase.co.`);
+            return
+         }
+         alert(getAuthErrorMessage(e));
+      } finally {
+         setIsLoading(false);
       }
    };
+
+   if (step === 'role-select') {
+      return <ChooseRole onSelect={handleRoleSelect} onBack={onBack} />;
+   }
 
    return (
       <div className="w-full max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-8">
@@ -451,125 +409,32 @@ const AuthWizard = ({ initialRole, initialMode = 'login', onComplete, onBack, ex
 
             {/* Right Side - Form */}
             <div className="flex-1 p-8 md:p-12 bg-white flex flex-col justify-center">
-               {step === 'identity' && (
-                  <div className="space-y-6 max-w-sm mx-auto w-full">
-                     <div>
-                        <h2 className="text-3xl font-bold text-slate-900 mb-2">
-                           {isLoginMode ? 'Login' : `Register`}
-                        </h2>
-                        <p className="text-slate-500">
-                           {isLoginMode ? 'Enter your registered mobile number.' : 'Create a new account to get started.'}
-                        </p>
-                     </div>
-                     <div className="space-y-5">
-                        <Input label="Mobile Number" placeholder="98765 43210" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })} icon={<Phone className="w-4 h-4" />} />
-                        {!isLoginMode && <Input label="Email Address" type="email" placeholder="you@example.com" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} icon={<Mail className="w-4 h-4" />} />}
-                        <Button className="w-full h-12 text-lg shadow-lg shadow-nature-600/20" onClick={checkIdentity} disabled={!formData.phone || (!isLoginMode && !formData.email)}>
-                           Continue <ArrowRight className="w-4 h-4 ml-2" />
-                        </Button>
-                        <div className="text-center pt-2">
-                            <button onClick={() => setIsLoginMode(!isLoginMode)} className="text-sm font-medium text-blue-600 hover:text-blue-800 underline">
-                                {isLoginMode ? 'New user? Create an account' : 'Already have an account? Login'}
-                            </button>
+               
+               {step === 'auth' && (
+                  <div className="w-full max-w-sm mx-auto animate-in fade-in slide-in-from-bottom-8">
+                     <div className="text-center mb-8">
+                        <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-nature-600/10 mx-auto mb-4">
+                           <Phone className="w-8 h-8 text-nature-600" />
                         </div>
+                        <h2 className="text-2xl font-bold text-slate-900 mb-2">{isLoginMode === 'login' ? 'Welcome Back' : 'Create Account'}</h2>
+                        <p className="text-slate-500 text-sm">{isLoginMode === 'login' ? 'Login with your mobile number and password.' : 'Register with your mobile number and password.'}</p>
                      </div>
-                  </div>
-               )}
-
-               {step === 'verify' && (
-                  <div className="space-y-8 max-w-sm mx-auto w-full">
-                     <div className="text-center">
-                        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600"><ShieldCheck className="w-8 h-8" /></div>
-                        <h2 className="text-2xl font-bold text-slate-900">Verify Identity</h2>
-                        <p className="text-slate-500 text-sm mt-1">We sent a code to <span className="font-bold text-slate-800">{formData.phone}</span></p>
-                     </div>
-
-                     <div className="space-y-6">
-                        <div>
-                           <label className="text-xs font-bold text-slate-400 uppercase block mb-3 text-center">Enter 4-Digit OTP</label>
-                           <div className="flex gap-3 justify-center">
-                              {[0, 1, 2, 3].map(i => (
-                                 <input
-                                    key={i}
-                                    id={`otp-${i}`}
-                                    maxLength={1}
-                                    className="w-14 h-16 text-center text-3xl font-bold bg-slate-50 border border-slate-200 rounded-xl focus:border-nature-500 focus:ring-4 focus:ring-nature-500/10 outline-none transition-all"
-                                    value={otp[i] || ''}
-                                    onChange={e => {
-                                       const v = e.target.value;
-                                       if (/^\d*$/.test(v)) {
-                                          const n = otp.split('');
-                                          n[i] = v;
-                                          setOtp(n.join(''));
-                                          if (v && i < 3) document.getElementById(`otp-${i + 1}`)?.focus();
-                                       }
-                                    }}
-                                    onKeyDown={e => {
-                                       if (e.key === 'Backspace' && !otp[i] && i > 0) {
-                                          const n = otp.split('');
-                                          n[i - 1] = '';
-                                          setOtp(n.join(''));
-                                          document.getElementById(`otp-${i - 1}`)?.focus();
-                                       }
-                                    }}
-                                 />
-                              ))}
-                           </div>
-                        </div>
-
-                        <div className="p-4 rounded-xl border border-dashed border-slate-300 bg-slate-50 flex items-center justify-between">
-                           <div className="flex items-center gap-3">
-                              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${emailVerified ? 'bg-green-100 text-green-600' : 'bg-slate-200 text-slate-400'}`}><Mail className="w-4 h-4" /></div>
-                              <div className="text-sm">
-                                 <div className="font-medium text-slate-900">Email Verification</div>
-                                 <div className="text-xs text-slate-500">{emailVerified ? 'Verified' : 'Pending check'}</div>
-                              </div>
-                           </div>
-                           {!emailVerified && <Button size="sm" variant="outline" onClick={() => setEmailVerified(true)}>Verify</Button>}
-                           {emailVerified && <CheckCircle className="w-5 h-5 text-green-600" />}
-                        </div>
-
-                        <Button className="w-full h-12" onClick={handleVerify} disabled={otp.length !== 4 || !emailVerified}>Verify & Continue</Button>
-                     </div>
-                  </div>
-               )}
-
-               {step === 'password' && (
-                  <div className="space-y-6 max-w-sm mx-auto w-full">
-                     <div>
-                        <h2 className="text-2xl font-bold text-slate-900 mb-2">{isLoginMode ? 'Enter Password' : 'Set Password'}</h2>
-                        <p className="text-slate-500 text-sm">{isLoginMode ? 'Welcome back! Please login.' : 'Secure your account.'}</p>
-                     </div>
-                     <div className="space-y-5">
+                     <div className="space-y-4">
+                        <Input label="Mobile Number" placeholder="9876543210" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} icon={<Phone className="w-4 h-4" />} type="tel" />
                         <Input label="Password" type="password" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} icon={<Lock className="w-4 h-4" />} />
-                        {!isLoginMode && (
-                           <>
-                              <Input label="Confirm Password" type="password" value={formData.confirmPassword} onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })} icon={<ShieldCheck className="w-4 h-4" />} />
-                              <div className="flex gap-1 h-1 bg-slate-100 rounded-full overflow-hidden">
-                                 {[1, 2, 3, 4].map(i => (<div key={i} className={`flex-1 transition-all duration-500 ${formData.password.length >= (i * 2) ? 'bg-nature-500' : 'bg-transparent'}`} />))}
-                              </div>
-                           </>
+                        
+                        {isLoginMode === 'register' && (
+                           <Input label="Confirm Password" type="password" value={formData.confirmPassword} onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })} icon={<ShieldCheck className="w-4 h-4" />} />
                         )}
-                        <Button className="w-full h-12" onClick={handlePasswordSubmit} disabled={isLoginMode ? formData.password.length < 4 : (formData.password.length < 8 || formData.password !== formData.confirmPassword)}>
-                           {isLoginMode ? 'Login' : 'Create Account'}
+ 
+                        <Button className="w-full h-12" onClick={handleSubmit} disabled={isLoading}>
+                           {isLoading ? 'Processing...' : (isLoginMode === 'login' ? 'Login' : 'Continue')}
                         </Button>
-                     </div>
-                  </div>
-               )}
-
-               {step === 'role-confirm' && (
-                  <div className="space-y-8 max-w-sm mx-auto w-full text-center">
-                     <div className="w-20 h-20 bg-nature-50 rounded-full flex items-center justify-center mx-auto text-nature-600 mb-2"><UserIcon className="w-10 h-10" /></div>
-                     <div>
-                        <h2 className="text-2xl font-bold text-slate-900">Confirm Role</h2>
-                        <p className="text-slate-500 mt-2">You are registering as a <span className="font-bold text-nature-700 uppercase bg-nature-100 px-2 py-0.5 rounded">{formData.role}</span></p>
-                     </div>
-                     <div className="p-4 bg-yellow-50 text-yellow-800 text-sm rounded-xl border border-yellow-100">
-                        ⚠️ This cannot be changed later.
-                     </div>
-                     <div className="space-y-3">
-                        <Button className="w-full h-12" onClick={() => setStep('profile')}>Confirm & Continue</Button>
-                        <Button variant="ghost" className="w-full" onClick={() => onBack()}>Change Role</Button>
+                        <div className="text-center">
+                           <button onClick={() => setAuthMode(isLoginMode === 'login' ? 'register' : 'login')} className="text-sm font-medium text-nature-600 hover:text-nature-700 underline">
+                              {isLoginMode === 'login' ? "New here? Create Account" : "Already have an account? Login"}
+                           </button>
+                        </div>
                      </div>
                   </div>
                )}
@@ -580,9 +445,24 @@ const AuthWizard = ({ initialRole, initialMode = 'login', onComplete, onBack, ex
                         <h2 className="text-2xl font-bold text-slate-900">Complete Profile</h2>
                         <p className="text-slate-500">Tell us more about yourself to get the best experience.</p>
                      </div>
-                     {formData.role === 'farmer' && <FarmerRegistration onSubmit={(p) => onComplete({ ...formData, profile: p })} />}
-                     {formData.role === 'buyer' && <BuyerRegistration onSubmit={(p) => onComplete({ ...formData, profile: p })} />}
-                     {formData.role === 'transporter' && <TransporterRegistration onSubmit={(p) => onComplete({ ...formData, profile: p })} />}
+                     {formData.role === 'farmer' && <FarmerRegistration onSubmit={async (p) => {
+                        const userPayload = { id: formData.userId, email: formData.email, phone: formData.phone || null, role: formData.role, status: 'active', createdAt: new Date().toISOString(), profile: p };
+                        const saved = await svc.addUser(userPayload);
+                        if (!saved) { alert('Failed to save profile. Check Supabase RLS/policies.'); return; }
+                        onComplete(saved);
+                     }} />}
+                     {formData.role === 'buyer' && <BuyerRegistration onSubmit={async (p) => {
+                        const userPayload = { id: formData.userId, email: formData.email, phone: formData.phone || null, role: formData.role, status: 'active', createdAt: new Date().toISOString(), profile: p };
+                        const saved = await svc.addUser(userPayload);
+                        if (!saved) { alert('Failed to save profile. Check Supabase RLS/policies.'); return; }
+                        onComplete(saved);
+                     }} />}
+                     {formData.role === 'transporter' && <TransporterRegistration onSubmit={async (p) => {
+                        const userPayload = { id: formData.userId, email: formData.email, phone: formData.phone || null, role: formData.role, status: 'active', createdAt: new Date().toISOString(), profile: p };
+                        const saved = await svc.addUser(userPayload);
+                        if (!saved) { alert('Failed to save profile. Check Supabase RLS/policies.'); return; }
+                        onComplete(saved);
+                     }} />}
                   </div>
                )}
             </div>
@@ -1707,7 +1587,9 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
                                              {String(req.mode).replace('_', ' ')} • {String(req.status).replace('_', ' ')} • ₹{req.finalFare ?? req.estimatedFare}
                                           </div>
                                        )}
-                                       {req?.deliveryOtp && req.status !== 'delivered' && <div className="text-xs text-slate-500 mt-1">Delivery OTP: <span className="font-black text-slate-800">{req.deliveryOtp}</span></div>}
+                                       {req?.pickupOtp && req.status !== 'picked_up' && req.status !== 'delivered' && req.status !== 'open' && (
+                                          <div className="text-xs text-slate-500 mt-1">Pickup OTP: <span className="font-black text-slate-800">{req.pickupOtp}</span></div>
+                                       )}
                                        {transporter && <div className="text-xs text-slate-500 mt-1">Assigned: <span className="font-bold text-slate-700">{transporter.profile?.fullName || transporter.phone}</span></div>}
                                     </div>
                                  </div>
@@ -2495,12 +2377,14 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
 };
 
 // Buyer and Transporter Dashboards remain the same
-const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, transportRequests, transportBids, allUsers, onAddRfq, onSendMessage, onPlaceOffer, onAcceptOffer, onCounterOffer, onCancelOffer, onLogout, onUpdateProfile, onRaiseDispute, onCreateTransportRequest, onAcceptTransportBid, onOpenChat, onViewInvoice, onUpdateOrderPayment }: any) => {
+const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, transportRequests, transportBids, allUsers, onAddRfq, onSendMessage, onPlaceOffer, onAcceptOffer, onCounterOffer, onCancelOffer, onLogout, onUpdateProfile, onRaiseDispute, onCreateTransportRequest, onAcceptTransportBid, onCounterTransportBid, onUpdateTransportRequest, onOpenChat, onViewInvoice, onUpdateOrderPayment, onDirectBuy }: any) => {
    const [view, setView] = useState('home');
    const [searchTerm, setSearchTerm] = useState('');
    const [selectedListing, setSelectedListing] = useState<any>(null);
    const [showOfferModal, setShowOfferModal] = useState(false);
    const [offerData, setOfferData] = useState({ quantity: 0, price: 0 });
+   const [showBuyModal, setShowBuyModal] = useState(false);
+   const [buyQuantity, setBuyQuantity] = useState(1);
    
    // Negotiation State
    const [counterModal, setCounterModal] = useState<{open: boolean, offer: any | null}>({ open: false, offer: null });
@@ -2508,27 +2392,27 @@ const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, transp
 
    const [showTransportModal, setShowTransportModal] = useState(false);
    const [transportOrderId, setTransportOrderId] = useState<string | null>(null);
+   const [transportStep, setTransportStep] = useState<'mode' | 'vehicle'>('mode');
+   const [transportPriceModal, setTransportPriceModal] = useState<{ open: boolean; type: 'vehicle_offer' | 'edit_offer' | 'counter_bid'; orderId?: string; requestId?: string; bidId?: string; vehicleType?: TransportRequest['vehicleType']; baseFare?: number }>({ open: false, type: 'vehicle_offer' });
+   const [transportPriceValue, setTransportPriceValue] = useState('');
    const [cartItems, setCartItems] = useState<{ listingId: string; quantity: number }[]>([]);
    const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-   const cartKey = `kisansetu_cart_${user.id}`;
+   const getVehicleCapacityKg = (t: TransportRequest['vehicleType']) =>
+      t === 'Bike' ? 50 : t === 'Auto' ? 500 : t === 'Mini Truck' ? 2000 : t === 'Pickup' ? 5000 : 50000;
 
-   React.useEffect(() => {
-      try {
-         const saved = localStorage.getItem(cartKey);
-         if (saved) setCartItems(JSON.parse(saved));
-      } catch (e) {
-         console.error('Failed to load cart', e);
-      }
-   }, [cartKey]);
-
-   React.useEffect(() => {
-      try {
-         localStorage.setItem(cartKey, JSON.stringify(cartItems));
-      } catch (e) {
-         console.error('Failed to save cart', e);
-      }
-   }, [cartKey, cartItems]);
+   const estimateTransportFare = (distanceKm: number, vehicleType: TransportRequest['vehicleType']) => {
+      const km = Math.max(1, distanceKm || 1);
+      const table: Record<TransportRequest['vehicleType'], { ratePerKm: number; min: number }> = {
+         Bike: { ratePerKm: 8, min: 80 },
+         Auto: { ratePerKm: 12, min: 150 },
+         'Mini Truck': { ratePerKm: 18, min: 400 },
+         Pickup: { ratePerKm: 25, min: 800 },
+         Truck: { ratePerKm: 35, min: 1200 }
+      };
+      const calc = Math.round(km * table[vehicleType].ratePerKm);
+      return Math.max(calc, table[vehicleType].min);
+   };
 
    React.useEffect(() => {
       setActiveImageIndex(0);
@@ -2558,11 +2442,7 @@ const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, transp
    const [marketSort, setMarketSort] = useState<'newest' | 'price_low' | 'price_high'>('newest');
 
    // Notifications State
-   const [notifications, setNotifications] = useState([
-      { id: 'b1', type: 'offer', title: 'Offer Accepted', message: 'Your offer for 500kg Wheat has been accepted by Ramesh Kumar.', timestamp: '2 hours ago', isRead: false },
-      { id: 'b2', type: 'order', title: 'Order Dispatched', message: 'Order #ORD-123 is now in transit. Track shipment.', timestamp: '5 hours ago', isRead: false },
-      { id: 'b3', type: 'system', title: 'Market Alert', message: 'Soybean prices dropped by 5% in Indore region.', timestamp: '1 day ago', isRead: true },
-   ]);
+   const [notifications, setNotifications] = useState<any[]>([]);
    const [notificationFilter, setNotificationFilter] = useState<'all' | 'unread' | 'offer' | 'order'>('all');
 
    // Help & Support State
@@ -2630,15 +2510,54 @@ const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, transp
       setTimeout(() => setView('offers'), 100);
    };
 
+   const handleBuyNowSubmit = async () => {
+      if (!selectedListing) return
+      const maxQty = Number(selectedListing.availableQuantity || selectedListing.quantity || 0)
+      const qty = Math.max(1, Math.min(Number(buyQuantity || 1), maxQty || Number(buyQuantity || 1)))
+      try {
+         await onDirectBuy?.(selectedListing.id, qty)
+         setShowBuyModal(false)
+         setSelectedListing(null)
+         setView('orders')
+      } catch (e) {
+         console.error(e)
+         alert('Failed to place order.')
+      }
+   }
+
+   const handleBuyFromCart = async (listing: any, quantity: number) => {
+      const maxQty = Number(listing.availableQuantity || listing.quantity || 0)
+      const qty = Math.max(1, Math.min(Number(quantity || 1), maxQty || Number(quantity || 1)))
+      const order = await onDirectBuy?.(listing.id, qty)
+      if (!order) return
+      setCartItems(prev => prev.filter(i => i.listingId !== listing.id))
+      setView('orders')
+   }
+
+   const handleCheckoutCart = async () => {
+      if (cartItems.length === 0) return
+      for (const ci of cartItems) {
+         const l = listings.find((x: any) => x.id === ci.listingId)
+         if (!l) continue
+         const maxQty = Number(l.availableQuantity || l.quantity || 0)
+         const qty = Math.max(1, Math.min(Number(ci.quantity || 1), maxQty || Number(ci.quantity || 1)))
+         await onDirectBuy?.(l.id, qty)
+      }
+      setCartItems([])
+      setView('orders')
+   }
+
    return (
       <div className="flex h-screen bg-slate-50 overflow-hidden">
          {/* Sidebar */}
-         <aside className="w-64 bg-white border-r border-slate-200 flex flex-col p-4">
-            <div className="flex items-center gap-2 mb-8 px-2">
-               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white"><ShoppingBag className="w-5 h-5" /></div>
-               <span className="font-bold text-xl text-slate-900 leading-tight">KisanSetu <br /><span className="text-blue-600 text-xs">Buyer Portal</span></span>
+         <aside className="w-72 bg-gradient-to-b from-blue-700 via-blue-700 to-indigo-800 border-r border-blue-900/30 flex flex-col p-4 text-white">
+            <div className="flex items-center gap-3 mb-8 px-2">
+               <div className="w-10 h-10 bg-white/15 border border-white/15 rounded-xl flex items-center justify-center text-white shadow-sm">
+                  <ShoppingBag className="w-5 h-5" />
+               </div>
+               <span className="font-black text-xl leading-tight">KisanSetu <br /><span className="text-blue-200 text-xs font-black tracking-widest uppercase">Buyer Portal</span></span>
             </div>
-            <nav className="space-y-1 flex-1 overflow-y-auto">
+            <nav className="space-y-1 flex-1 overflow-y-auto pr-1">
                {[
                   { id: 'home', label: 'Marketplace', icon: Store },
                   { id: 'offers', label: 'My Offers', icon: ShoppingBag, badge: myOffers.length },
@@ -2659,19 +2578,23 @@ const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, transp
                   <button
                      key={item.id}
                      onClick={() => setView(item.id)}
-                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${view === item.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-600 hover:bg-slate-100'}`}
+                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${view === item.id ? 'bg-white/15 text-white ring-1 ring-white/15' : 'text-white/80 hover:text-white hover:bg-white/10'}`}
                   >
-                     <item.icon className="w-5 h-5" />
+                     <item.icon className={`w-5 h-5 ${view === item.id ? 'text-white' : 'text-white/80'}`} />
                      <span className="flex-1 text-left">{item.label}</span>
-                     {item.badge > 0 && <span className={`text-[10px] px-2 py-0.5 rounded-full ${view === item.id ? 'bg-white/20 text-white' : 'bg-blue-100 text-blue-600'}`}>{item.badge}</span>}
+                     {item.badge > 0 && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${view === item.id ? 'bg-white/25 text-white' : 'bg-white/15 text-white'}`}>
+                           {item.badge}
+                        </span>
+                     )}
                   </button>
                ))}
             </nav>
-            <button onClick={onLogout} className="mt-auto flex items-center gap-2 px-4 py-3 text-slate-400 hover:text-red-600 font-medium transition-colors"><LogOut className="w-5 h-5" /> Logout</button>
+            <button onClick={onLogout} className="mt-auto flex items-center gap-2 px-4 py-3 rounded-xl text-white/80 hover:text-white hover:bg-white/10 font-bold transition-colors"><LogOut className="w-5 h-5" /> Logout</button>
          </aside>
 
          {/* Main Content */}
-         <main className="flex-1 overflow-y-auto p-8 relative h-screen">
+         <main className="flex-1 overflow-y-auto p-6 lg:p-8 relative h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/60">
             {view === 'home' && (
                <div className="space-y-8 animate-in fade-in">
                   <Card className="p-0 overflow-hidden border-slate-200">
@@ -2682,7 +2605,7 @@ const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, transp
                               <div>
                                  <div className="text-[10px] font-black uppercase tracking-[0.25em] text-white/80">Marketplace</div>
                                  <h2 className="text-3xl md:text-4xl font-black mt-1 leading-tight">Buy Direct From Farmers</h2>
-                                 <p className="text-white/80 font-medium mt-2 max-w-2xl">Compare price, quality, and location. Add to cart, then negotiate with the farmer like Flipkart-style product browsing.</p>
+                                 <p className="text-white/85 font-medium mt-2 max-w-2xl leading-relaxed">Compare price, quality, and location. Add items to cart and negotiate directly with farmers.</p>
                               </div>
                               <div className="grid grid-cols-3 gap-3 w-full md:w-auto">
                                  <div className="p-4 rounded-2xl bg-white/10 border border-white/15">
@@ -2741,56 +2664,116 @@ const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, transp
                   </Card>
 
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                     {filteredListings.map(l => (
-                        <Card key={l.id} className="p-0 overflow-hidden group hover:shadow-2xl transition-all duration-500 border-slate-200 hover:border-blue-300 bg-white">
-                           <div className="h-52 overflow-hidden relative cursor-pointer" onClick={() => { setSelectedListing(l); setView('product-details'); }}>
-                              <img src={l.imageUrls?.[0] || l.imageUrl} alt={l.cropName} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-slate-900/0 to-slate-900/0 opacity-80" />
-                              <div className="absolute top-3 right-3 flex items-center gap-2">
-                                 <div className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-[10px] font-black uppercase text-blue-700 shadow-sm border border-blue-100">Grade {l.grade}</div>
-                                 <div className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-[10px] font-black uppercase text-slate-700 shadow-sm border border-slate-200 flex items-center gap-1">
-                                    <Star className="w-3 h-3 text-amber-500" /> 4.6
+                     {filteredListings.map(l => {
+                        const imageUrl = l.imageUrls?.[0] || l.imageUrl
+                        const stock = Number(l.availableQuantity ?? l.quantity ?? 0)
+                        const quantityUnit = (l.quantityUnit || 'kg').toString()
+                        const minQty = Math.max(1, Number(l.minOrderQuantity ?? 1))
+                        const minQtyUnit = (l.minOrderQuantityUnit || quantityUnit).toString()
+                        const priceUnit = (l.priceUnit || 'kg').toString()
+                        const farmerName = (l.farmerName || 'Unknown').toString()
+                        const location = (l.location || '—').toString()
+                        const cropTitle = `${l.cropName || 'Crop'}${l.variety ? ` • ${l.variety}` : ''}`
+                        const price = Number(l.pricePerKg ?? 0)
+                        return (
+                           <Card key={l.id} className="p-0 overflow-hidden bg-white border border-slate-200/80 shadow-sm hover:shadow-2xl hover:border-blue-300 transition-all duration-300 rounded-2xl">
+                              <button
+                                 className="relative w-full text-left"
+                                 onClick={() => { setSelectedListing(l); setView('product-details'); }}
+                                 type="button"
+                              >
+                                 <div className="h-48 overflow-hidden bg-slate-100 relative">
+                                    {imageUrl ? (
+                                       <img src={imageUrl} alt={l.cropName} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                                    ) : (
+                                       <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200" />
+                                    )}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-slate-950/10 to-transparent" />
+
+                                    <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-3">
+                                       <div className="flex items-center gap-2">
+                                          {!!l.grade && (
+                                             <div className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-[10px] font-black uppercase text-blue-700 shadow-sm border border-blue-100">
+                                                Grade {l.grade}
+                                             </div>
+                                          )}
+                                          {!!(l.certification && l.certification.length) && (
+                                             <div className="px-3 py-1 bg-green-50/90 backdrop-blur-sm rounded-full text-[10px] font-black uppercase text-green-700 shadow-sm border border-green-100">
+                                                Certified
+                                             </div>
+                                          )}
+                                       </div>
+                                       <button
+                                          className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-slate-200 text-slate-700 flex items-center justify-center shadow-sm hover:bg-white transition-colors"
+                                          onClick={(e) => { e.stopPropagation(); addToCart(l); }}
+                                          type="button"
+                                       >
+                                          <ShoppingCart className="w-5 h-5" />
+                                       </button>
+                                    </div>
+
+                                    <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-3">
+                                       <div className="min-w-0">
+                                          <div className="text-white font-black leading-tight truncate">{cropTitle}</div>
+                                          <div className="text-white/85 text-xs font-bold flex items-center gap-1 truncate mt-1">
+                                             <MapPin className="w-3 h-3" />
+                                             {location}
+                                          </div>
+                                       </div>
+                                       <div className="shrink-0 text-right">
+                                          <div className="px-3 py-2 rounded-2xl bg-white/90 backdrop-blur-sm border border-white/50 shadow-sm">
+                                             <div className="text-[10px] font-black uppercase tracking-widest text-slate-500">Price</div>
+                                             <div className="text-slate-900 font-black text-lg leading-none">₹{price.toLocaleString()}</div>
+                                             <div className="text-[10px] font-black uppercase tracking-widest text-slate-500">/{priceUnit}</div>
+                                          </div>
+                                       </div>
+                                    </div>
                                  </div>
-                              </div>
-                              <button className="absolute top-3 left-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-blue-100 text-blue-700 flex items-center justify-center shadow-sm hover:bg-white transition-colors" onClick={(e) => { e.stopPropagation(); addToCart(l); }}>
-                                 <ShoppingCart className="w-5 h-5" />
                               </button>
-                              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-3">
-                                 <div className="min-w-0">
-                                    <div className="text-white font-black truncate">{l.cropName}{l.variety ? ` • ${l.variety}` : ''}</div>
-                                    <div className="text-white/80 text-xs font-bold flex items-center gap-1 truncate"><MapPin className="w-3 h-3" /> {l.location}</div>
-                                 </div>
-                                 <div className="text-right">
-                                    <div className="text-white font-black text-lg">₹{l.pricePerKg}/kg</div>
-                                 </div>
-                              </div>
-                           </div>
-                           <div className="p-5">
-                              <div className="flex items-start justify-between gap-4">
-                                 <div className="min-w-0">
-                                    <div className="text-xs text-slate-400 font-black uppercase tracking-widest">Farmer</div>
-                                    <div className="font-black text-slate-900 truncate">{l.farmerName}</div>
-                                 </div>
-                                 <div className="text-right">
-                                    <div className="text-xs text-slate-400 font-black uppercase tracking-widest">Stock</div>
-                                    <div className="font-black text-slate-900">{l.availableQuantity || l.quantity} kg</div>
-                                 </div>
-                              </div>
 
-                              <div className="mt-4 flex flex-wrap gap-2">
-                                 <div className="px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-[10px] font-black text-slate-600 uppercase tracking-wider">MOQ {l.minOrderQuantity || 1}kg</div>
-                                 {!!(l.packagingDetails || '').trim() && <div className="px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-[10px] font-black text-slate-600 uppercase tracking-wider">Packed</div>}
-                                 {!!(l.certification && l.certification.length) && <div className="px-3 py-1 rounded-full bg-green-50 border border-green-100 text-[10px] font-black text-green-700 uppercase tracking-wider">Certified</div>}
-                              </div>
+                              <div className="p-5">
+                                 <div className="flex items-start justify-between gap-4">
+                                    <div className="min-w-0">
+                                       <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Farmer</div>
+                                       <div className="font-black text-slate-900 truncate">{farmerName}</div>
+                                    </div>
+                                    <div className="text-right">
+                                       <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Stock</div>
+                                       <div className="font-black text-slate-900">{stock.toLocaleString()} {quantityUnit}</div>
+                                    </div>
+                                 </div>
 
-                              <div className="mt-5 flex gap-2">
-                                 <Button variant="outline" className="flex-1 h-11 text-xs font-black border-slate-200" onClick={() => { setSelectedListing(l); setView('product-details'); }}>View</Button>
-                                 <Button variant="outline" className="w-11 h-11 p-0 border-slate-200" onClick={() => addToCart(l)}><ShoppingCart className="w-4 h-4" /></Button>
-                                 <Button className="flex-[2] h-11 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20 text-xs font-black" onClick={() => { setSelectedListing(l); setOfferData({ quantity: l.minOrderQuantity || l.availableQuantity || l.quantity, price: l.pricePerKg }); setShowOfferModal(true); }}>Negotiate</Button>
+                                 <div className="mt-4 flex flex-wrap gap-2">
+                                    <div className="px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-[10px] font-black text-slate-600 uppercase tracking-wider">
+                                       MOQ {minQty.toLocaleString()}{minQtyUnit}
+                                    </div>
+                                    {!!(l.packagingDetails || '').trim() && (
+                                       <div className="px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-[10px] font-black text-slate-600 uppercase tracking-wider">
+                                          Packed
+                                       </div>
+                                    )}
+                                    {!!l.harvestDate && (
+                                       <div className="px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-[10px] font-black text-slate-600 uppercase tracking-wider">
+                                          Harvest {l.harvestDate}
+                                       </div>
+                                    )}
+                                 </div>
+
+                                 <div className="mt-5 grid grid-cols-3 gap-2">
+                                    <Button variant="outline" className="h-11 text-xs font-black border-slate-200" onClick={() => { setSelectedListing(l); setView('product-details'); }}>
+                                       View
+                                    </Button>
+                                    <Button variant="outline" className="h-11 text-xs font-black border-slate-200" onClick={() => { setSelectedListing(l); setBuyQuantity(Number(l.minOrderQuantity || 1)); setShowBuyModal(true); }}>
+                                       Buy Now
+                                    </Button>
+                                    <Button className="h-11 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20 text-xs font-black" onClick={() => { setSelectedListing(l); setOfferData({ quantity: l.minOrderQuantity || l.availableQuantity || l.quantity, price: l.pricePerKg }); setShowOfferModal(true); }}>
+                                       Negotiate
+                                    </Button>
+                                 </div>
                               </div>
-                           </div>
-                        </Card>
-                     ))}
+                           </Card>
+                        )
+                     })}
                   </div>
                </div>
             )}
@@ -2938,6 +2921,7 @@ const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, transp
                                     <Card className="p-5 border-slate-200 bg-white">
                                        <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Quick Actions</div>
                                        <div className="mt-4 space-y-3">
+                                          <Button className="w-full h-12 bg-slate-900 hover:bg-slate-800 font-black" onClick={() => { setBuyQuantity(Number(selectedListing.minOrderQuantity || 1)); setShowBuyModal(true); }}>Buy Now</Button>
                                           <Button className="w-full h-12 bg-blue-600 hover:bg-blue-700 font-black" onClick={() => { addToCart(selectedListing); setView('cart'); }}><ShoppingCart className="w-4 h-4 mr-2" /> Add to Cart</Button>
                                           <Button variant="outline" className="w-full h-12 font-black border-slate-200" onClick={() => { setOfferData({ quantity: selectedListing.minOrderQuantity || 1, price: selectedListing.pricePerKg }); setShowOfferModal(true); }}>Negotiate Price</Button>
                                           <Button variant="ghost" className="w-full h-11 font-black text-slate-600" onClick={() => { setView('home'); }}>Continue Shopping</Button>
@@ -3193,6 +3177,7 @@ const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, transp
                                           <div className="flex gap-2 flex-wrap justify-end">
                                              <Button variant="outline" className="h-10 text-xs font-black border-slate-200" onClick={() => { setSelectedListing(l); setView('product-details'); }}>View</Button>
                                              <Button className="h-10 text-xs font-black bg-blue-600 hover:bg-blue-700" onClick={() => { setSelectedListing(l); setOfferData({ quantity: ci.quantity, price: l.pricePerKg }); setShowOfferModal(true); }}>Place Offer</Button>
+                                             <Button className="h-10 text-xs font-black bg-slate-900 hover:bg-slate-800" onClick={() => handleBuyFromCart(l, ci.quantity)}>Buy Now</Button>
                                              <Button variant="outline" className="h-10 text-xs font-black border-slate-200" onClick={() => removeFromCart(ci.listingId)}><Trash2 className="w-4 h-4" /></Button>
                                           </div>
                                        </div>
@@ -3212,7 +3197,10 @@ const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, transp
                                     }, 0).toLocaleString()}
                                  </div>
                               </div>
-                              <Button className="h-12 bg-slate-900 hover:bg-slate-800 font-black" onClick={() => setView('home')}>Add More Items</Button>
+                              <div className="flex gap-3 flex-wrap">
+                                 <Button variant="outline" className="h-12 font-black border-slate-200" onClick={() => setView('home')}>Add More Items</Button>
+                                 <Button className="h-12 bg-slate-900 hover:bg-slate-800 font-black" onClick={handleCheckoutCart}>Buy All</Button>
+                              </div>
                            </div>
                         </Card>
                      </div>
@@ -3250,26 +3238,72 @@ const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, transp
                                  <div>
                                     <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Transport</div>
                                     {!req && <div className="text-sm font-bold text-slate-800">Not arranged yet</div>}
-                                    {req && <div className="text-sm font-bold text-slate-800">{req.mode.replace('_', ' ')} • {req.status.replace('_', ' ')}</div>}
-                                    {req?.deliveryOtp && req.status !== 'delivered' && <div className="text-xs text-slate-500 mt-1">Delivery OTP: <span className="font-black text-slate-800">{req.deliveryOtp}</span></div>}
+                                    {req && (
+                                       <div className="space-y-1">
+                                          <div className="text-sm font-bold text-slate-800">{req.mode.replace('_', ' ')} • {req.status.replace('_', ' ')}</div>
+                                          {req.mode === 'marketplace' && (
+                                             <div className="text-xs text-slate-500 font-bold">
+                                                Vehicle: <span className="text-slate-800">{req.vehicleType}</span> • Base ₹{Number(req.estimatedFare || 0).toLocaleString()}
+                                                {req.finalFare != null ? <> • Final ₹{Number(req.finalFare || 0).toLocaleString()}</> : null}
+                                             </div>
+                                          )}
+                                          {req.mode === 'marketplace' && (
+                                             <div className="text-xs text-slate-500">
+                                                Payment: <span className="font-black text-slate-800">{(req.transportPaymentStatus || 'unpaid').toString()}</span>
+                                             </div>
+                                          )}
+                                          {req?.deliveryOtp && req.status !== 'delivered' && req.status !== 'open' && (
+                                             <div className="text-xs text-slate-500">Delivery OTP: <span className="font-black text-slate-800">{req.deliveryOtp}</span></div>
+                                          )}
+                                       </div>
+                                    )}
                                  </div>
                                  {!req && (
-                                    <Button className="h-10 bg-blue-600 hover:bg-blue-700 text-xs font-black" onClick={() => { setTransportOrderId(o.id); setShowTransportModal(true); }}>Arrange Transport</Button>
+                                    <Button className="h-10 bg-blue-600 hover:bg-blue-700 text-xs font-black" onClick={() => { setTransportStep('mode'); setTransportOrderId(o.id); setShowTransportModal(true); }}>Arrange Transport</Button>
                                  )}
                               </div>
                               {req && req.mode === 'marketplace' && req.status === 'open' && (
                                  <div className="mt-4 space-y-2">
                                     <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Transporter Offers</div>
+                                    <div className="flex items-center justify-between gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                       <div className="text-xs font-black text-slate-700">Your Offer: ₹{Number(req.estimatedFare || 0).toLocaleString()}</div>
+                                       <Button variant="outline" className="h-9 text-xs font-black border-slate-200" onClick={() => {
+                                          setTransportPriceValue(String(req.estimatedFare || 0))
+                                          setTransportPriceModal({ open: true, type: 'edit_offer', requestId: req.id })
+                                       }}>Edit</Button>
+                                    </div>
                                     {bids.length === 0 && <div className="text-xs text-slate-500">Waiting for transporter bids...</div>}
                                     {bids.length > 0 && (
                                        <div className="grid md:grid-cols-2 gap-2">
                                           {bids.map((b: any) => (
                                              <div key={b.id} className="p-3 bg-white rounded-xl border border-slate-200 flex items-center justify-between gap-3">
                                                 <div className="min-w-0">
-                                                   <div className="text-sm font-black text-slate-900">₹{b.amount}</div>
-                                                   <div className="text-[10px] text-slate-400 font-bold truncate">Bid {b.status}</div>
+                                                   <div className="text-sm font-black text-slate-900">
+                                                      ₹{Number((b.counterAmount != null ? b.counterAmount : b.amount) || 0).toLocaleString()}
+                                                   </div>
+                                                   <div className="text-[10px] text-slate-400 font-bold truncate">
+                                                      {b.status}{b.lastActionBy ? ` • last: ${b.lastActionBy}` : ''}
+                                                   </div>
                                                 </div>
-                                                <Button className="h-9 text-xs font-black bg-blue-600 hover:bg-blue-700" onClick={() => onAcceptTransportBid?.(b.id)}>Accept</Button>
+                                                <div className="flex items-center gap-2">
+                                                   <Button
+                                                      variant="outline"
+                                                      className="h-9 text-xs font-black border-slate-200"
+                                                      onClick={() => {
+                                                         setTransportPriceValue(String(b.amount || req.estimatedFare || 0))
+                                                         setTransportPriceModal({ open: true, type: 'counter_bid', bidId: b.id })
+                                                      }}
+                                                   >
+                                                      Counter
+                                                   </Button>
+                                                   <Button
+                                                      className="h-9 text-xs font-black bg-blue-600 hover:bg-blue-700"
+                                                      disabled={b.status !== 'pending' || b.lastActionBy === 'buyer'}
+                                                      onClick={() => onAcceptTransportBid?.(b.id)}
+                                                   >
+                                                      Accept
+                                                   </Button>
+                                                </div>
                                              </div>
                                           ))}
                                        </div>
@@ -3609,6 +3643,86 @@ const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, transp
             </div>
          )}
 
+         {transportPriceModal.open && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+               <Card className="w-full max-w-md p-8 shadow-2xl relative overflow-hidden bg-white">
+                  <div className="absolute top-0 left-0 w-full h-1.5 bg-slate-900" />
+                  <button onClick={() => { setTransportPriceModal(prev => ({ ...prev, open: false })); }} className="absolute top-4 right-4 p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-900 transition-all"><X className="w-5 h-5" /></button>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-2">{transportPriceModal.type === 'counter_bid' ? 'Counter Transport Price' : 'Set Transport Offer'}</h3>
+                  <p className="text-sm text-slate-500 mb-8 border-b border-slate-100 pb-4">Enter amount in ₹</p>
+                  <div className="space-y-6">
+                     <Input
+                        label="Amount (₹)"
+                        type="number"
+                        value={transportPriceValue}
+                        onChange={e => setTransportPriceValue(e.target.value)}
+                     />
+                     <div className="flex gap-3">
+                        <Button variant="ghost" className="flex-1" onClick={() => setTransportPriceModal(prev => ({ ...prev, open: false }))}>Cancel</Button>
+                        <Button className="flex-[2] bg-slate-900 hover:bg-slate-800 shadow-xl shadow-slate-900/15 font-bold" onClick={async () => {
+                           const n = Number(transportPriceValue)
+                           if (!Number.isFinite(n) || n <= 0) return
+                           if (transportPriceModal.type === 'vehicle_offer') {
+                              const orderId = transportPriceModal.orderId
+                              const vehicleType = transportPriceModal.vehicleType
+                              if (!orderId || !vehicleType) return
+                              await onCreateTransportRequest?.(orderId, 'marketplace', { vehicleType, estimatedFare: n })
+                              setTransportPriceModal(prev => ({ ...prev, open: false }))
+                              setShowTransportModal(false)
+                              setTransportStep('mode')
+                              return
+                           }
+                           if (transportPriceModal.type === 'edit_offer') {
+                              const requestId = transportPriceModal.requestId
+                              if (!requestId) return
+                              await onUpdateTransportRequest?.(requestId, { estimatedFare: n })
+                              setTransportPriceModal(prev => ({ ...prev, open: false }))
+                              return
+                           }
+                           if (transportPriceModal.type === 'counter_bid') {
+                              const bidId = transportPriceModal.bidId
+                              if (!bidId) return
+                              onCounterTransportBid?.(bidId, n, 'buyer')
+                              setTransportPriceModal(prev => ({ ...prev, open: false }))
+                              return
+                           }
+                        }}>Confirm</Button>
+                     </div>
+                  </div>
+               </Card>
+            </div>
+         )}
+
+         {showBuyModal && selectedListing && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+               <Card className="w-full max-w-md p-8 shadow-2xl relative overflow-hidden bg-white">
+                  <div className="absolute top-0 left-0 w-full h-1.5 bg-slate-900" />
+                  <button onClick={() => setShowBuyModal(false)} className="absolute top-4 right-4 p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-900 transition-all"><X className="w-5 h-5" /></button>
+
+                  <h3 className="text-2xl font-bold text-slate-900 mb-2">Buy Now</h3>
+                  <p className="text-sm text-slate-500 mb-8 border-b border-slate-100 pb-4">Confirm quantity for <span className="text-slate-900 font-bold">{selectedListing.cropName}</span></p>
+
+                  <div className="space-y-6">
+                     <Input
+                        label="Quantity (kg)"
+                        type="number"
+                        value={buyQuantity}
+                        onChange={e => setBuyQuantity(Math.max(1, Number(e.target.value)))}
+                        max={selectedListing.availableQuantity || selectedListing.quantity}
+                     />
+                     <div className="p-5 bg-slate-900/5 rounded-2xl border border-slate-200 flex justify-between items-center">
+                        <div className="text-sm font-bold text-slate-700">Total</div>
+                        <div className="text-2xl font-black text-slate-900 font-display">₹{(Number(selectedListing.pricePerKg || 0) * Number(buyQuantity || 0)).toLocaleString()}</div>
+                     </div>
+                     <div className="flex gap-3">
+                        <Button variant="ghost" className="flex-1" onClick={() => setShowBuyModal(false)}>Cancel</Button>
+                        <Button className="flex-[2] bg-slate-900 hover:bg-slate-800 shadow-xl shadow-slate-900/15 font-bold" onClick={handleBuyNowSubmit}>Place Order</Button>
+                     </div>
+                  </div>
+               </Card>
+            </div>
+         )}
+
          {/* Place Offer Modal */}
          {showOfferModal && selectedListing && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
@@ -3652,14 +3766,78 @@ const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, transp
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
                <Card className="w-full max-w-lg p-8 shadow-2xl relative overflow-hidden bg-white">
                   <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-600" />
-                  <button onClick={() => setShowTransportModal(false)} className="absolute top-4 right-4 p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-900 transition-all"><X className="w-5 h-5" /></button>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-2">Arrange Transport</h3>
-                  <p className="text-sm text-slate-500 mb-8 border-b border-slate-100 pb-4">Choose how you want transport for <span className="text-slate-900 font-bold">Order #{transportOrderId}</span></p>
-                  <div className="grid md:grid-cols-3 gap-3">
-                     <Button className="h-12 bg-slate-900 hover:bg-slate-800 font-bold" onClick={() => { onCreateTransportRequest?.(transportOrderId, 'farmer_arranged'); setShowTransportModal(false); }}>Farmer Arranged</Button>
-                     <Button className="h-12 bg-blue-600 hover:bg-blue-700 font-bold" onClick={() => { onCreateTransportRequest?.(transportOrderId, 'marketplace'); setShowTransportModal(false); }}>Marketplace</Button>
-                     <Button variant="outline" className="h-12 font-bold border-slate-200" onClick={() => { onCreateTransportRequest?.(transportOrderId, 'buyer_own'); setShowTransportModal(false); }}>I Will Arrange</Button>
-                  </div>
+                  <button onClick={() => { setTransportStep('mode'); setShowTransportModal(false); }} className="absolute top-4 right-4 p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-900 transition-all"><X className="w-5 h-5" /></button>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-2">{transportStep === 'vehicle' ? 'Choose Vehicle' : 'Arrange Transport'}</h3>
+                  <p className="text-sm text-slate-500 mb-8 border-b border-slate-100 pb-4">
+                     {transportStep === 'vehicle'
+                        ? <>Select vehicle type for <span className="text-slate-900 font-bold">Order #{transportOrderId}</span></>
+                        : <>Choose how you want transport for <span className="text-slate-900 font-bold">Order #{transportOrderId}</span></>}
+                  </p>
+
+                  {transportStep === 'mode' && (
+                     <div className="grid md:grid-cols-3 gap-3">
+                        <Button className="h-12 bg-slate-900 hover:bg-slate-800 font-bold" onClick={() => { onCreateTransportRequest?.(transportOrderId, 'farmer_arranged'); setShowTransportModal(false); setTransportStep('mode'); }}>Farmer Arranged</Button>
+                        <Button className="h-12 bg-blue-600 hover:bg-blue-700 font-bold" onClick={() => { setTransportStep('vehicle'); }}>Marketplace</Button>
+                        <Button variant="outline" className="h-12 font-bold border-slate-200" onClick={() => { onCreateTransportRequest?.(transportOrderId, 'buyer_own'); setShowTransportModal(false); setTransportStep('mode'); }}>I Will Arrange</Button>
+                     </div>
+                  )}
+
+                  {transportStep === 'vehicle' && (() => {
+                     const order = (orders || []).find((o: any) => o.id === transportOrderId)
+                     const distanceKm = Number(order?.distanceKm || 45)
+                     const weightKg = Number(order?.quantity || 0)
+                     const vehicleTypes: TransportRequest['vehicleType'][] = ['Bike', 'Auto', 'Mini Truck', 'Pickup', 'Truck']
+                     const eligibleCount = vehicleTypes.filter(vt => getVehicleCapacityKg(vt) >= weightKg).length
+                     return (
+                        <div className="space-y-4">
+                           <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs font-bold text-slate-700">
+                              Required load: {Number(weightKg || 0).toLocaleString()} kg
+                           </div>
+                           {eligibleCount === 0 && (
+                              <div className="p-4 bg-red-50 rounded-2xl border border-red-100 text-xs font-black text-red-700">
+                                 No vehicle can carry this load. Reduce quantity or use multiple trips.
+                              </div>
+                           )}
+                           <div className="grid sm:grid-cols-2 gap-3">
+                              {vehicleTypes.map(vt => {
+                                 const cap = getVehicleCapacityKg(vt)
+                                 const eligible = cap >= weightKg
+                                 const base = estimateTransportFare(distanceKm, vt)
+                                 return (
+                                    <button
+                                       key={vt}
+                                       type="button"
+                                       className={`p-5 rounded-2xl border text-left transition-all ${eligible ? 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-lg' : 'bg-slate-50 border-slate-200 opacity-60 cursor-not-allowed'}`}
+                                       disabled={!eligible}
+                                       onClick={() => {
+                                          if (!eligible) return
+                                          setTransportPriceValue(String(base))
+                                          setTransportPriceModal({ open: true, type: 'vehicle_offer', orderId: transportOrderId, vehicleType: vt, baseFare: base })
+                                       }}
+                                    >
+                                       <div className="flex items-start justify-between gap-3">
+                                          <div>
+                                             <div className="text-xs font-black uppercase tracking-widest text-slate-400">Vehicle</div>
+                                             <div className="text-lg font-black text-slate-900">{vt}</div>
+                                             <div className="text-xs text-slate-500 font-bold mt-1">Max {cap.toLocaleString()} kg</div>
+                                          </div>
+                                          <div className="text-right">
+                                             <div className="text-xs font-black uppercase tracking-widest text-slate-400">Base Fare</div>
+                                             <div className="text-xl font-black text-blue-600">₹{base.toLocaleString()}</div>
+                                             <div className="text-[10px] text-slate-500 font-bold">{distanceKm} KM est.</div>
+                                          </div>
+                                       </div>
+                                       {!eligible && <div className="mt-3 text-[10px] font-black uppercase tracking-widest text-red-600">Not enough capacity</div>}
+                                    </button>
+                                 )
+                              })}
+                           </div>
+                           <div className="flex gap-3">
+                              <Button variant="outline" className="flex-1 h-12 font-black border-slate-200" onClick={() => setTransportStep('mode')}>Back</Button>
+                           </div>
+                        </div>
+                     )
+                  })()}
                </Card>
             </div>
          )}
@@ -3667,11 +3845,11 @@ const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, transp
    );
 };
 
-const TransporterDashboard = ({ user, orders, messages, routePlans, transportRequests, transportBids, allUsers, onAddRoutePlan, onSendMessage, onLogout, onUpdateOrderStatus, onUpdateProfile, onRaiseDispute, onAcceptTransportRequest, onAddTransportBid, onUpdateTransportRequestStatus }: any) => {
+const TransporterDashboard = ({ user, orders, messages, routePlans, transportRequests, transportBids, allUsers, onAddRoutePlan, onSendMessage, onLogout, onUpdateOrderStatus, onUpdateProfile, onRaiseDispute, onAddTransportBid, onUpdateTransportRequestStatus, onCounterTransportBid, onTransporterAcceptBuyerCounter, onOpenChat }: any) => {
    const [view, setView] = useState('home');
 
    // Vehicle & Profile State
-   const [vehicleData, setVehicleData] = useState({ type: 'Mini Truck', number: 'MH-12-DT-8899', capacity: '2000', available: true });
+   const [vehicleData, setVehicleData] = useState({ type: user.profile?.vehicleType || 'Mini Truck', number: user.profile?.vehicleNumber || '', capacity: user.profile?.maxCapacity || '', available: true });
    const [profileData, setProfileData] = useState<TransporterProfile>(user.profile || {
       fullName: user.phone,
       vehicleType: 'Mini Truck',
@@ -3694,10 +3872,7 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
    const [loadFilter, setLoadFilter] = useState<'all' | 'local' | 'inter-city'>('all');
 
    // Notifications State
-   const [notifications, setNotifications] = useState([
-      { id: 't1', type: 'job', title: 'New Load Available', message: '500kg Wheat from Nashik to Mumbai requires transport.', timestamp: '10 mins ago', isRead: false },
-      { id: 't2', type: 'system', title: 'Payment Received', message: 'Payment of ₹4,500 for Order #ORD-101 has been credited.', timestamp: '1 day ago', isRead: true },
-   ]);
+   const [notifications, setNotifications] = useState<any[]>([]);
    const [notificationFilter, setNotificationFilter] = useState<'all' | 'unread' | 'job'>('all');
 
    // Help & Support State
@@ -3715,6 +3890,11 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
    const [issueModalOpen, setIssueModalOpen] = useState(false);
    const [issueOrderId, setIssueOrderId] = useState<string | null>(null);
    const [issueText, setIssueText] = useState('');
+
+   const [transportNumberModal, setTransportNumberModal] = useState<{ open: boolean; type: 'bid' | 'counter'; requestId?: string; bidId?: string; title: string }>({ open: false, type: 'bid', title: '' });
+   const [transportNumberValue, setTransportNumberValue] = useState('');
+   const [otpModal, setOtpModal] = useState<{ open: boolean; requestId: string; nextStatus: 'picked_up' | 'delivered' }>({ open: false, requestId: '', nextStatus: 'picked_up' });
+   const [otpValue, setOtpValue] = useState('');
 
    // Add Vehicle State
    const [showAddVehicle, setShowAddVehicle] = useState(false);
@@ -3779,21 +3959,20 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
    const matchesVehicle = (r: TransportRequest) => {
       const vehicles = getActiveVehicles();
       if (vehicles.length === 0) return false;
-      const reqRank = vehicleRank(r.vehicleType);
       const weight = Number(r.weightKg || 0);
       return vehicles.some(v => {
          const vt = normalizeVehicleType(v.type);
          if (!vt) return false;
          const cap = Number(v.capacity || 0);
          if (!Number.isFinite(cap) || cap <= 0) return false;
-         return vehicleRank(vt) >= reqRank && cap >= weight;
+         return vt === r.vehicleType && cap >= weight;
       });
    };
 
    const availableJobs = (transportRequests || []).filter((r: any) =>
-      (r.status === 'open' || r.status === 'awaiting_farmer') &&
+      r.mode === 'marketplace' &&
+      r.status === 'open' &&
       !r.transporterId &&
-      r.status !== 'assigned' &&
       matchesVehicle(r)
    );
    const myDeliveries = (transportRequests || []).filter((r: any) => r.transporterId === user.id);
@@ -3801,6 +3980,28 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
    const activeDeliveries = myDeliveries.filter((r: any) => r.status !== 'delivered' && r.status !== 'cancelled');
 
    const totalEarnings = completedDeliveries.reduce((sum: number, r: any) => sum + (r.finalFare ?? r.estimatedFare ?? 0), 0);
+
+   const formatDateTime = (v: any) => {
+      const s = v ? String(v) : ''
+      const t = Date.parse(s)
+      if (!Number.isFinite(t)) return '—'
+      return new Date(t).toLocaleString()
+   }
+
+   const computeTimeMinutes = (pickupAt: any, deliveredAt: any) => {
+      const start = Date.parse(pickupAt ? String(pickupAt) : '')
+      const end = Date.parse(deliveredAt ? String(deliveredAt) : '')
+      if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) return null
+      return Math.round((end - start) / 60000)
+   }
+
+   const formatMinutes = (mins: any) => {
+      const n = Number(mins)
+      if (!Number.isFinite(n) || n < 0) return '—'
+      const h = Math.floor(n / 60)
+      const m = Math.floor(n % 60)
+      return h > 0 ? `${h}h ${m}m` : `${m}m`
+   }
 
    return (
       <div className="flex h-screen bg-slate-50 overflow-hidden text-slate-900">
@@ -3867,6 +4068,7 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
                         const distanceKm = Number(order?.distanceKm || 45);
                         const cropName = order?.cropName || 'Crop';
                         const quantity = Number(order?.quantity || r.weightKg || 0);
+                        const alreadyBid = (transportBids || []).some((b: any) => b.requestId === r.id && b.transporterId === user.id && b.status !== 'rejected' && b.status !== 'withdrawn');
                         return (
                         <Card key={r.id} className="p-0 overflow-hidden border-orange-100 group hover:shadow-2xl transition-all duration-500">
                            <div className="flex flex-col md:flex-row">
@@ -3877,6 +4079,7 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
                                        <div>
                                           <div className="text-xs text-orange-600 font-black uppercase tracking-widest mb-1">New Load Available</div>
                                           <h4 className="font-bold text-xl text-slate-800">{cropName} • {quantity} kg</h4>
+                                          <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">Vehicle: {r.vehicleType}</div>
                                        </div>
                                     </div>
                                     <div className="text-right">
@@ -3908,16 +4111,41 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
                                  </div>
 
                                  <div className="flex gap-4">
-                                    <Button variant="outline" className="flex-1 h-12 font-bold border-slate-200" onClick={() => {
-                                       const defaultBid = r.estimatedFare;
-                                       if (confirm(`Place bid for ₹${defaultBid} (Estimated)?`)) {
-                                          onAddTransportBid?.(r.id, user.id, defaultBid);
-                                       }
+                                    <Button variant="outline" disabled={alreadyBid} className="flex-1 h-12 font-bold border-slate-200" onClick={() => {
+                                       setTransportNumberValue(String(r.estimatedFare || 0))
+                                       setTransportNumberModal({ open: true, type: 'bid', requestId: r.id, title: 'Place Bid' })
                                     }}>Bid Fare</Button>
-                                    <Button className="flex-[2] h-12 bg-orange-600 hover:bg-orange-700 shadow-xl shadow-orange-600/20 font-black" onClick={() => onAcceptTransportRequest?.(r.id, user.id)}>
-                                       Accept Job
+                                    <Button disabled={alreadyBid} className="flex-[2] h-12 bg-orange-600 hover:bg-orange-700 shadow-xl shadow-orange-600/20 font-black" onClick={() => onAddTransportBid?.(r.id, user.id, r.estimatedFare, 'Accept base fare')}>
+                                       Accept Base
                                     </Button>
                                  </div>
+                                 {alreadyBid && (() => {
+                                    const myBid = (transportBids || []).find((b: any) => b.requestId === r.id && b.transporterId === user.id && b.status === 'pending')
+                                    if (!myBid) return null
+                                    const countered = myBid.lastActionBy === 'buyer' && myBid.counterAmount != null
+                                    return (
+                                       <div className="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
+                                          <div className="min-w-0">
+                                             <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Your Bid</div>
+                                             <div className="text-sm font-black text-slate-900">
+                                                ₹{Number((myBid.counterAmount != null ? myBid.counterAmount : myBid.amount) || 0).toLocaleString()}
+                                             </div>
+                                             {countered && <div className="text-[10px] font-black text-amber-700">Buyer countered</div>}
+                                          </div>
+                                          {countered ? (
+                                             <div className="flex items-center gap-2">
+                                                <Button variant="outline" className="h-10 text-xs font-black border-slate-200" onClick={() => {
+                                                   setTransportNumberValue(String(myBid.amount || r.estimatedFare || 0))
+                                                   setTransportNumberModal({ open: true, type: 'counter', bidId: myBid.id, title: 'Counter Offer' })
+                                                }}>Counter Back</Button>
+                                                <Button className="h-10 text-xs font-black bg-orange-600 hover:bg-orange-700" onClick={() => onTransporterAcceptBuyerCounter?.(myBid.id)}>Accept Counter</Button>
+                                             </div>
+                                          ) : (
+                                             <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Waiting buyer</div>
+                                          )}
+                                       </div>
+                                    )
+                                 })()}
                               </div>
                            </div>
                         </Card>
@@ -3953,9 +4181,15 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
                                     value={r.status}
                                     onChange={(e) => {
                                        const next = e.target.value as any;
+                                       if (next === 'picked_up') {
+                                          setOtpValue('')
+                                          setOtpModal({ open: true, requestId: r.id, nextStatus: 'picked_up' })
+                                          return
+                                       }
                                        if (next === 'delivered') {
-                                          const enteredOtp = r.deliveryOtp || '1234';
-                                          if (!confirm(`Verify delivery with OTP: ${enteredOtp}?`)) return;
+                                          setOtpValue('')
+                                          setOtpModal({ open: true, requestId: r.id, nextStatus: 'delivered' })
+                                          return
                                        }
                                        onUpdateTransportRequestStatus?.(r.id, next);
                                     }}
@@ -3969,11 +4203,21 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
                            </div>
 
                            <div className="flex gap-3 mt-4 flex-wrap">
-                              <Button variant="outline" className="h-10 text-xs font-bold border-dashed border-slate-300 hover:border-orange-500 hover:text-orange-600 transition-colors">POD</Button>
+                              <Button variant="outline" className="h-10 text-xs font-bold border-dashed border-slate-300 hover:border-orange-500 hover:text-orange-600 transition-colors" onClick={() => {
+                                 alert('POD upload will be added soon.')
+                              }}>POD</Button>
                               <Button className="h-10 text-xs font-bold bg-orange-600 hover:bg-orange-700" onClick={() => {
-                                 const farmerName = order?.farmerName;
-                                 const toUserId = farmerName ? '' : '';
-                                 if (toUserId) onSendMessage?.({ toUserId, text: `Update on shipment ${order?.id || r.orderId}` });
+                                 const toUserId = order?.buyerId || r.buyerId || ''
+                                 const toUserName =
+                                    order?.buyerName ||
+                                    allUsers?.find((u: any) => u.id === toUserId)?.profile?.fullName ||
+                                    allUsers?.find((u: any) => u.id === toUserId)?.phone ||
+                                    'Buyer'
+                                 if (!toUserId) {
+                                    alert('Buyer not found for this order.')
+                                    return
+                                 }
+                                 onOpenChat?.(toUserId, toUserName, undefined, order?.id || r.orderId)
                               }}>Message</Button>
                               <Button variant="outline" className="h-10 text-xs font-bold" onClick={() => {
                                  setIssueOrderId(order?.id || r.orderId);
@@ -4025,20 +4269,30 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
                            <thead className="bg-slate-50 text-slate-400 uppercase text-[10px] font-black tracking-widest">
                               <tr>
                                  <th className="px-6 py-4">Order ID</th>
-                                 <th className="px-6 py-4">Date</th>
+                                 <th className="px-6 py-4">Pickup</th>
+                                 <th className="px-6 py-4">Delivered</th>
+                                 <th className="px-6 py-4">Time Taken</th>
                                  <th className="px-6 py-4">Distance</th>
                                  <th className="px-6 py-4 text-right">Amount</th>
                               </tr>
                            </thead>
                            <tbody className="divide-y divide-slate-100">
-                              {completedDeliveries.map(o => (
-                                 <tr key={o.id} className="hover:bg-slate-50 transition-colors">
-                                    <td className="px-6 py-4 font-bold text-slate-700">#{o.id}</td>
-                                    <td className="px-6 py-4 text-slate-500">{new Date(o.date).toLocaleDateString()}</td>
-                                    <td className="px-6 py-4 text-slate-500">{o.distanceKm || 45} KM</td>
-                                    <td className="px-6 py-4 text-right font-black text-slate-900">₹{(o.distanceKm || 45) * 15}</td>
-                                 </tr>
-                              ))}
+                              {completedDeliveries.map((r: any) => {
+                                 const order = orders.find((o: any) => o.id === r.orderId)
+                                 const distance = Number(order?.distanceKm || 45)
+                                 const amount = Number(r.finalFare ?? r.estimatedFare ?? 0)
+                                 const timeMins = r.totalTimeMinutes ?? computeTimeMinutes(r.pickupConfirmedAt, r.deliveryConfirmedAt)
+                                 return (
+                                    <tr key={r.id} className="hover:bg-slate-50 transition-colors">
+                                       <td className="px-6 py-4 font-bold text-slate-700">#{r.orderId}</td>
+                                       <td className="px-6 py-4 text-slate-500">{formatDateTime(r.pickupConfirmedAt)}</td>
+                                       <td className="px-6 py-4 text-slate-500">{formatDateTime(r.deliveryConfirmedAt)}</td>
+                                       <td className="px-6 py-4 text-slate-500">{formatMinutes(timeMins)}</td>
+                                       <td className="px-6 py-4 text-slate-500">{distance} KM</td>
+                                       <td className="px-6 py-4 text-right font-black text-slate-900">₹{amount.toLocaleString()}</td>
+                                    </tr>
+                                 )
+                              })}
                            </tbody>
                         </table>
                         {completedDeliveries.length === 0 && <div className="py-12 text-center text-slate-400 text-xs">No payment records found yet.</div>}
@@ -4194,8 +4448,7 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
                          <div className="text-center py-12 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
                              <Truck className="w-12 h-12 text-slate-300 mx-auto mb-3" />
                              <h3 className="text-slate-900 font-bold">No Vehicles Added</h3>
-                             <p className="text-slate-500 text-sm mb-4">Add your trucks to start receiving orders.</p>
-                             <Button onClick={() => { setTempVehicle({ status: 'active', type: 'Mini Truck' }); setIsEditingVehicle(false); setShowAddVehicle(true); }}>Add First Vehicle</Button>
+                             <p className="text-slate-500 text-sm">Add your trucks to start receiving orders.</p>
                          </div>
                      )}
                   </div>
@@ -4558,6 +4811,80 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
                </div>
             )}
          </main>
+         {transportNumberModal.open && (
+            <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+               <Card className="w-full max-w-md relative bg-white p-0 overflow-hidden">
+                  <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+                     <div className="font-bold text-slate-900">{transportNumberModal.title}</div>
+                     <button onClick={() => setTransportNumberModal(prev => ({ ...prev, open: false }))} className="bg-white/80 rounded-full p-2 text-slate-700 border border-slate-200">
+                        <X className="w-5 h-5" />
+                     </button>
+                  </div>
+                  <div className="p-5 space-y-4">
+                     <Input
+                        label="Amount (₹)"
+                        type="number"
+                        value={transportNumberValue}
+                        onChange={(e) => setTransportNumberValue(e.target.value)}
+                     />
+                  </div>
+                  <div className="p-5 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+                     <Button variant="ghost" onClick={() => setTransportNumberModal(prev => ({ ...prev, open: false }))} className="h-10 text-sm font-bold">Cancel</Button>
+                     <Button
+                        className="h-10 text-sm font-bold bg-orange-600 hover:bg-orange-700"
+                        onClick={() => {
+                           const n = Number(transportNumberValue)
+                           if (!Number.isFinite(n) || n <= 0) return
+                           if (transportNumberModal.type === 'bid') {
+                              if (!transportNumberModal.requestId) return
+                              onAddTransportBid?.(transportNumberModal.requestId, user.id, n)
+                              setTransportNumberModal(prev => ({ ...prev, open: false }))
+                              return
+                           }
+                           if (transportNumberModal.type === 'counter') {
+                              if (!transportNumberModal.bidId) return
+                              onCounterTransportBid?.(transportNumberModal.bidId, n, 'transporter')
+                              setTransportNumberModal(prev => ({ ...prev, open: false }))
+                              return
+                           }
+                        }}
+                     >
+                        Confirm
+                     </Button>
+                  </div>
+               </Card>
+            </div>
+         )}
+         {otpModal.open && (
+            <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+               <Card className="w-full max-w-md relative bg-white p-0 overflow-hidden">
+                  <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+                     <div className="font-bold text-slate-900">{otpModal.nextStatus === 'picked_up' ? 'Pickup Verification' : 'Delivery Verification'}</div>
+                     <button onClick={() => setOtpModal(prev => ({ ...prev, open: false }))} className="bg-white/80 rounded-full p-2 text-slate-700 border border-slate-200">
+                        <X className="w-5 h-5" />
+                     </button>
+                  </div>
+                  <div className="p-5 space-y-4">
+                     <div className="text-sm text-slate-600 font-bold text-center">Enter OTP</div>
+                     <OTPInput onComplete={(otp) => setOtpValue(otp)} />
+                  </div>
+                  <div className="p-5 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+                     <Button variant="ghost" onClick={() => setOtpModal(prev => ({ ...prev, open: false }))} className="h-10 text-sm font-bold">Cancel</Button>
+                     <Button
+                        className="h-10 text-sm font-bold bg-orange-600 hover:bg-orange-700"
+                        disabled={(otpValue || '').length < 6}
+                        onClick={() => {
+                           if (!otpModal.requestId) return
+                           onUpdateTransportRequestStatus?.(otpModal.requestId, otpModal.nextStatus, otpValue)
+                           setOtpModal(prev => ({ ...prev, open: false }))
+                        }}
+                     >
+                        Verify
+                     </Button>
+                  </div>
+               </Card>
+            </div>
+         )}
          {issueModalOpen && (
             <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
                <Card className="w-full max-w-lg relative bg-white p-0 overflow-hidden">
@@ -4752,14 +5079,15 @@ const App = () => {
    const [screen, setScreen] = useState<'landing' | 'choose-role' | 'auth' | 'admin-login' | 'dashboard'>('landing');
    const [selectedRole, setSelectedRole] = useState<UserRole>(null);
    const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+   const [connectionError, setConnectionError] = useState<string | null>(null);
    const supabaseAvailable = !!getSupabase();
 
    // STATE
-   const [allUsers, setAllUsers] = useState<User[]>(INITIAL_USERS);
-   const [listings, setListings] = useState<CropListing[]>(INITIAL_LISTINGS);
+   const [allUsers, setAllUsers] = useState<User[]>([]);
+   const [listings, setListings] = useState<CropListing[]>([]);
    const [offers, setOffers] = useState<Offer[]>([]);
-   const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
-   const [disputes, setDisputes] = useState<Dispute[]>(INITIAL_DISPUTES);
+   const [orders, setOrders] = useState<Order[]>([]);
+   const [disputes, setDisputes] = useState<Dispute[]>([]);
    const [messages, setMessages] = useState<Message[]>([]);
    const [systemConfig, setSystemConfig] = useState<SystemConfig>({ offerExpiryHours: 24, maxListingsPerFarmer: 20, maxActiveJobsPerTransporter: 3, platformFeePercent: 2 });
    const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -4782,20 +5110,50 @@ const App = () => {
 
    // Load data from Supabase on mount
    React.useEffect(() => {
-      if (!supabaseAvailable) {
-         try {
-            const savedOrders = localStorage.getItem('kisansetu_orders');
-            const savedTransportRequests = localStorage.getItem('kisansetu_transport_requests');
-            const savedTransportBids = localStorage.getItem('kisansetu_transport_bids');
-            if (savedOrders) setOrders(JSON.parse(savedOrders));
-            if (savedTransportRequests) setTransportRequests(JSON.parse(savedTransportRequests));
-            if (savedTransportBids) setTransportBids(JSON.parse(savedTransportBids));
-         } catch (e) {
-            console.error('Failed to load local data', e);
+      // Listen for auth state changes (e.g. Magic Link login)
+      const c = getSupabase();
+      if (c) {
+         c.auth.onAuthStateChange(async (event, session) => {
+            console.log("Auth State Changed:", event, session?.user?.id);
+            if (event === 'SIGNED_IN' && session?.user) {
+               const user = await svc.getCurrentUser();
+               if (user) {
+                  setCurrentUser(user);
+                  setScreen('dashboard');
+               }
+            }
+         });
+      }
+
+      // Health Check
+      const checkConnection = async () => {
+         if (!supabaseAvailable) return;
+         const net = await svc.checkSupabaseConnectivity(6000)
+         const authOk = !!net?.auth?.ok
+         const restOk = !!net?.rest?.ok
+         if (authOk && restOk) {
+            setConnectionError(null)
+            return
          }
+         const authPart = authOk ? `auth=${net.auth.status}` : `auth_error=${net?.auth?.error || 'unknown'}`
+         const restPart = restOk ? `rest=${net.rest.status}` : `rest_error=${net?.rest?.error || 'unknown'}`
+         setConnectionError(`Supabase connection issue: ${authPart}, ${restPart}. Disable AdBlock/VPN and allow *.supabase.co.`)
+      };
+      checkConnection();
+
+      if (!supabaseAvailable) {
+         setConnectionError("Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
          return;
       }
       const loadData = async () => {
+         // Restore Session
+         const sessionUser = await svc.getCurrentUser();
+         if (sessionUser) {
+            setCurrentUser(sessionUser);
+            // If we have a user, go to dashboard
+            setScreen('dashboard');
+         }
+
          const [u, l, off, ord, d, m, inv, pay, r, rp, tr, tb] = await Promise.all([
             svc.getUsers(),
             svc.getListings(),
@@ -4827,17 +5185,6 @@ const App = () => {
       loadData();
    }, [supabaseAvailable]);
 
-   React.useEffect(() => {
-      if (supabaseAvailable) return;
-      try {
-         localStorage.setItem('kisansetu_orders', JSON.stringify(orders));
-         localStorage.setItem('kisansetu_transport_requests', JSON.stringify(transportRequests));
-         localStorage.setItem('kisansetu_transport_bids', JSON.stringify(transportBids));
-      } catch (e) {
-         console.error('Failed to save local data', e);
-      }
-   }, [supabaseAvailable, orders, transportRequests, transportBids]);
-
    const handleGetStarted = (role: UserRole | null = null, mode: 'login' | 'register' = 'register') => {
       setSelectedRole(role);
       setAuthMode(mode);
@@ -4850,21 +5197,46 @@ const App = () => {
       setScreen('auth');
    };
    const handleAuthComplete = async (userData: any) => {
-      let user = userData;
-      if (!userData.id) {
-         user = { ...userData, id: `u_${Date.now()}`, status: 'active', createdAt: new Date().toISOString() };
-         await svc.addUser(user);
-         setAllUsers([...allUsers, user]);
+      setCurrentUser(userData); 
+      setScreen('dashboard');
+      try {
+         const [u, l, off, ord, d, m, inv, pay, r, rp, tr, tb] = await Promise.all([
+            svc.getUsers(),
+            svc.getListings(),
+            svc.getOffers(),
+            svc.getOrders(),
+            svc.getDisputes(),
+            svc.getMessages(),
+            svc.getInventoryItems(),
+            svc.getPayouts(),
+            svc.getRfqs(),
+            svc.getRoutePlans(),
+            svc.getTransportRequests(),
+            svc.getTransportBids()
+         ]);
+         if (u) setAllUsers(u);
+         if (l) setListings(l);
+         if (off) setOffers(off);
+         if (ord) setOrders(ord);
+         if (d) setDisputes(d);
+         if (m) setMessages(m);
+         if (inv) setInventoryItems(inv);
+         if (pay) setPayouts(pay);
+         if (r) setRfqs(r);
+         if (rp) setRoutePlans(rp);
+         if (tr) setTransportRequests(tr);
+         if (tb) setTransportBids(tb);
+      } catch (e) {
+         console.error(e);
       }
-      setCurrentUser(user); setScreen('dashboard');
    };
    const handleAdminLogin = () => { setCurrentUser({ id: 'admin', phone: '0000', role: 'admin', status: 'active', createdAt: new Date().toISOString() }); setScreen('dashboard'); };
-   const handleLogout = () => { setCurrentUser(null); setScreen('landing'); };
+  const handleLogout = async () => { await svc.signOut(); setCurrentUser(null); setScreen('landing'); };
    const handleAddListing = async (l: any) => {
       try {
          const saved = await svc.addListing(l);
          if (!saved) return;
-         setListings(prev => [saved, ...prev]);
+        setListings(prev => [saved, ...prev]);
       } catch (e) {
          console.error(e);
          alert('Failed to publish listing. Please try again.');
@@ -4874,7 +5246,7 @@ const App = () => {
       try {
          const saved = await svc.updateListing(updatedListing);
          if (!saved) return;
-         setListings(prev => prev.map(l => l.id === saved.id ? saved : l));
+        setListings(prev => prev.map(l => l.id === saved.id ? saved : l));
       } catch (e) {
          console.error(e);
          alert('Failed to update listing. Please try again.');
@@ -4883,14 +5255,14 @@ const App = () => {
    const handleUpdateListingStatus = async (id: string, status: ListingStatus) => {
       try {
          await svc.updateListingStatus(id, status);
-         setListings(prev => prev.map(l => l.id === id ? { ...l, status } : l));
+        setListings(prev => prev.map(l => l.id === id ? { ...l, status } : l));
       } catch (e) {
          console.error(e);
          alert('Failed to update listing status. Please try again.');
       }
    };
 
-   const handleDeleteListing = (id: string) => { svc.deleteListing(id); setListings(listings.filter(l => l.id !== id)); };
+  const handleDeleteListing = (id: string) => { svc.deleteListing(id); setListings(listings.filter(l => l.id !== id)); };
 
    const handlePlaceOffer = async (offer: any) => {
       const offerId = `off_${Date.now()}`;
@@ -4909,6 +5281,7 @@ const App = () => {
           status: 'pending', 
           createdAt: new Date().toISOString(),
           lastActionBy: 'buyer',
+          buyerId: currentUser?.id, // Added for RLS
           history: initialHistory 
       };
       
@@ -4924,6 +5297,60 @@ const App = () => {
          alert('Failed to place offer. This usually means the listing is not published to the server.');
       }
    };
+
+   const handleDirectBuy = async (listingId: string, quantity: number) => {
+      if (!currentUser) {
+         alert('Please login to continue.')
+         return null
+      }
+      const freshListings = await svc.getListings()
+      const listing = (freshListings || []).find((l: any) => l.id === listingId) || (listings || []).find((l: any) => l.id === listingId)
+      if (!listing) {
+         alert('Listing not found.')
+         return null
+      }
+
+      const available = Number(listing.availableQuantity ?? listing.quantity ?? 0)
+      const qty = Math.max(1, Math.min(Number(quantity || 1), available || Number(quantity || 1)))
+      if (available > 0 && qty > available) {
+         alert('Not enough stock available for this listing.')
+         return null
+      }
+
+      const buyerName = currentUser.profile?.fullName || currentUser.phone || 'Buyer'
+      const buyerLocation = currentUser.profile?.city || ''
+
+      const newOrder: Order = {
+         id: `ord_${Date.now()}`,
+         listingId: listing.id,
+         cropName: listing.cropName,
+         quantity: qty,
+         totalAmount: Number(listing.pricePerKg || 0) * qty,
+         status: 'confirmed',
+         paymentStatus: 'pending',
+         date: new Date().toISOString(),
+         farmerName: listing.farmerName,
+         farmerId: listing.farmerId,
+         farmerLocation: listing.location,
+         buyerName,
+         buyerId: currentUser.id,
+         buyerLocation
+      };
+
+      try {
+         const order = await svc.createOrder(newOrder)
+         const nextAvailable = Math.max(0, available - qty)
+         const updatedListing = { ...listing, availableQuantity: nextAvailable }
+         await svc.updateListing(updatedListing)
+         setOrders(prev => [order, ...prev])
+         setListings(prev => prev.map(l => l.id === listing.id ? updatedListing : l))
+         return order
+      } catch (e) {
+         console.error(e)
+         alert('Failed to place order. Check console for details.')
+         return null
+      }
+   }
 
    const handleAcceptOffer = async (offerId: string) => {
       console.log("Accepting offer:", offerId);
@@ -4967,8 +5394,10 @@ const App = () => {
          paymentStatus: 'pending', // <--- New Payment Status
          date: new Date().toISOString(),
          farmerName: listing.farmerName,
+         farmerId: listing.farmerId, // Added for RLS
          farmerLocation: listing.location,
          buyerName: offer.buyerName,
+         buyerId: offer.buyerId, // Added for RLS
          buyerLocation: offer.buyerLocation
       };
 
@@ -5101,14 +5530,14 @@ const App = () => {
 
   const generateOtp = () => String(Math.floor(100000 + Math.random() * 900000));
 
-  const handleCreateTransportRequest = async (orderId: string, mode: TransportRequest['mode']) => {
+  const handleCreateTransportRequest = async (orderId: string, mode: TransportRequest['mode'], options?: { vehicleType?: TransportRequest['vehicleType']; estimatedFare?: number; pickupDate?: string; pickupTime?: string }) => {
      const order = orders.find(o => o.id === orderId);
      if (!order) return;
      const buyerId = currentUser?.id || '';
-     const farmerId = (allUsers.find(u => u.profile?.fullName === order.farmerName)?.id) || '';
+     const farmerId = order.farmerId || (allUsers.find(u => u.profile?.fullName === order.farmerName)?.id) || '';
      const weightKg = Number(order.quantity || 0);
-     const vehicleType = recommendVehicleType(weightKg);
-     const estimatedFare = estimateTransportFare(Number(order.distanceKm || 45), vehicleType);
+     const vehicleType = options?.vehicleType || recommendVehicleType(weightKg);
+     const estimatedFare = Number(options?.estimatedFare ?? estimateTransportFare(Number(order.distanceKm || 45), vehicleType));
      const status: TransportRequest['status'] =
         mode === 'farmer_arranged' ? 'awaiting_farmer' : mode === 'buyer_own' ? 'assigned' : 'open';
 
@@ -5124,15 +5553,24 @@ const App = () => {
         mode,
         status,
         estimatedFare,
-        deliveryOtp: generateOtp(),
+        pickupDate: options?.pickupDate,
+        pickupTime: options?.pickupTime,
+        transportPaymentStatus: mode === 'marketplace' ? 'unpaid' : undefined,
         createdAt: new Date().toISOString()
      };
 
-     await svc.addTransportRequest(newReq);
-     setTransportRequests([newReq, ...transportRequests]);
+     try {
+        const saved = await svc.addTransportRequest(newReq);
+        if (!saved) return;
+        setTransportRequests(prev => [saved, ...prev]);
+     } catch (e) {
+        console.error(e);
+        alert('Failed to create transport request.');
+     }
   };
 
   const handleAddTransportBid = async (requestId: string, transporterId: string, amount: number, message?: string) => {
+     const now = new Date().toISOString()
      const bid: TransportBid = {
         id: `tb_${Date.now()}`,
         requestId,
@@ -5140,11 +5578,76 @@ const App = () => {
         amount,
         message,
         status: 'pending',
-        createdAt: new Date().toISOString()
+        lastActionBy: 'transporter',
+        history: [{
+           role: 'transporter',
+           amount,
+           action: 'bid',
+           timestamp: now
+        }],
+        createdAt: now
      };
-     await svc.addTransportBid(bid);
-     setTransportBids([bid, ...transportBids]);
+
+     setTransportBids(prev => [bid, ...prev]);
+     try {
+        const saved = await svc.addTransportBid({ ...bid, updatedAt: now });
+        if (!saved) return;
+        setTransportBids(prev => prev.map(b => b.id === bid.id ? saved : b));
+     } catch (e) {
+        console.error(e);
+     }
   };
+
+  const handleCounterTransportBid = async (bidId: string, amount: number, role: 'buyer' | 'transporter') => {
+     const bid = transportBids.find(b => b.id === bidId);
+     if (!bid) return;
+     const timestamp = new Date().toISOString()
+
+     const updates: any = {
+        updatedAt: timestamp,
+        history: [...(bid.history || []), { role, amount, action: 'counter', timestamp }]
+     }
+
+     if (role === 'buyer') {
+        updates.counterAmount = amount
+        updates.lastActionBy = 'buyer'
+     } else {
+        updates.amount = amount
+        updates.counterAmount = null
+        updates.lastActionBy = 'transporter'
+     }
+
+     const optimistic = { ...bid, ...updates }
+     setTransportBids(prev => prev.map(b => b.id === bidId ? optimistic : b))
+     try {
+        const saved = await svc.updateTransportBid(bidId, updates)
+        if (saved) setTransportBids(prev => prev.map(b => b.id === bidId ? saved : b))
+     } catch (e) {
+        console.error(e)
+     }
+  }
+
+  const handleTransporterAcceptBuyerCounter = async (bidId: string) => {
+     const bid = transportBids.find(b => b.id === bidId)
+     if (!bid || bid.counterAmount == null) return
+     const timestamp = new Date().toISOString()
+     const nextAmount = Number(bid.counterAmount)
+     const updates: any = {
+        amount: nextAmount,
+        counterAmount: null,
+        lastActionBy: 'transporter',
+        updatedAt: timestamp,
+        history: [...(bid.history || []), { role: 'transporter', amount: nextAmount, action: 'accept', timestamp }]
+     }
+     const optimistic = { ...bid, ...updates }
+     setTransportBids(prev => prev.map(b => b.id === bidId ? optimistic : b))
+     try {
+        const saved = await svc.updateTransportBid(bidId, updates)
+        if (saved) setTransportBids(prev => prev.map(b => b.id === bidId ? saved : b))
+     } catch (e) {
+        console.error(e)
+     }
+  }
 
   const handleAcceptTransportBid = async (bidId: string) => {
      const bid = transportBids.find(b => b.id === bidId);
@@ -5152,17 +5655,45 @@ const App = () => {
      const req = transportRequests.find(r => r.id === bid.requestId);
      if (!req) return;
 
+     if (req.mode === 'marketplace' && bid.lastActionBy === 'buyer') {
+        alert('Waiting for transporter response on your counter.')
+        return
+     }
+
+     const agreedFare = Number((bid.counterAmount != null && bid.lastActionBy === 'buyer') ? bid.counterAmount : bid.amount)
+
      const requestBids = transportBids.filter(b => b.requestId === req.id);
-     await Promise.all(requestBids.map(b => svc.setTransportBidStatus(b.id, b.id === bid.id ? 'accepted' : 'rejected')));
      setTransportBids(prev => prev.map(b => b.requestId !== req.id ? b : { ...b, status: b.id === bid.id ? 'accepted' : 'rejected' }));
+     try {
+        await Promise.all(requestBids.map(b => svc.setTransportBidStatus(b.id, b.id === bid.id ? 'accepted' : 'rejected')));
+     } catch (e) {
+        console.error(e)
+     }
 
-     const patch = { transporterId: bid.transporterId, finalFare: bid.amount, status: 'assigned' };
-     const saved = await svc.updateTransportRequest(req.id, patch);
-     const updatedReq = saved ? saved : ({ ...req, ...patch } as TransportRequest);
-     setTransportRequests(prev => prev.map(r => r.id === updatedReq.id ? updatedReq : r));
+     const patch: any = {
+        transporterId: bid.transporterId,
+        acceptedBidId: bid.id,
+        finalFare: agreedFare,
+        status: 'assigned',
+        pickupOtp: generateOtp(),
+        deliveryOtp: generateOtp(),
+        transportPaymentStatus: 'held',
+        transportPaymentProof: `TRN-${Date.now()}`
+     };
+     setTransportRequests(prev => prev.map(r => r.id !== req.id ? r : ({ ...r, ...patch } as TransportRequest)));
+     try {
+        const saved = await svc.updateTransportRequest(req.id, patch);
+        if (saved) setTransportRequests(prev => prev.map(r => r.id === saved.id ? saved : r));
+     } catch (e) {
+        console.error(e)
+     }
 
-     await svc.setOrderTransporter(req.orderId, bid.transporterId);
      setOrders(prev => prev.map(o => o.id === req.orderId ? { ...o, transporterId: bid.transporterId } : o));
+     try {
+        await svc.setOrderTransporter(req.orderId, bid.transporterId);
+     } catch (e) {
+        console.error(e)
+     }
   };
 
   const handleAcceptTransportRequest = async (requestId: string, transporterId: string, finalFare?: number) => {
@@ -5170,7 +5701,7 @@ const App = () => {
      if (!transporterId) {
          const req = transportRequests.find(r => r.id === requestId);
          if (!req) return;
-         const patch = { status: 'open' };
+         const patch: any = { status: 'open', mode: 'marketplace', transportPaymentStatus: 'unpaid' };
          const saved = await svc.updateTransportRequest(req.id, patch);
          const updatedReq = saved ? saved : ({ ...req, ...patch } as TransportRequest);
          setTransportRequests(prev => prev.map(r => r.id === updatedReq.id ? updatedReq : r));
@@ -5189,11 +5720,52 @@ const App = () => {
      setOrders(prev => prev.map(o => o.id === req.orderId ? { ...o, transporterId } : o));
   };
 
-  const handleUpdateTransportRequestStatus = async (requestId: string, status: TransportRequest['status']) => {
+  const handleUpdateTransportRequest = async (requestId: string, patch: Partial<TransportRequest>) => {
+     const req = transportRequests.find(r => r.id === requestId)
+     if (!req) return
+     setTransportRequests(prev => prev.map(r => r.id === requestId ? ({ ...r, ...patch } as TransportRequest) : r))
+     try {
+        const saved = await svc.updateTransportRequest(requestId, patch)
+        if (saved) setTransportRequests(prev => prev.map(r => r.id === requestId ? saved : r))
+     } catch (e) {
+        console.error(e)
+     }
+  }
+
+  const handleUpdateTransportRequestStatus = async (requestId: string, status: TransportRequest['status'], otp?: string) => {
      const req = transportRequests.find(r => r.id === requestId);
      if (!req) return;
-     const saved = await svc.updateTransportRequest(requestId, { status });
-     const updatedReq = saved ? saved : ({ ...req, status } as TransportRequest);
+     const patch: any = { status }
+     if (status === 'picked_up') {
+        const entered = (otp || '').trim()
+        if (!entered || entered !== (req.pickupOtp || '').trim()) {
+           alert('Invalid pickup OTP.')
+           return
+        }
+        patch.pickupConfirmedAt = new Date().toISOString()
+     }
+     if (status === 'delivered') {
+        const entered = (otp || '').trim()
+        if (!entered || entered !== (req.deliveryOtp || '').trim()) {
+           alert('Invalid delivery OTP.')
+           return
+        }
+        if (!req.pickupConfirmedAt) {
+           alert('Pickup must be verified before delivery.')
+           return
+        }
+        const deliveredAt = new Date().toISOString()
+        patch.deliveryConfirmedAt = deliveredAt
+        patch.transportPaymentStatus = 'released'
+        const pickupAt = req.pickupConfirmedAt
+        const start = pickupAt ? Date.parse(pickupAt) : NaN
+        const end = Date.parse(deliveredAt)
+        if (Number.isFinite(start) && Number.isFinite(end) && end >= start) {
+           patch.totalTimeMinutes = Math.round((end - start) / 60000)
+        }
+     }
+     const saved = await svc.updateTransportRequest(requestId, patch);
+     const updatedReq = saved ? saved : ({ ...req, ...patch } as TransportRequest);
      setTransportRequests(prev => prev.map(r => r.id === updatedReq.id ? updatedReq : r));
 
      const orderStatus: OrderStatus | null =
@@ -5204,7 +5776,10 @@ const App = () => {
      }
   };
 
-   const handleUpdateOrderStatus = async (orderId: string, newStatus: OrderStatus) => { await svc.setOrderStatus(orderId, newStatus); setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o)); };
+  const handleUpdateOrderStatus = async (orderId: string, newStatus: OrderStatus) => {
+     await svc.setOrderStatus(orderId, newStatus);
+     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+  };
   const handleUpdateOrderPayment = async (orderId: string, paymentStatus: Order['paymentStatus'], paymentProof?: string) => {
      await svc.updateOrderPayment(orderId, paymentStatus as any, paymentProof);
      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, paymentStatus, paymentProof: paymentProof ?? o.paymentProof } : o));
@@ -5212,28 +5787,52 @@ const App = () => {
 
    const handleResolveDispute = async (disputeId: string, outcome: string) => { await svc.resolveDispute(disputeId, 'resolved'); setDisputes(disputes.map(d => d.id === disputeId ? { ...d, status: 'resolved' } : d)); };
 
-   const handleAddInventoryItem = async (item: Omit<InventoryItem, 'id' | 'createdAt'>) => {
-      const newItem: InventoryItem = { ...item, id: `inv_${Date.now()}`, createdAt: new Date().toISOString() };
-      await svc.addInventoryItem(newItem);
-      setInventoryItems([newItem, ...inventoryItems]);
-   };
-   const handleAddPayout = async (p: Omit<Payout, 'id' | 'createdAt'>) => {
-      const newP: Payout = { ...p, id: `pay_${Date.now()}`, createdAt: new Date().toISOString() };
-      await svc.addPayout(newP);
-      setPayouts([newP, ...payouts]);
-   };
-   const handleAddRfq = async (r: Omit<RFQ, 'id' | 'createdAt' | 'status'>) => {
-      const newR: RFQ = { ...r, id: `rfq_${Date.now()}`, status: 'open', createdAt: new Date().toISOString() };
-      await svc.addRfq(newR);
-      setRfqs([newR, ...rfqs]);
-   };
-   const handleAddRoutePlan = async (rp: Omit<RoutePlan, 'id' | 'createdAt'>) => {
-      const newRP: RoutePlan = { ...rp, id: `route_${Date.now()}`, createdAt: new Date().toISOString() };
-      await svc.addRoutePlan(newRP);
-      setRoutePlans([newRP, ...routePlans]);
-   };
+  const handleAddInventoryItem = async (item: Omit<InventoryItem, 'id' | 'createdAt'>) => {
+     const newItem: InventoryItem = { ...item, id: `inv_${Date.now()}`, createdAt: new Date().toISOString() };
+     try {
+        const saved = await svc.addInventoryItem(newItem);
+        if (!saved) return;
+        setInventoryItems(prev => [saved, ...prev]);
+     } catch (e) {
+        console.error(e);
+        alert('Failed to add inventory item.');
+     }
+  };
+  const handleAddPayout = async (p: Omit<Payout, 'id' | 'createdAt'>) => {
+     const newP: Payout = { ...p, id: `pay_${Date.now()}`, createdAt: new Date().toISOString() };
+     try {
+        const saved = await svc.addPayout(newP);
+        if (!saved) return;
+        setPayouts(prev => [saved, ...prev]);
+     } catch (e) {
+        console.error(e);
+        alert('Failed to add payout.');
+     }
+  };
+  const handleAddRfq = async (r: Omit<RFQ, 'id' | 'createdAt' | 'status'>) => {
+     const newR: RFQ = { ...r, id: `rfq_${Date.now()}`, status: 'open', createdAt: new Date().toISOString() };
+     try {
+        const saved = await svc.addRfq(newR);
+        if (!saved) return;
+        setRfqs(prev => [saved, ...prev]);
+     } catch (e) {
+        console.error(e);
+        alert('Failed to add RFQ.');
+     }
+  };
+  const handleAddRoutePlan = async (rp: Omit<RoutePlan, 'id' | 'createdAt'>) => {
+     const newRP: RoutePlan = { ...rp, id: `route_${Date.now()}`, createdAt: new Date().toISOString() };
+     try {
+        const saved = await svc.addRoutePlan(newRP);
+        if (!saved) return;
+        setRoutePlans(prev => [saved, ...prev]);
+     } catch (e) {
+        console.error(e);
+        alert('Failed to add route plan.');
+     }
+  };
 
-   const handleRaiseDispute = (payload: { orderId: string; raisedBy: string; role: UserRole; issue: string; details?: string; amount?: number }) => {
+  const handleRaiseDispute = async (payload: { orderId: string; raisedBy: string; role: UserRole; issue: string; details?: string; amount?: number }) => {
       const newDispute: Dispute = {
          id: `disp_${Date.now()}`,
          orderId: payload.orderId,
@@ -5245,8 +5844,14 @@ const App = () => {
          status: 'open',
          createdAt: new Date().toISOString()
       };
-      svc.raiseDispute(newDispute);
-      setDisputes([newDispute, ...disputes]);
+     try {
+        const saved = await svc.raiseDispute(newDispute);
+        if (!saved) return;
+        setDisputes(prev => [saved, ...prev]);
+     } catch (e) {
+        console.error(e);
+        alert('Failed to raise dispute.');
+     }
    };
 
    const handleSendMessage = async (msg: { toUserId: string; text: string; listingId?: string; orderId?: string }) => {
@@ -5261,8 +5866,14 @@ const App = () => {
          timestamp: new Date().toISOString(),
          read: false
       };
-      await svc.addMessage(newMsg);
-      setMessages([newMsg, ...messages]);
+     try {
+        const saved = await svc.addMessage(newMsg);
+        if (!saved) return;
+        setMessages(prev => [saved, ...prev]);
+     } catch (e) {
+        console.error(e);
+        alert('Failed to send message.');
+     }
    };
 
    const handleUpdateProfile = async (userId: string, newProfile: any) => {
@@ -5276,15 +5887,21 @@ const App = () => {
 
    return (
       <div className="min-h-screen font-sans text-slate-900 bg-slate-50">
+         {connectionError && (
+            <div className="bg-red-600 text-white px-4 py-2 text-center text-sm font-bold flex items-center justify-center gap-2 sticky top-0 z-[100]">
+               <AlertCircle className="w-4 h-4" />
+               {connectionError}
+            </div>
+         )}
          {screen === 'landing' && <LandingPage onGetStarted={handleGetStarted} onAdminLogin={() => setScreen('admin-login')} />}
          {screen === 'choose-role' && <ChooseRole onSelect={handleRoleSelect} onBack={() => setScreen('landing')} />}
-         {screen === 'auth' && <div className="min-h-screen bg-gradient-to-br from-nature-50 to-blue-50 flex items-center justify-center p-4"><AuthWizard initialRole={selectedRole} initialMode={authMode} onComplete={handleAuthComplete} onBack={() => setScreen('landing')} existingUsers={allUsers} /></div>}
+        {screen === 'auth' && <div className="min-h-screen bg-gradient-to-br from-nature-50 to-blue-50 flex items-center justify-center p-4"><AuthWizard initialRole={selectedRole} initialMode={authMode} onComplete={handleAuthComplete} onBack={() => setScreen('landing')} /></div>}
          {screen === 'admin-login' && <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4"><AdminLogin onLogin={handleAdminLogin} onBack={() => setScreen('landing')} /></div>}
 
          {screen === 'dashboard' && currentUser?.role === 'admin' && <AdminDashboard allUsers={allUsers} listings={listings} orders={orders} disputes={disputes} systemConfig={systemConfig} onUpdateConfig={setSystemConfig} onLogout={handleLogout} onUpdateUserStatus={handleUserStatusChange} onResolveDispute={handleResolveDispute} />}
         {screen === 'dashboard' && currentUser?.role === 'farmer' && <FarmerDashboard user={currentUser} listings={listings} offers={offers} orders={orders} messages={messages} inventoryItems={inventoryItems} payouts={payouts} transportRequests={transportRequests} allUsers={allUsers} onAddInventoryItem={handleAddInventoryItem} onAddPayout={handleAddPayout} onSendMessage={handleSendMessage} onAddListing={handleAddListing} onUpdateListing={handleUpdateListing} onUpdateListingStatus={handleUpdateListingStatus} onDeleteListing={handleDeleteListing} onAcceptOffer={handleAcceptOffer} onRejectOffer={handleRejectOffer} onCounterOffer={handleCounterOffer} onUpdateProfile={handleUpdateProfile} onRaiseDispute={handleRaiseDispute} onLogout={handleLogout} onAcceptTransportRequest={handleAcceptTransportRequest} onOpenChat={handleOpenChat} onViewInvoice={handleViewInvoice} onUpdateOrderPayment={handleUpdateOrderPayment} />}
-         {screen === 'dashboard' && currentUser?.role === 'buyer' && <BuyerDashboard user={currentUser} listings={listings} offers={offers} orders={orders} messages={messages} rfqs={rfqs} transportRequests={transportRequests} transportBids={transportBids} allUsers={allUsers} onAddRfq={handleAddRfq} onSendMessage={handleSendMessage} onPlaceOffer={handlePlaceOffer} onAcceptOffer={handleAcceptOffer} onCounterOffer={handleCounterOffer} onCancelOffer={handleCancelOffer} onUpdateProfile={handleUpdateProfile} onRaiseDispute={handleRaiseDispute} onLogout={handleLogout} onCreateTransportRequest={handleCreateTransportRequest} onAcceptTransportBid={handleAcceptTransportBid} onOpenChat={handleOpenChat} onViewInvoice={handleViewInvoice} onUpdateOrderPayment={handleUpdateOrderPayment} />}
-        {screen === 'dashboard' && currentUser?.role === 'transporter' && <TransporterDashboard user={currentUser} orders={orders} messages={messages} routePlans={routePlans} transportRequests={transportRequests} transportBids={transportBids} allUsers={allUsers} onAddRoutePlan={handleAddRoutePlan} onSendMessage={handleSendMessage} onRaiseDispute={handleRaiseDispute} onLogout={handleLogout} onUpdateOrderStatus={handleUpdateOrderStatus} onUpdateProfile={handleUpdateProfile} onAcceptTransportRequest={handleAcceptTransportRequest} onAddTransportBid={handleAddTransportBid} onUpdateTransportRequestStatus={handleUpdateTransportRequestStatus} />}
+        {screen === 'dashboard' && currentUser?.role === 'buyer' && <BuyerDashboard user={currentUser} listings={listings} offers={offers} orders={orders} messages={messages} rfqs={rfqs} transportRequests={transportRequests} transportBids={transportBids} allUsers={allUsers} onAddRfq={handleAddRfq} onSendMessage={handleSendMessage} onPlaceOffer={handlePlaceOffer} onAcceptOffer={handleAcceptOffer} onCounterOffer={handleCounterOffer} onCancelOffer={handleCancelOffer} onUpdateProfile={handleUpdateProfile} onRaiseDispute={handleRaiseDispute} onLogout={handleLogout} onCreateTransportRequest={handleCreateTransportRequest} onAcceptTransportBid={handleAcceptTransportBid} onCounterTransportBid={handleCounterTransportBid} onUpdateTransportRequest={handleUpdateTransportRequest} onOpenChat={handleOpenChat} onViewInvoice={handleViewInvoice} onUpdateOrderPayment={handleUpdateOrderPayment} onDirectBuy={handleDirectBuy} />}
+        {screen === 'dashboard' && currentUser?.role === 'transporter' && <TransporterDashboard user={currentUser} orders={orders} messages={messages} routePlans={routePlans} transportRequests={transportRequests} transportBids={transportBids} allUsers={allUsers} onAddRoutePlan={handleAddRoutePlan} onSendMessage={handleSendMessage} onRaiseDispute={handleRaiseDispute} onLogout={handleLogout} onUpdateOrderStatus={handleUpdateOrderStatus} onUpdateProfile={handleUpdateProfile} onAddTransportBid={handleAddTransportBid} onUpdateTransportRequestStatus={handleUpdateTransportRequestStatus} onCounterTransportBid={handleCounterTransportBid} onTransporterAcceptBuyerCounter={handleTransporterAcceptBuyerCounter} onOpenChat={handleOpenChat} />}
          
          <ChatDrawer 
             open={chatDrawer.open} 

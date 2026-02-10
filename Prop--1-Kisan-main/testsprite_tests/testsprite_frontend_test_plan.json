@@ -1,0 +1,642 @@
+[
+  {
+    "id": "TC001",
+    "title": "User Registration and Role Assignment",
+    "description": "Verify that users can register with phone and password, select a role, and successfully create their profile.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to registration page"
+      },
+      {
+        "type": "action",
+        "description": "Input valid phone number and password"
+      },
+      {
+        "type": "action",
+        "description": "Select user role (Farmer/Buyer/Transporter/Admin where applicable)"
+      },
+      {
+        "type": "action",
+        "description": "Complete profile setup form with required details"
+      },
+      {
+        "type": "action",
+        "description": "Submit registration"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm registration success and correct role assignment"
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Login Success with Valid Credentials",
+    "description": "Check login is successful with correct phone number and password combination.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to login page"
+      },
+      {
+        "type": "action",
+        "description": "Input registered phone number and correct password"
+      },
+      {
+        "type": "action",
+        "description": "Click login button"
+      },
+      {
+        "type": "assertion",
+        "description": "User is redirected to the appropriate role-based dashboard"
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Login Failure with Invalid Credentials",
+    "description": "Ensure login is rejected when incorrect phone number or password is entered.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to login page"
+      },
+      {
+        "type": "action",
+        "description": "Input invalid phone number or password"
+      },
+      {
+        "type": "action",
+        "description": "Click login button"
+      },
+      {
+        "type": "assertion",
+        "description": "Display error message indicating invalid credentials and prevent login"
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Farmer Creates New Crop Listing",
+    "description": "Validate that Farmers can create crop listings with details and media, and listings are persisted and displayed correctly.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as Farmer"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to 'Create Listing' section"
+      },
+      {
+        "type": "action",
+        "description": "Enter crop details including name, price, quantity, and description"
+      },
+      {
+        "type": "action",
+        "description": "Upload associated media files (e.g., images) for the crop"
+      },
+      {
+        "type": "action",
+        "description": "Submit listing"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm listing is saved and displayed with correct details and media"
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Farmer Updates Existing Crop Listing",
+    "description": "Check that Farmers can update details and media of an existing crop listing and changes persist.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as Farmer"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to existing crop listing"
+      },
+      {
+        "type": "action",
+        "description": "Modify listing details such as price and quantity"
+      },
+      {
+        "type": "action",
+        "description": "Update or replace media files"
+      },
+      {
+        "type": "action",
+        "description": "Submit updates"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify updated details and media are correctly saved and displayed"
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Farmer Deletes Crop Listing",
+    "description": "Ensure Farmers can delete a crop listing and it is removed from the marketplace and their dashboard.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as Farmer"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the crop listing to delete"
+      },
+      {
+        "type": "action",
+        "description": "Initiate delete action and confirm deletion"
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure listing is removed and no longer visible in any browse or dashboard views"
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Buyer Browses Crop Listings",
+    "description": "Verify Buyers can browse available crop listings with accurate details visible.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as Buyer"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to marketplace listing page"
+      },
+      {
+        "type": "action",
+        "description": "View multiple crop listings"
+      },
+      {
+        "type": "assertion",
+        "description": "Listings display correct crop names, prices, quantities, and media"
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Buyer Places Offer on Crop Listing",
+    "description": "Test that Buyers can place offers on crop listings, which are stored and visible in offer history.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as Buyer"
+      },
+      {
+        "type": "action",
+        "description": "Browse and select a crop listing"
+      },
+      {
+        "type": "action",
+        "description": "Enter offer details and submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm offer is recorded and visible in buyer and farmer offer histories"
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Buyer Negotiates and Confirms Order",
+    "description": "Check Buyers can engage in offer negotiation and confirm orders from accepted offers.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as Buyer"
+      },
+      {
+        "type": "action",
+        "description": "View existing offers and counteroffers"
+      },
+      {
+        "type": "action",
+        "description": "Accept an offer and confirm the order"
+      },
+      {
+        "type": "assertion",
+        "description": "Order status updates correctly and order appears in buyer's active orders"
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Order Payment Workflow - Submit Payment Proof",
+    "description": "Validate Buyers can submit payment proof for orders and Farmers can verify the payment proof.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as Buyer with confirmed order"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to order payment section"
+      },
+      {
+        "type": "action",
+        "description": "Upload payment proof and submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Payment proof is saved and visible to Farmer for verification"
+      },
+      {
+        "type": "action",
+        "description": "Login as Farmer"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to orders and view payment proofs"
+      },
+      {
+        "type": "action",
+        "description": "Verify payment and update order status"
+      },
+      {
+        "type": "assertion",
+        "description": "Order payment status updated from pending to verified"
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Transporter Views Loadboard and Bids on Jobs",
+    "description": "Ensure Transporters can view transport requests in a loadboard and place bids which get recorded properly.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as Transporter"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to loadboard to view open transport requests"
+      },
+      {
+        "type": "action",
+        "description": "Select a request and place a bid"
+      },
+      {
+        "type": "assertion",
+        "description": "Bid is recorded and visible in Transporter's bid list"
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Transporter Manages Delivery Status and OTP Verification",
+    "description": "Validate that Transporters can update delivery statuses and verify deliveries using OTP, with correct status flows.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as Transporter with assigned delivery job"
+      },
+      {
+        "type": "action",
+        "description": "Update delivery status sequentially (e.g., picked up, in transit, delivered)"
+      },
+      {
+        "type": "action",
+        "description": "At delivery, input OTP provided by recipient"
+      },
+      {
+        "type": "assertion",
+        "description": "Delivery status updates correctly and OTP matches expected value"
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Transporter Adds and Updates Fleet Vehicles",
+    "description": "Check that Transporters can add up to two vehicles with data and photos, and update their information.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as Transporter"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to fleet/vehicle management section"
+      },
+      {
+        "type": "action",
+        "description": "Add vehicle details and upload vehicle photos"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to add third vehicle"
+      },
+      {
+        "type": "assertion",
+        "description": "System allows up to two vehicles and prevents adding a third with appropriate message"
+      },
+      {
+        "type": "action",
+        "description": "Update existing vehicle information and save"
+      },
+      {
+        "type": "assertion",
+        "description": "Vehicle details and photos update correctly"
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "In-app Messaging Linked to Orders and Listings",
+    "description": "Verify users can send and receive messages within the app linked to specific orders or listings and messages display in correct conversations.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as any user role"
+      },
+      {
+        "type": "action",
+        "description": "Open messaging interface linked to a particular order or listing"
+      },
+      {
+        "type": "action",
+        "description": "Send a message to the linked user"
+      },
+      {
+        "type": "assertion",
+        "description": "Recipient receives the message in the correct conversation thread in real-time"
+      },
+      {
+        "type": "action",
+        "description": "Reply from recipient"
+      },
+      {
+        "type": "assertion",
+        "description": "Sender sees the reply in real-time"
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Raise and Resolve Disputes",
+    "description": "Check that users can raise disputes on orders and Admins can view, update status, and resolve disputes through the admin dashboard.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as Farmer/Buyer/Transporter with an active order"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to order and raise a dispute with relevant details"
+      },
+      {
+        "type": "assertion",
+        "description": "Dispute is created and visible in user's dispute list"
+      },
+      {
+        "type": "action",
+        "description": "Login as Admin"
+      },
+      {
+        "type": "action",
+        "description": "Access dispute management dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Review dispute details and update dispute resolution status"
+      },
+      {
+        "type": "assertion",
+        "description": "Dispute status updates and resolution is reflected in user dashboards"
+      }
+    ]
+  },
+  {
+    "id": "TC016",
+    "title": "Role-Based Dashboard Data Filtering",
+    "description": "Validate that each user role sees only authorized data and features in their dashboard with correct filtering applied.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as Farmer"
+      },
+      {
+        "type": "assertion",
+        "description": "Dashboard shows only farmer-specific listings, orders, and relevant information"
+      },
+      {
+        "type": "action",
+        "description": "Logout and login as Buyer"
+      },
+      {
+        "type": "assertion",
+        "description": "Dashboard shows only marketplace listings, buyer orders, and offers without farmer or admin data"
+      },
+      {
+        "type": "action",
+        "description": "Logout and login as Transporter"
+      },
+      {
+        "type": "assertion",
+        "description": "Dashboard shows loadboard, fleet, and assigned deliveries only"
+      },
+      {
+        "type": "action",
+        "description": "Logout and login as Admin"
+      },
+      {
+        "type": "assertion",
+        "description": "Dashboard shows management tools for users, orders, disputes, and system settings"
+      }
+    ]
+  },
+  {
+    "id": "TC017",
+    "title": "Data Integrity Enforcement with Row Level Security",
+    "description": "Verify that unauthorized access to data is prevented via Supabase Row Level Security policies, ensuring users cannot access or modify data beyond their permissions.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Attempt to access or modify another user's listings or orders using direct API or UI methods with a non-admin user"
+      },
+      {
+        "type": "assertion",
+        "description": "Access is denied and data is not exposed or altered"
+      },
+      {
+        "type": "action",
+        "description": "Admin users attempt to access all user data"
+      },
+      {
+        "type": "assertion",
+        "description": "Admin can access and modify data as permitted"
+      }
+    ]
+  },
+  {
+    "id": "TC018",
+    "title": "Order Status Transitions and Validations",
+    "description": "Check the correct lifecycle of orders through status transitions including created, negotiated, confirmed, paid, shipped, delivered, and closed.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Create a new order"
+      },
+      {
+        "type": "assertion",
+        "description": "Initial status is 'created'"
+      },
+      {
+        "type": "action",
+        "description": "Perform negotiation steps with counteroffers"
+      },
+      {
+        "type": "assertion",
+        "description": "Status updates to 'negotiating' or equivalent"
+      },
+      {
+        "type": "action",
+        "description": "Buyer confirms order"
+      },
+      {
+        "type": "assertion",
+        "description": "Status updates to 'confirmed'"
+      },
+      {
+        "type": "action",
+        "description": "Buyer submits payment proof"
+      },
+      {
+        "type": "assertion",
+        "description": "Status updates to 'payment pending verification'"
+      },
+      {
+        "type": "action",
+        "description": "Farmer verifies payment"
+      },
+      {
+        "type": "assertion",
+        "description": "Status updates to 'paid'"
+      },
+      {
+        "type": "action",
+        "description": "Transporter updates delivery status through shipment process"
+      },
+      {
+        "type": "assertion",
+        "description": "Status transitions through 'in transit', 'delivered', etc."
+      },
+      {
+        "type": "action",
+        "description": "Close order after successful delivery"
+      },
+      {
+        "type": "assertion",
+        "description": "Final status is 'closed'"
+      }
+    ]
+  },
+  {
+    "id": "TC019",
+    "title": "Error Handling for Invalid Listing Data",
+    "description": "Ensure the system prevents creation or update of crop listings with invalid or missing mandatory fields, showing appropriate error messages.",
+    "category": "error handling",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as Farmer"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to create a listing leaving mandatory fields empty or with invalid data"
+      },
+      {
+        "type": "assertion",
+        "description": "Display error messages for missing/invalid fields and prevent submission"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to update existing listing with invalid data"
+      },
+      {
+        "type": "assertion",
+        "description": "Error messages appear and update is rejected"
+      }
+    ]
+  },
+  {
+    "id": "TC020",
+    "title": "UI Rendering and Real-time Data Loading Verification",
+    "description": "Validate that role-based dashboards render correctly with real-time updates from Supabase and user actions update the UI accordingly.",
+    "category": "ui",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as any role"
+      },
+      {
+        "type": "assertion",
+        "description": "Dashboard components load without errors and display relevant data"
+      },
+      {
+        "type": "action",
+        "description": "Perform create, update, or delete actions (e.g., listing creation)"
+      },
+      {
+        "type": "assertion",
+        "description": "UI updates immediately reflecting the changes without page reload"
+      },
+      {
+        "type": "action",
+        "description": "Simulate real-time data update via backend (e.g., new order assigned)"
+      },
+      {
+        "type": "assertion",
+        "description": "Dashboard updates dynamically reflecting the backend changes"
+      }
+    ]
+  }
+]

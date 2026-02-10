@@ -16,5 +16,12 @@ View your app in AI Studio: https://ai.studio/apps/drive/1_PTCojwmazvYJlvtJN4XPm
 1. Install dependencies:
    `npm install`
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
+3. Configure Supabase in `.env.local`:
+   - `VITE_SUPABASE_URL=...`
+   - `VITE_SUPABASE_ANON_KEY=...`
+4. Supabase Auth setup (to avoid email rate limits during development):
+   - Supabase Dashboard → Authentication → Providers → Email
+   - If you use email+password signups, either disable “Confirm email” for dev, or configure SMTP (Authentication → SMTP)
+   - If “Confirm email” is enabled without SMTP, Supabase can throttle confirmation emails and signup may fail with `over_email_send_rate_limit`
+5. Run the app:
    `npm run dev`

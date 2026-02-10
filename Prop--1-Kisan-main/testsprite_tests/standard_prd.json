@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "project": "KisanSetu Web Application",
+    "date": "2026-02-06",
+    "prepared_by": "Software Development Manager"
+  },
+  "product_overview": "KisanSetu is a React-based single-page web application designed to connect Farmers, Buyers, Transporters, and Admins in an integrated agricultural marketplace ecosystem. The platform enables crop listings, order management, transport logistics, and dispute resolution through role-based dashboards, powered by Supabase backend services.",
+  "core_goals": [
+    "Enable Farmers to create, manage, and promote crop listings efficiently.",
+    "Allow Buyers to browse listings, negotiate offers, and manage orders and payments.",
+    "Facilitate Transporters in managing fleet vehicles, viewing loadboards, bidding on transport jobs, and updating delivery statuses.",
+    "Provide Admins with tools to manage users, listings, orders, disputes, and system settings.",
+    "Ensure smooth end-to-end workflows from registration through order fulfillment and dispute resolution.",
+    "Maintain data integrity and streamlined user experience via role-based dashboards and real-time data loading from Supabase."
+  ],
+  "key_features": [
+    "Robust User Authentication and Profile Management supporting multiple roles (Farmer, Buyer, Transporter, Admin).",
+    "Crop Listings management allowing Farmers to add, update, and delete listings with multimedia support via Supabase Storage.",
+    "Marketplace browsing and offer negotiation workflow for Buyers with offer history tracking.",
+    "Comprehensive Order lifecycle management including status transitions and payment verification.",
+    "Transport and Logistics module with loadboard for Transporters to bid on jobs and manage delivery stages.",
+    "Fleet/Vehicle management by Transporters with vehicle data and photos, limited to up to two vehicles per transporter.",
+    "In-app Messaging system for communication among users linked to orders or listings.",
+    "Dispute management system enabling users to raise issues and Admins to resolve disputes.",
+    "Admin dashboard for user and system configuration management.",
+    "Secure data storage with Row Level Security policies intended for production deployment."
+  ],
+  "user_flow_summary": [
+    "User lands on the application and selects their role (Farmer, Buyer, Transporter, Admin).",
+    "User completes phone-based authentication and profile setup.",
+    "Post-login, user is directed to a role-specific dashboard showing relevant features and data.",
+    "Farmers create and manage crop listings, including uploading media files.",
+    "Buyers browse the marketplace, place offers, negotiate, and confirm orders.",
+    "Transporters view loadboard requests, bid on jobs, and track delivery progress with status updates and OTP verification.",
+    "Payment workflow allows Buyers to submit payment proof and Farmers to verify payments in orders.",
+    "Users communicate via the messaging system linked to transactions.",
+    "Users can raise disputes on orders which Admins can review and resolve.",
+    "All data interactions are conducted via Supabase with real-time updates and filtering based on user roles."
+  ],
+  "validation_criteria": [
+    "Successful user registration and login with proper role assignment and profile creation.",
+    "Farmers can create, update, delete listings and upload media that persist and display correctly.",
+    "Buyers can place offers, receive counters, and confirm orders with accurate status transitions.",
+    "Orders accurately reflect payment statuses and allow payment proof submission and verification.",
+    "Transport requests and bids are properly created, viewed, and accepted with real-time loadboard updates.",
+    "Transporters can add and update vehicle information, with a maximum of two vehicles.",
+    "In-app messages are sent, received, and displayed correctly linked to relevant users and transactions.",
+    "Disputes can be raised and resolved with proper status updates visible in the admin dashboard.",
+    "Role-based dashboards display only authorized data per user with correct filtering.",
+    "Data security policies (RLS) are correctly configured and enforced to restrict unauthorized access."
+  ],
+  "code_summary": {
+    "tech_stack": [
+      "TypeScript",
+      "React",
+      "Vite",
+      "Tailwind CSS",
+      "Supabase (Mocked)"
+    ],
+    "features": [
+      {
+        "name": "Authentication",
+        "description": "User registration and login for Farmers, Buyers, and Transporters using Phone and Password. Supports profile creation.",
+        "files": [
+          "App.tsx",
+          "dataService.ts"
+        ]
+      },
+      {
+        "name": "Farmer Listings",
+        "description": "Farmers can create, update, and delete crop listings.",
+        "files": [
+          "App.tsx",
+          "dataService.ts"
+        ]
+      },
+      {
+        "name": "Marketplace & Ordering",
+        "description": "Buyers can view listings and place orders or offers.",
+        "files": [
+          "App.tsx",
+          "dataService.ts"
+        ]
+      },
+      {
+        "name": "Transport Logistics",
+        "description": "Farmers/Buyers can request transport. Transporters can view requests and place bids.",
+        "files": [
+          "App.tsx",
+          "dataService.ts"
+        ]
+      }
+    ]
+  }
+}

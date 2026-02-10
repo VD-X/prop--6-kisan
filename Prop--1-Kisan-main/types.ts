@@ -232,6 +232,7 @@ export interface Offer {
   listingId: string;
   cropName: string;
   buyerName: string;
+  buyerId?: string; // Added for RLS
   buyerBusiness?: string;
   buyerLocation: string;
   offeredPrice: number;
@@ -271,8 +272,10 @@ export interface Order {
 
   // Logistics
   farmerName: string;
+  farmerId?: string; // Added for RLS
   farmerLocation: string;
   buyerName: string;
+  buyerId?: string; // Added for RLS
   buyerLocation: string;
   transporterId?: string;
   distanceKm?: number; // Simulated
@@ -281,6 +284,7 @@ export interface Order {
 export type TransportMode = 'farmer_arranged' | 'marketplace' | 'buyer_own';
 export type TransportRequestStatus = 'draft' | 'open' | 'awaiting_farmer' | 'assigned' | 'picked_up' | 'in_transit' | 'delivered' | 'cancelled';
 export type TransportBidStatus = 'pending' | 'accepted' | 'rejected' | 'withdrawn';
+export type TransportPaymentStatus = 'unpaid' | 'held' | 'released' | 'refunded' | 'failed';
 
 export interface TransportRequest {
   id: string;
@@ -297,10 +301,15 @@ export interface TransportRequest {
   finalFare?: number;
   transporterId?: string;
   deliveryOtp?: string;
+  pickupOtp?: string;
+  acceptedBidId?: string;
+  transportPaymentStatus?: TransportPaymentStatus;
+  transportPaymentProof?: string;
   pickupDate?: string;
   pickupTime?: string;
   pickupConfirmedAt?: string;
   deliveryConfirmedAt?: string;
+  totalTimeMinutes?: number;
   createdAt: string;
 }
 
