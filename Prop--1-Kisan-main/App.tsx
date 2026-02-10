@@ -86,8 +86,7 @@ import {
    ChevronDown,
    HelpCircle,
    CreditCard,
-   Upload,
-   Smartphone
+   Upload
 } from 'lucide-react';
 import { Button, Input, Card } from './components/UI';
 import VoiceInput from './components/VoiceInput';
@@ -106,26 +105,128 @@ import {
    FarmerProfile,
    BuyerProfile,
    TransporterProfile,
+   Vehicle,
    Offer,
    Order,
    OrderStatus,
+   ListingStatus,
    TransportRequest,
    TransportBid,
    Dispute,
    SystemConfig,
-   Transaction
+   Transaction,
+   Message,
+   InventoryItem,
+   Payout,
+   RFQ,
+   RoutePlan
 } from './types';
 
 // --- MOCK DATA ---
-const INITIAL_USERS: User[] = [];
+const INITIAL_USERS: User[] = [
+   {
+      id: 'f1',
+      phone: '9999999999',
+      email: 'farmer@kisan.com',
+      role: 'farmer',
+      status: 'active',
+      createdAt: '2023-01-15',
+      profile: {
+         fullName: 'Rajesh Kumar',
+         village: 'Sehore',
+         district: 'Sehore',
+         state: 'Madhya Pradesh',
+         language: 'Hindi',
+         rating: 4.8,
+         totalSales: 24,
+         memberSince: '2023-01-15',
+         totalLandArea: '5',
+         landUnit: 'Acres',
+         landType: 'Owned',
+         irrigationSource: 'Borewell',
+         currentCrops: ['Wheat', 'Soybean'],
+         farmingPractices: ['Organic']
+      } as FarmerProfile
+   },
+   {
+      id: 'b1',
+      phone: '8888888888',
+      email: 'buyer@kisan.com',
+      role: 'buyer',
+      status: 'active',
+      createdAt: '2023-02-20',
+      profile: {
+         fullName: 'Amit Verma',
+         businessName: 'Verma Traders',
+         city: 'Indore',
+         state: 'Madhya Pradesh',
+         language: 'Hindi',
+         rating: 4.5,
+         completedDeals: 15,
+         memberSince: '2023-02-20',
+         buyerType: 'Wholesaler',
+         procurementRegions: ['Indore', 'Ujjain'],
+         preferredCrops: ['Wheat', 'Soybean', 'Maize'],
+         purchaseCapacity: 'Medium (1–5 tons)',
+         purchaseFrequency: 'Weekly'
+      } as BuyerProfile
+   },
+   {
+      id: 't1',
+      phone: '7777777777',
+      email: 'transport@kisan.com',
+      role: 'transporter',
+      status: 'active',
+      createdAt: '2023-03-10',
+      profile: {
+         fullName: 'Sartaj Singh',
+         vehicleType: 'Pickup Truck',
+         maxCapacity: '1500',
+         approvalStatus: 'approved',
+         city: 'Bhopal',
+         state: 'Madhya Pradesh',
+         language: 'Hindi',
+         vehicleNumber: 'MP04GA1234',
+         operatingRegions: ['Bhopal', 'Sehore', 'Indore'],
+         routeType: 'Inter-district',
+         canHandlePerishables: true,
+         canHandleBulk: false,
+         isCoveredVehicle: true,
+         availability: 'Full-time',
+         rating: 4.9,
+         totalDeliveries: 42,
+         onTimeDeliveryRate: 98,
+         memberSince: '2023-03-10'
+      } as TransporterProfile
+   },
+];
 
-const INITIAL_LISTINGS: CropListing[] = [];
+const INITIAL_LISTINGS: CropListing[] = [
+   { id: '1', farmerId: 'f1', farmerName: 'Rajesh Kumar', cropName: 'Wheat (Sharbati)', grade: 'A', quantity: 500, availableQuantity: 500, pricePerKg: 28, description: 'High quality Sharbati wheat, freshly harvested.', imageUrls: ['https://picsum.photos/400/300?random=1'], location: 'Sehore, MP', status: 'active', harvestDate: '2023-10-15', createdAt: new Date().toISOString() },
+   { id: '2', farmerId: 'f2', farmerName: 'Sunita Devi', cropName: 'Tomato (Hybrid)', grade: 'B', quantity: 200, availableQuantity: 200, pricePerKg: 15, description: 'Red ripe tomatoes, suitable for processing.', imageUrls: ['https://picsum.photos/400/300?random=2'], location: 'Nashik, MH', status: 'active', harvestDate: '2023-10-20', createdAt: new Date().toISOString() },
+];
 
-const INITIAL_ORDERS: Order[] = [];
+const INITIAL_ORDERS: Order[] = [
+   { id: 'o1', listingId: '1', cropName: 'Wheat (Sharbati)', quantity: 100, totalAmount: 2800, status: 'in_transit', date: '2023-10-25', farmerName: 'Rajesh Kumar', farmerLocation: 'Sehore', buyerName: 'Verma Traders', buyerLocation: 'Indore', distanceKm: 45, transporterId: 't1', paymentStatus: 'pending' },
+   { id: 'o2', listingId: '2', cropName: 'Tomato (Hybrid)', quantity: 500, totalAmount: 7500, status: 'confirmed', date: '2023-10-26', farmerName: 'Sunita Devi', farmerLocation: 'Nashik', buyerName: 'Fresh Mart', buyerLocation: 'Mumbai', distanceKm: 160, paymentStatus: 'paid' }
+];
 
-const MOCK_HISTORY: Transaction[] = [];
+const MOCK_HISTORY: Transaction[] = [
+   { id: 'h1', date: '2023-09-15', type: 'sale', itemName: 'Wheat (Sharbati)', counterpartyName: 'Verma Traders', amount: 28000, quantity: 1000, status: 'completed', rating: 5 },
+   { id: 'h2', date: '2023-08-10', type: 'sale', itemName: 'Soybean', counterpartyName: 'Agro Corp', amount: 45000, quantity: 900, status: 'completed', rating: 4 },
+   { id: 'h3', date: '2023-07-22', type: 'sale', itemName: 'Tomato', counterpartyName: 'Fresh Mart', amount: 12000, quantity: 400, status: 'completed', rating: 5 },
+   { id: 'h4', date: '2023-09-01', type: 'purchase', itemName: 'Wheat (Sharbati)', counterpartyName: 'Rajesh Kumar', amount: 28000, quantity: 1000, status: 'completed', rating: 5 },
+   { id: 'h5', date: '2023-09-20', type: 'delivery', itemName: 'Sehore to Indore', counterpartyName: 'Verma Traders', amount: 1200, status: 'completed', rating: 5 }
+];
 
-const MOCK_NOTIFICATIONS: any[] = [];
+const MOCK_NOTIFICATIONS = [
+   { id: 'n1', type: 'offer' as const, title: 'New Offer Received', message: 'Verma Traders offered ₹32/kg for your Wheat listing (500 kg).', timestamp: '2 hours ago', isRead: false },
+   { id: 'n2', type: 'order' as const, title: 'Order Confirmed', message: 'Your order #ORD-2023-456 has been confirmed and is ready for pickup.', timestamp: '5 hours ago', isRead: false },
+   { id: 'n3', type: 'price' as const, title: 'Price Alert: Wheat', message: 'Wheat prices have increased by 8% in your district. Current rate: ₹34/kg.', timestamp: '1 day ago', isRead: true },
+   { id: 'n4', type: 'system' as const, title: 'Profile Incomplete', message: 'Complete your profile to get 20% more visibility to buyers.', timestamp: '2 days ago', isRead: true },
+   { id: 'n5', type: 'offer' as const, title: 'Counter Offer', message: 'Agro Corp countered your price for Soybean at ₹48/kg.', timestamp: '3 days ago', isRead: true },
+   { id: 'n6', type: 'order' as const, title: 'Payment Received', message: 'You received ₹28,000 for Order #ORD-2023-321. Check your bank.', timestamp: '5 days ago', isRead: true },
+];
 
 const FAQ_DATA = [
    { q: 'How do I list my crops for sale?', a: 'Go to "My Crops" section and click "Add New Crop". Upload photos, enter quantity and price, and publish your listing.' },
@@ -135,83 +236,90 @@ const FAQ_DATA = [
    { q: 'Is my data secure?', a: 'Yes, we use bank-grade encryption to protect your personal and financial information. We never share your data with third parties.' },
 ];
 
-const INITIAL_DISPUTES: Dispute[] = [];
+const INITIAL_DISPUTES: Dispute[] = [
+   {
+      id: 'd1',
+      orderId: 'o1',
+      raisedBy: 'Amit Verma',
+      role: 'buyer',
+      issue: 'Quality mismatch: Received Grade C instead of A',
+      details: 'The wheat delivered contains higher moisture content than agreed (14% vs 10%). Also found foreign matter in 2 bags.',
+      amount: 2800,
+      status: 'open',
+      createdAt: new Date().toISOString()
+   }
+];
 
 // --- 1. LANDING PAGE ---
 const LandingPage = ({ onGetStarted, onAdminLogin }: { onGetStarted: (role?: UserRole, mode?: 'login' | 'register') => void, onAdminLogin: () => void }) => {
    return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 to-blue-50 text-slate-800 font-sans">
-         <header className="px-6 py-4 flex justify-between items-center bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200 shadow-sm">
+      <div className="relative min-h-screen flex flex-col">
+         {/* <HarvestBackground /> */}
+         <header className="px-6 py-4 flex justify-between items-center glass sticky top-0 z-50">
             <div className="flex items-center gap-2">
-               <div className="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center shadow-lg">
+               <div className="w-10 h-10 bg-nature-600 rounded-xl flex items-center justify-center shadow-lg shadow-nature-600/20">
                   <Leaf className="w-6 h-6 text-white" />
                </div>
-               <span className="font-bold text-xl text-green-900 tracking-tight">KisanSetu</span>
+               <span className="font-bold text-xl text-nature-900 tracking-tight">KisanSetu</span>
             </div>
             <div className="flex gap-4">
-               <button onClick={() => onGetStarted(undefined, 'login')} className="text-sm font-medium text-slate-600 hover:text-green-700 transition-colors">Login</button>
-               <Button onClick={() => onGetStarted(undefined, 'register')} className="py-2 px-4 text-sm h-10 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-md">Get Started</Button>
+               <button onClick={() => onGetStarted(undefined, 'login')} className="text-sm font-medium text-slate-600 hover:text-nature-700">Login</button>
+               <Button onClick={() => onGetStarted(undefined, 'register')} className="py-2 px-4 text-sm h-10">Get Started</Button>
             </div>
          </header>
 
-         <main className="flex-1 container mx-auto px-6 py-12 flex flex-col items-center justify-center text-center">
-             <div className="max-w-4xl mx-auto space-y-8">
-               <div className="inline-block px-4 py-1.5 rounded-full bg-green-100 text-green-800 text-sm font-semibold border border-green-200 shadow-sm">
+         <main className="flex-1 container mx-auto px-6 py-12 flex flex-col items-center">
+            <div className="text-center max-w-3xl mx-auto mb-16 animate-in fade-in slide-in-from-bottom-8 duration-700">
+               <div className="inline-block px-4 py-1.5 rounded-full bg-nature-100 text-nature-700 text-sm font-semibold mb-6 border border-nature-200">
                   🌾 Revolutionizing Agri-Commerce
                </div>
-               
-               <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 leading-tight tracking-tight">
-                  Connecting Farmers,<br/>
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-blue-600">Fairly & Directly.</span>
+               <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight">
+                  Connecting Farmers, Buyers, and Transporters — <span className="text-nature-600">Fairly.</span>
                </h1>
-               
-               <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                  Sell directly from your farm. Buy with complete transparency. Deliver with verified jobs. <span className="font-bold text-slate-800">No middlemen.</span>
+               <p className="text-lg text-slate-600 mb-8 max-w-2xl mx-auto">
+                  Sell directly from your farm. Buy with complete transparency. Deliver with verified jobs. No middlemen, just growth.
                </p>
 
-               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-                  <Button onClick={() => onGetStarted(undefined, 'register')} className="text-lg px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl shadow-xl transition-transform hover:-translate-y-1">
-                     Join the Network
-                  </Button>
-                  <Button onClick={() => onGetStarted(undefined, 'login')} variant="outline" className="text-lg px-8 py-4 bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-700 rounded-xl shadow-sm transition-transform hover:-translate-y-1">
-                     Login to Account
-                  </Button>
-               </div>
-             </div>
-
-            <div className="grid md:grid-cols-3 gap-8 w-full max-w-6xl mt-24">
-               <div onClick={() => onGetStarted('farmer', 'register')} className="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 cursor-pointer hover:shadow-2xl hover:border-green-200 hover:-translate-y-2 transition-all duration-300 group">
-                  <div className="h-16 w-16 bg-green-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-green-600 transition-colors duration-300">
-                     <Tractor className="w-8 h-8 text-green-600 group-hover:text-white transition-colors duration-300" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-3">Farmer</h3>
-                  <p className="text-slate-500 mb-6">"I grow crops. I want fair prices without middlemen."</p>
-                  <div className="flex items-center text-green-600 font-bold group-hover:gap-2 transition-all">Join as Farmer <ArrowRight className="w-5 h-5 ml-2" /></div>
+               <div className="mb-12">
+                  {/* <TradeAnimation /> */}
                </div>
 
-               <div onClick={() => onGetStarted('buyer', 'register')} className="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 cursor-pointer hover:shadow-2xl hover:border-blue-200 hover:-translate-y-2 transition-all duration-300 group">
-                  <div className="h-16 w-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors duration-300">
-                     <ShoppingBag className="w-8 h-8 text-blue-600 group-hover:text-white transition-colors duration-300" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-3">Buyer</h3>
-                  <p className="text-slate-500 mb-6">"I want reliable supply with transparent pricing."</p>
-                  <div className="flex items-center text-blue-600 font-bold group-hover:gap-2 transition-all">Join as Buyer <ArrowRight className="w-5 h-5 ml-2" /></div>
-               </div>
+               <Button onClick={() => onGetStarted(undefined, 'register')} className="text-lg px-8 py-4 shadow-xl shadow-nature-600/20">Join the Network</Button>
+            </div>
 
-               <div onClick={() => onGetStarted('transporter', 'register')} className="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 cursor-pointer hover:shadow-2xl hover:border-orange-200 hover:-translate-y-2 transition-all duration-300 group">
-                  <div className="h-16 w-16 bg-orange-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-orange-600 transition-colors duration-300">
-                     <Truck className="w-8 h-8 text-orange-600 group-hover:text-white transition-colors duration-300" />
+            <div className="grid md:grid-cols-3 gap-8 w-full max-w-5xl">
+               <Card className="group hover:-translate-y-2 transition-transform duration-300 border-t-4 border-nature-500" onClick={() => onGetStarted('farmer', 'register')}>
+                  <div className="h-12 w-12 bg-nature-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                     <Tractor className="w-6 h-6 text-nature-600" />
                   </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-3">Transporter</h3>
-                  <p className="text-slate-500 mb-6">"I want verified delivery jobs without chaos."</p>
-                  <div className="flex items-center text-orange-600 font-bold group-hover:gap-2 transition-all">Join as Transporter <ArrowRight className="w-5 h-5 ml-2" /></div>
-               </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Farmer</h3>
+                  <p className="text-slate-600 mb-4 text-sm">"I grow crops. I want fair prices without middlemen."</p>
+                  <div className="flex items-center text-nature-600 font-medium text-sm group-hover:gap-2 transition-all">Join as Farmer <ArrowRight className="w-4 h-4 ml-1" /></div>
+               </Card>
+
+               <Card className="group hover:-translate-y-2 transition-transform duration-300 border-t-4 border-blue-500" onClick={() => onGetStarted('buyer', 'register')}>
+                  <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                     <ShoppingBag className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Buyer</h3>
+                  <p className="text-slate-600 mb-4 text-sm">"I want reliable supply with transparent pricing."</p>
+                  <div className="flex items-center text-blue-600 font-medium text-sm group-hover:gap-2 transition-all">Join as Buyer <ArrowRight className="w-4 h-4 ml-1" /></div>
+               </Card>
+
+               <Card className="group hover:-translate-y-2 transition-transform duration-300 border-t-4 border-orange-500" onClick={() => onGetStarted('transporter', 'register')}>
+                  <div className="h-12 w-12 bg-orange-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                     <Truck className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Transporter</h3>
+                  <p className="text-slate-600 mb-4 text-sm">"I want verified delivery jobs without chaos."</p>
+                  <div className="flex items-center text-orange-600 font-medium text-sm group-hover:gap-2 transition-all">Join as Transporter <ArrowRight className="w-4 h-4 ml-1" /></div>
+               </Card>
             </div>
          </main>
 
-         <footer className="py-8 text-center text-slate-400 text-sm bg-slate-50 border-t border-slate-200">
+         <footer className="py-8 text-center text-slate-500 text-sm border-t border-slate-200 bg-white/50 backdrop-blur-sm">
             <p>&copy; 2024 KisanSetu. All rights reserved.</p>
-            <button onClick={onAdminLogin} className="mt-4 text-xs font-medium hover:text-slate-700 flex items-center justify-center gap-1 mx-auto transition-colors"><ShieldCheck className="w-3 h-3" /> Admin Login</button>
+            <button onClick={onAdminLogin} className="mt-4 text-xs font-medium hover:text-nature-700 flex items-center justify-center gap-1 mx-auto"><ShieldCheck className="w-3 h-3" /> Admin Login</button>
          </footer>
       </div>
    );
@@ -505,7 +613,7 @@ const FarmerRegistration = ({ onSubmit }: { onSubmit: (profile: FarmerProfile) =
 
 const BuyerRegistration = ({ onSubmit }: { onSubmit: (profile: BuyerProfile) => void }) => {
    const [step, setStep] = useState(1);
-   const [data, setData] = useState<BuyerProfile>({ fullName: '', businessName: '', city: '', state: '', language: 'English', buyerType: 'Individual', procurementRegions: [], preferredCrops: [], purchaseCapacity: 'Small (<1 ton)' });
+   const [data, setData] = useState<BuyerProfile>({ fullName: '', businessName: '', city: '', state: '', language: 'English', buyerType: 'Individual Trader', procurementRegions: [], preferredCrops: [], purchaseCapacity: 'Small (≤ 1 ton)' });
 
    return (
       <div className="space-y-6">
@@ -524,6 +632,16 @@ const BuyerRegistration = ({ onSubmit }: { onSubmit: (profile: BuyerProfile) => 
 
 const TransporterRegistration = ({ onSubmit }: { onSubmit: (profile: TransporterProfile) => void }) => {
    const [data, setData] = useState<TransporterProfile>({ fullName: '', vehicleType: 'Pickup Truck', maxCapacity: '', approvalStatus: 'pending', city: '', state: '', language: 'Hindi', vehicleNumber: '', vehicleName: '', numberPlatePhoto: '', vehiclePhoto: '', operatingRegions: [] });
+   const uploadOrFallback = async (file: File, field: 'numberPlatePhoto' | 'vehiclePhoto') => {
+      const url = await uploadMedia(file, `transporter/${data.vehicleNumber || data.fullName || 'new'}`);
+      if (url) {
+         setData(prev => ({ ...prev, [field]: url }));
+         return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => setData(prev => ({ ...prev, [field]: reader.result as string }));
+      reader.readAsDataURL(file);
+   };
    return (
       <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
          <div><h3 className="font-bold text-slate-900 mb-1">Vehicle Details</h3><p className="text-xs text-slate-500">Enter vehicle information for verification.</p></div>
@@ -546,12 +664,10 @@ const TransporterRegistration = ({ onSubmit }: { onSubmit: (profile: Transporter
                   type="file"
                   accept="image/*"
                   className="w-full bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl px-4 py-3"
-                  onChange={e => {
+                  onChange={async e => {
                      const file = e.target.files?.[0];
                      if (!file || file.size > 5 * 1024 * 1024) return;
-                     const reader = new FileReader();
-                     reader.onloadend = () => setData(prev => ({ ...prev, numberPlatePhoto: reader.result as string }));
-                     reader.readAsDataURL(file);
+                     await uploadOrFallback(file, 'numberPlatePhoto');
                   }}
                />
                {data.numberPlatePhoto && <img src={data.numberPlatePhoto} alt="Number Plate" className="mt-2 h-24 w-full object-cover rounded-lg border border-slate-200" />}
@@ -562,12 +678,10 @@ const TransporterRegistration = ({ onSubmit }: { onSubmit: (profile: Transporter
                   type="file"
                   accept="image/*"
                   className="w-full bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl px-4 py-3"
-                  onChange={e => {
+                  onChange={async e => {
                      const file = e.target.files?.[0];
                      if (!file || file.size > 5 * 1024 * 1024) return;
-                     const reader = new FileReader();
-                     reader.onloadend = () => setData(prev => ({ ...prev, vehiclePhoto: reader.result as string }));
-                     reader.readAsDataURL(file);
+                     await uploadOrFallback(file, 'vehiclePhoto');
                   }}
                />
                {data.vehiclePhoto && <img src={data.vehiclePhoto} alt="Vehicle" className="mt-2 h-24 w-full object-cover rounded-lg border border-slate-200" />}
@@ -590,13 +704,13 @@ const TransporterRegistration = ({ onSubmit }: { onSubmit: (profile: Transporter
 
 // --- 4. DASHBOARDS ---
 
-const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryItems, payouts, transportRequests, allUsers, onAddInventoryItem, onAddPayout, onSendMessage, onAddListing, onUpdateListing, onDeleteListing, onUpdateProfile, onUpdateListingStatus, onAcceptOffer, onRejectOffer, onCounterOffer, onRaiseDispute, onLogout, onAcceptTransportRequest, onOpenChat, onViewInvoice, onCreateTransportRequest }: any) => {
+const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryItems, payouts, transportRequests, allUsers, onAddInventoryItem, onAddPayout, onSendMessage, onAddListing, onUpdateListing, onDeleteListing, onUpdateProfile, onUpdateListingStatus, onAcceptOffer, onRejectOffer, onCounterOffer, onRaiseDispute, onLogout, onAcceptTransportRequest, onOpenChat, onViewInvoice, onUpdateOrderPayment }: any) => {
    const [view, setView] = useState('home');
    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
    const myListings = listings.filter((l: any) => l.farmerId === user.id);
    const myOffers = offers.filter((o: any) => myListings.some((l: any) => l.id === o.listingId));
    const myOrders = (orders || []).filter((o: any) => o?.farmerName === user?.profile?.fullName);
-   const myHistory = []; // Mock history for farmer
+   const myHistory = MOCK_HISTORY.filter(h => h.type === 'sale'); // Mock history for farmer
 
    const [images, setImages] = useState<string[]>([]);
    const [video, setVideo] = useState<{ url: string; durationSec: number; sizeBytes: number; type: string; thumbnail?: string } | null>(null);
@@ -628,7 +742,7 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
    const [profileTab, setProfileTab] = useState<'overview' | 'edit'>('overview');
 
    // Notifications State
-   const [notifications, setNotifications] = useState([]);
+   const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
    const [notificationFilter, setNotificationFilter] = useState<'all' | 'unread' | 'offer' | 'order'>('all');
 
    // Help & Support State
@@ -655,7 +769,8 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
          cropName: listing.cropName,
          grade: listing.grade,
          qualityDescription: listing.description,
-         estimatedPrice: listing.pricePerKg
+         estimatedPrice: listing.pricePerKg,
+         confidence: 0.9
       });
       setFormData({
          quantity: (listing.quantityUnit ? fromKg(Number(listing.quantity || 0), listing.quantityUnit) : Number(listing.quantity || 0)).toString(),
@@ -670,7 +785,8 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
          minOrderQuantityUnit: listing.minOrderQuantityUnit || 'kg',
          availableDate: listing.availableDate || new Date().toISOString().split('T')[0],
          packagingDetails: listing.packagingDetails || '',
-         description: listing.description || ''
+         description: listing.description || '',
+         certification: listing.certification || []
       });
       setIsAddingCrop(true);
       setCropStep(1);
@@ -904,15 +1020,19 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
       setCropStep(1);
       setFormData({
          quantity: '',
+         quantityUnit: 'kg',
          price: '',
+         priceUnit: 'per_kg',
          variety: '',
          harvestDate: new Date().toISOString().split('T')[0],
          storageType: 'Ambient',
          moistureContent: '',
          minOrderQuantity: '',
+         minOrderQuantityUnit: 'kg',
          availableDate: new Date().toISOString().split('T')[0],
          packagingDetails: '',
-         description: ''
+         description: '',
+         certification: []
       });
    };
 
@@ -942,7 +1062,6 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
                <SidebarItem id="my-crops" label="My Crops" icon={Package} badge={myListings.length} />
                <SidebarItem id="offers" label="Offers" icon={ShoppingBag} badge={myOffers.length} />
                <SidebarItem id="orders" label="Orders" icon={Truck} badge={myOrders.length} />
-               <SidebarItem id="logistics" label="Logistics" icon={Truck} />
                <SidebarItem id="inventory" label="Inventory" icon={Package} />
                <SidebarItem id="payments" label="Payments" icon={IndianRupee} />
                <SidebarItem id="history" label="History & Insights" icon={FileClock} />
@@ -1175,8 +1294,7 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
 
                {/* Reusing existing Farmer Dashboard components */}
                {/* DASHBOARD HOME */}
-            
-            {view === 'home' && (
+               {view === 'home' && (
                   <div className="space-y-8 animate-in fade-in">
                      {/* 2. Welcome & Context */}
                      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -1432,7 +1550,6 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
                                              <div className="flex items-center gap-4 text-xs text-slate-400 font-medium">
                                                 <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> Bhopal, MP</span>
                                                 <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> Received {new Date(o.createdAt).toLocaleDateString()}</span>
-                                                {o.expectedDeliveryDate && <span className="flex items-center gap-1 text-blue-600 font-bold"><Calendar className="w-3 h-3" /> Due: {new Date(o.expectedDeliveryDate).toLocaleDateString()}</span>}
                                              </div>
                                           </div>
                                           <div className="text-right">
@@ -1521,7 +1638,6 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
                                  <div>
                                     <div className="flex items-center gap-3 mb-1">
                                        <h3 className="text-lg font-bold text-slate-900">#{o.id} • {o.cropName}</h3>
-                                       <span className="text-xs text-slate-400 font-medium">({new Date(o.date).toLocaleDateString()})</span>
                                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${o.status === 'delivered' ? 'bg-green-100 text-green-700' :
                                           o.status === 'in_transit' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
                                           }`}>
@@ -1541,8 +1657,7 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
                                           className="h-9 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white"
                                           onClick={async () => {
                                              if (confirm(`Buyer has submitted payment proof: ${o.paymentProof}. Confirm receipt?`)) {
-                                                await svc.updateOrderPayment(o.id, 'paid');
-                                                setOrders(prev => prev.map(ord => ord.id === o.id ? { ...ord, paymentStatus: 'paid' } : ord));
+                                                await onUpdateOrderPayment?.(o.id, 'paid');
                                              }
                                           }}
                                        >
@@ -1590,14 +1705,6 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
                                        {req && (
                                           <div className="text-sm font-bold text-slate-700">
                                              {String(req.mode).replace('_', ' ')} • {String(req.status).replace('_', ' ')} • ₹{req.finalFare ?? req.estimatedFare}
-                                             {(req.pickupDate || req.pickupTime) && <div className="text-xs text-slate-500 mt-1 font-medium">Scheduled: {req.pickupDate} {req.pickupTime}</div>}
-                                             {req.pickupConfirmedAt && <div className="text-xs text-green-600 mt-1 font-medium">Picked Up: {new Date(req.pickupConfirmedAt).toLocaleString()}</div>}
-                                             {req.deliveryConfirmedAt && <div className="text-xs text-green-600 mt-1 font-medium">Delivered: {new Date(req.deliveryConfirmedAt).toLocaleString()}</div>}
-                                             {req.pickupConfirmedAt && req.deliveryConfirmedAt && (
-                                                 <div className="text-xs text-slate-500 mt-1 font-bold">
-                                                     Total Time: {((new Date(req.deliveryConfirmedAt).getTime() - new Date(req.pickupConfirmedAt).getTime()) / (1000 * 60 * 60)).toFixed(1)} hrs
-                                                 </div>
-                                             )}
                                           </div>
                                        )}
                                        {req?.deliveryOtp && req.status !== 'delivered' && <div className="text-xs text-slate-500 mt-1">Delivery OTP: <span className="font-black text-slate-800">{req.deliveryOtp}</span></div>}
@@ -1974,63 +2081,6 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
                   </div>
                )}
                {/* ... existing views ... */}
-               {view === 'logistics' && (
-                  <div className="space-y-6 animate-in slide-in-from-right-4">
-                     <div className="flex justify-between items-center">
-                        <div>
-                           <h2 className="text-2xl font-bold text-slate-900">Logistics</h2>
-                           <p className="text-slate-500">Manage shipments for your orders.</p>
-                        </div>
-                     </div>
-
-                     {/* Active Requests */}
-                     <h3 className="text-lg font-bold text-slate-900 mt-6">My Transport Requests</h3>
-                     {transportRequests.filter((r: any) => r.farmerId === user.id && r.status !== 'delivered' && r.status !== 'cancelled').map((r: any) => (
-                        <Card key={r.id} className="p-6 mb-4 border-nature-100">
-                           <div className="flex justify-between">
-                              <div>
-                                 <h4 className="font-bold">Request for Order #{r.orderId}</h4>
-                                 <div className="text-sm text-slate-500">{r.pickupLocation} → {r.dropLocation}</div>
-                                 <div className="text-sm font-bold text-nature-600 uppercase mt-1">{r.status}</div>
-                              </div>
-                              <div className="text-right">
-                                 <div className="text-xl font-black text-slate-900">₹{r.estimatedFare}</div>
-                                 {r.transporterId && <div className="text-xs text-slate-400 font-bold uppercase mt-1">Transporter Assigned</div>}
-                              </div>
-                           </div>
-                        </Card>
-                     ))}
-                     {transportRequests.filter((r: any) => r.farmerId === user.id && r.status !== 'delivered' && r.status !== 'cancelled').length === 0 && <div className="text-sm text-slate-400 italic mb-8">No active requests.</div>}
-
-                     {/* Requests from Buyers */}
-                     <h3 className="text-lg font-bold text-slate-900 mt-8">Buyer Requests (Farmer Arranged)</h3>
-                     {orders.filter((o: any) => o.farmerName === user.profile.fullName && o.status === 'confirmed' && !o.transporterId).map((o: any) => {
-                        // Check if there is already a request for this order
-                        const existingReq = transportRequests.find((r: any) => r.orderId === o.id);
-                        if (existingReq) return null; // Already handled
-
-                        return (
-                           <Card key={o.id} className="p-6 mb-4 border-l-4 border-nature-500">
-                              <div className="flex justify-between items-center">
-                                 <div>
-                                    <h4 className="font-bold text-slate-900">Order #{o.id} - {o.cropName}</h4>
-                                    <div className="text-sm text-slate-500">Buyer requested you to arrange transport.</div>
-                                    <div className="text-xs font-bold text-slate-400 mt-1">{o.quantity} kg • {o.distanceKm || 45} km</div>
-                                 </div>
-                                 <Button className="bg-nature-600 hover:bg-nature-700 font-bold" onClick={() => {
-                                     // Open similar modal for Farmer to arrange
-                                     // For simplicity, we directly create a 'marketplace' request on behalf of the order
-                                     if (confirm("Arrange transport via Marketplace for this order?")) {
-                                         onCreateTransportRequest(o.id, 'marketplace');
-                                     }
-                                 }}>Arrange Transport</Button>
-                              </div>
-                           </Card>
-                        );
-                     })}
-                     {orders.filter((o: any) => o.farmerName === user.profile.fullName && o.status === 'confirmed' && !o.transporterId && !transportRequests.find((r: any) => r.orderId === o.id)).length === 0 && <div className="text-sm text-slate-400 italic">No pending requests from buyers.</div>}
-                  </div>
-               )}
             </main>
          {viewerOpen && (
             <div className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -2445,15 +2495,12 @@ const FarmerDashboard = ({ user, listings, offers, orders, messages, inventoryIt
 };
 
 // Buyer and Transporter Dashboards remain the same
-const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders, messages, rfqs, transportRequests, transportBids, allUsers, onAddRfq, onSendMessage, onPlaceOffer, onAcceptOffer, onCounterOffer, onCancelOffer, onLogout, onUpdateProfile, onRaiseDispute, onCreateTransportRequest, onAcceptTransportBid, onTransportBidCounter, onOpenChat, onViewInvoice }: any) => {
+const BuyerDashboard = ({ user, listings, offers, orders, messages, rfqs, transportRequests, transportBids, allUsers, onAddRfq, onSendMessage, onPlaceOffer, onAcceptOffer, onCounterOffer, onCancelOffer, onLogout, onUpdateProfile, onRaiseDispute, onCreateTransportRequest, onAcceptTransportBid, onOpenChat, onViewInvoice, onUpdateOrderPayment }: any) => {
    const [view, setView] = useState('home');
    const [searchTerm, setSearchTerm] = useState('');
    const [selectedListing, setSelectedListing] = useState<any>(null);
    const [showOfferModal, setShowOfferModal] = useState(false);
-   const [offerData, setOfferData] = useState<{ quantity: number; price: number; expectedDeliveryDate?: string }>({ quantity: 0, price: 0 });
-   
-   const myOffers = offers.filter((o: any) => o.buyerName === user.profile.fullName);
-   const myOrders = (orders || []).filter((o: any) => o?.buyerName === user?.profile?.fullName);
+   const [offerData, setOfferData] = useState({ quantity: 0, price: 0 });
    
    // Negotiation State
    const [counterModal, setCounterModal] = useState<{open: boolean, offer: any | null}>({ open: false, offer: null });
@@ -2461,33 +2508,8 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
 
    const [showTransportModal, setShowTransportModal] = useState(false);
    const [transportOrderId, setTransportOrderId] = useState<string | null>(null);
-   const [cartItems, setCartItems] = useState<{ listingId: string; quantity: number; price?: number; offerId?: string }[]>([]);
+   const [cartItems, setCartItems] = useState<{ listingId: string; quantity: number }[]>([]);
    const [activeImageIndex, setActiveImageIndex] = useState(0);
-
-   // Sync Accepted Offers to Cart
-   React.useEffect(() => {
-      if (!user || user.role !== 'buyer') return;
-      const acceptedOffers = myOffers.filter((o: any) => o.status === 'accepted');
-      
-      acceptedOffers.forEach((o: any) => {
-         // Check if this accepted offer should update an existing cart item or be added
-         const existingCartItem = cartItems.find(i => i.listingId === o.listingId);
-         
-         const price = o.lastActionBy === 'farmer' ? o.counterPrice : (o.offeredPrice || o.pricePerKg);
-         const qty = o.lastActionBy === 'farmer' ? o.counterQuantity : (o.quantityRequested || o.quantity);
-         const listing = listings.find((l: any) => l.id === o.listingId);
-
-         const isOrdered = myOrders.some((ord: any) => ord.listingId === o.listingId && ord.quantity === (o.counterQuantity || o.quantityRequested || o.quantity));
-
-         if (!isOrdered && listing) {
-            // If not in cart, or in cart but with different price/offer, update it
-            if (!existingCartItem || existingCartItem.offerId !== o.id || existingCartItem.price !== price) {
-               console.log("Syncing accepted offer to cart:", o.id);
-               addToCart(listing, qty, price, o.id);
-            }
-         }
-      });
-   }, [myOffers, user, cartItems, myOrders]);
 
    const cartKey = `kisansetu_cart_${user.id}`;
 
@@ -2512,17 +2534,15 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
       setActiveImageIndex(0);
    }, [selectedListing?.id]);
 
-   const addToCart = (listing: any, qty?: number, price?: number, offerId?: string) => {
+   const addToCart = (listing: any, qty?: number) => {
       const minQty = Number(listing.minOrderQuantity || 1);
       const addQty = Math.max(1, Number(qty || minQty));
       setCartItems(prev => {
          const existing = prev.find(i => i.listingId === listing.id);
-         if (!existing) return [...prev, { listingId: listing.id, quantity: Math.min(addQty, Number(listing.availableQuantity || listing.quantity || addQty)), price, offerId }];
+         if (!existing) return [...prev, { listingId: listing.id, quantity: Math.min(addQty, Number(listing.availableQuantity || listing.quantity || addQty)) }];
          return prev.map(i => i.listingId !== listing.id ? i : ({
             ...i,
-            quantity: Math.min(i.quantity + addQty, Number(listing.availableQuantity || listing.quantity || i.quantity + addQty)),
-            price: price || i.price, // Update price if provided (e.g. from offer)
-            offerId: offerId || i.offerId
+            quantity: Math.min(i.quantity + addQty, Number(listing.availableQuantity || listing.quantity || i.quantity + addQty))
          }));
       });
    };
@@ -2558,6 +2578,8 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
       twoFactor: false
    });
 
+   const myOffers = offers.filter((o: any) => o.buyerName === user.profile.fullName);
+   const myOrders = (orders || []).filter((o: any) => o?.buyerName === user?.profile?.fullName);
    const cartCount = cartItems.length;
    const filteredListings = listings.filter((l: any) =>
       l.status === 'active' &&
@@ -2590,18 +2612,6 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
    const recommendedOtherFarmers = selectedListing ? listings.filter((l: any) => l.status === 'active' && l.farmerId !== selectedListing.farmerId && getCategory(l.cropName) === getCategory(selectedListing.cropName)).slice(0, 12) : [];
    const recommendedNearYou = selectedListing ? listings.filter((l: any) => l.status === 'active' && l.farmerId !== selectedListing.farmerId && (l.location || '').toLowerCase().includes((user.profile?.city || '').toLowerCase())).slice(0, 8) : [];
 
-   // Negotiation State - Total Price Calculation
-   const [offerMode, setOfferMode] = useState<'per_kg' | 'total'>('per_kg');
-   const [offerTotal, setOfferTotal] = useState(0);
-
-   React.useEffect(() => {
-      if (offerMode === 'total') {
-         setOfferData(prev => ({ ...prev, price: Math.round(offerTotal / (prev.quantity || 1)) }));
-      } else {
-         setOfferTotal(offerData.price * offerData.quantity);
-      }
-   }, [offerMode, offerTotal, offerData.price, offerData.quantity]);
-
    const handlePlaceOfferSubmit = () => {
       onPlaceOffer({
          listingId: selectedListing.id,
@@ -2612,98 +2622,12 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
          offeredPrice: offerData.price,
          quantity: offerData.quantity,
          quantityRequested: offerData.quantity,
-         totalAmount: offerData.price * offerData.quantity,
-         expectedDeliveryDate: offerData.expectedDeliveryDate
+         totalAmount: offerData.price * offerData.quantity
       });
       setShowOfferModal(false);
       setSelectedListing(null);
       // Wait for state update then switch view
       setTimeout(() => setView('offers'), 100);
-   };
-
-   // Payment Simulation State
-   const [showPaymentModal, setShowPaymentModal] = useState(false);
-   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'card' | 'netbanking'>('upi');
-   const [paymentProcessing, setPaymentProcessing] = useState(false);
-
-   const handleCheckout = async () => {
-      if (cartItems.length === 0) return;
-      setShowPaymentModal(true);
-   };
-
-   const processPaymentAndOrder = async () => {
-      setPaymentProcessing(true);
-      // Simulate payment delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      console.log("Processing payment and orders:", cartItems);
-      
-      const newOrders: Order[] = [];
-
-      for (const item of cartItems) {
-         const listing = listings.find((l: any) => l.id === item.listingId);
-         if (!listing) continue;
-
-         // Use deal price if available, otherwise listing price
-         const finalPrice = item.price || listing.pricePerKg;
-         const finalQty = item.quantity;
-
-         const newOrder: Order = {
-            id: `ord_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            listingId: listing.id,
-            cropName: listing.cropName,
-            quantity: finalQty,
-            totalAmount: finalPrice * finalQty,
-            status: 'confirmed',
-            paymentStatus: 'paid', // Immediately paid
-            paymentProof: `PAY-${Date.now()}`, // Mock Payment ID
-            date: new Date().toISOString(),
-            farmerName: listing.farmerName,
-            farmerLocation: listing.location,
-            buyerName: user?.profile?.fullName || 'Buyer',
-            buyerLocation: user?.profile?.city || '',
-            distanceKm: 0,
-            transporterId: undefined
-         };
-
-         newOrders.push(newOrder);
-
-         try {
-            await svc.createOrder(newOrder);
-            
-            // Update listing quantity
-            const updatedListing = { ...listing, availableQuantity: Math.max(0, listing.availableQuantity - finalQty) };
-            await svc.updateListing(updatedListing);
-            
-            // Update offer status if applicable
-            if (item.offerId) {
-                await svc.setOfferStatus(item.offerId, 'ordered');
-            }
-            
-         } catch (e) {
-            console.error("Failed to checkout item (backend might be offline), falling back to local state", item, e);
-         }
-      }
-
-      setPaymentProcessing(false);
-      setShowPaymentModal(false);
-      
-      // Update local state immediately (Optimistic UI)
-      setOrders(prev => [...newOrders, ...prev]);
-      
-      // Clear cart
-      setCartItems([]);
-      
-      // Try to refresh from server, but ignore if it fails
-      try {
-          const currentListings = await svc.getListings();
-          if (currentListings && currentListings.length > 0) setListings(currentListings);
-      } catch (e) {
-          console.warn("Could not refresh listings from server");
-      }
-      
-      setView('orders');
-      alert("Payment Successful! Order placed.");
    };
 
    return (
@@ -2719,7 +2643,6 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
                   { id: 'home', label: 'Marketplace', icon: Store },
                   { id: 'offers', label: 'My Offers', icon: ShoppingBag, badge: myOffers.length },
                   { id: 'orders', label: 'My Orders', icon: Package, badge: myOrders.length },
-                  { id: 'logistics', label: 'Logistics', icon: Truck },
                   { id: 'payments', label: 'Pending Payments', icon: CreditCard, badge: myOrders.filter(o => o.paymentStatus === 'pending').length },
                   { id: 'cart', label: 'Cart', icon: ShoppingCart, badge: cartCount },
                      { id: 'rfq', label: 'RFQ', icon: FileText },
@@ -2862,8 +2785,7 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
 
                               <div className="mt-5 flex gap-2">
                                  <Button variant="outline" className="flex-1 h-11 text-xs font-black border-slate-200" onClick={() => { setSelectedListing(l); setView('product-details'); }}>View</Button>
-                                 <Button variant="outline" className="w-11 h-11 p-0 border-slate-200" onClick={() => addToCart(l, undefined, l.pricePerKg)}><ShoppingCart className="w-4 h-4" /></Button>
-                                 <Button className="flex-[2] h-11 bg-green-600 hover:bg-green-700 shadow-lg shadow-green-600/20 text-xs font-black" onClick={() => { addToCart(l, undefined, l.pricePerKg); setView('cart'); }}>Buy Now</Button>
+                                 <Button variant="outline" className="w-11 h-11 p-0 border-slate-200" onClick={() => addToCart(l)}><ShoppingCart className="w-4 h-4" /></Button>
                                  <Button className="flex-[2] h-11 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20 text-xs font-black" onClick={() => { setSelectedListing(l); setOfferData({ quantity: l.minOrderQuantity || l.availableQuantity || l.quantity, price: l.pricePerKg }); setShowOfferModal(true); }}>Negotiate</Button>
                               </div>
                            </div>
@@ -2898,13 +2820,11 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
                                  </div>
                                  <Button 
                                     className="bg-green-600 hover:bg-green-700 font-bold"
-                                    onClick={() => {
+                                    onClick={async () => {
                                        // Simulate Payment Proof Upload
                                        const proof = `TXN-${Date.now()}`;
                                        if (confirm("Simulate payment transfer for ₹" + o.totalAmount + "?\n(This is a mock transaction)")) {
-                                          svc.updateOrderPayment(o.id, 'review', proof);
-                                          // Optimistic update
-                                          setOrders(prev => prev.map(ord => ord.id === o.id ? { ...ord, paymentStatus: 'review', paymentProof: proof } : ord));
+                                          await onUpdateOrderPayment?.(o.id, 'review', proof);
                                           alert("Payment proof submitted! Waiting for Farmer approval.");
                                        }
                                     }}
@@ -3019,8 +2939,8 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
                                        <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Quick Actions</div>
                                        <div className="mt-4 space-y-3">
                                           <Button className="w-full h-12 bg-blue-600 hover:bg-blue-700 font-black" onClick={() => { addToCart(selectedListing); setView('cart'); }}><ShoppingCart className="w-4 h-4 mr-2" /> Add to Cart</Button>
-                                          <Button className="w-full h-12 bg-green-600 hover:bg-green-700 font-black shadow-lg shadow-green-600/20" onClick={() => { addToCart(selectedListing); setShowPaymentModal(true); }}><CreditCard className="w-4 h-4 mr-2" /> Buy Now</Button>
                                           <Button variant="outline" className="w-full h-12 font-black border-slate-200" onClick={() => { setOfferData({ quantity: selectedListing.minOrderQuantity || 1, price: selectedListing.pricePerKg }); setShowOfferModal(true); }}>Negotiate Price</Button>
+                                          <Button variant="ghost" className="w-full h-11 font-black text-slate-600" onClick={() => { setView('home'); }}>Continue Shopping</Button>
                                        </div>
                                     </Card>
                                  </div>
@@ -3118,19 +3038,17 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
                <div className="space-y-6 animate-in slide-in-from-right-4">
                   <h2 className="text-2xl font-bold text-slate-900">Request for Quotation</h2>
                   <Card className="p-6 space-y-4">
-                     <div className="grid md:grid-cols-4 gap-4">
+                     <div className="grid md:grid-cols-3 gap-4">
                         <Input id="rfq-crop" placeholder="Crop Name" />
                         <Input id="rfq-qty" type="number" placeholder="Quantity (kg)" />
                         <Input id="rfq-price" type="number" placeholder="Target Price (₹/kg)" />
-                        <Input id="rfq-date" type="date" label="Needed By" />
                      </div>
                      <Button className="w-full md:w-auto" onClick={() => {
                         const crop = (document.getElementById('rfq-crop') as HTMLInputElement)?.value;
                         const qty = Number((document.getElementById('rfq-qty') as HTMLInputElement)?.value || 0);
                         const price = Number((document.getElementById('rfq-price') as HTMLInputElement)?.value || 0);
-                        const date = (document.getElementById('rfq-date') as HTMLInputElement)?.value;
                         if (!crop || qty <= 0 || price <= 0) return;
-                        onAddRfq?.({ buyerId: user.id, cropName: crop, quantityKg: qty, targetPricePerKg: price, neededBy: date });
+                        onAddRfq?.({ buyerId: user.id, cropName: crop, quantityKg: qty, targetPricePerKg: price });
                      }}>Create RFQ</Button>
                   </Card>
                   <Card className="p-6">
@@ -3139,10 +3057,7 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
                            <div key={r.id} className="p-4 bg-slate-50 rounded-xl">
                               <div className="text-xs text-slate-400 uppercase font-bold">RFQ</div>
                               <div className="font-bold text-slate-900">{r.cropName} • {r.quantityKg} kg</div>
-                              <div className="text-sm text-slate-600">
-                                 Target ₹{r.targetPricePerKg}/kg • {r.status}
-                                 {r.neededBy && <span className="block text-xs text-slate-400 mt-1">Needed by {new Date(r.neededBy).toLocaleDateString()}</span>}
-                              </div>
+                              <div className="text-sm text-slate-600">Target ₹{r.targetPricePerKg}/kg • {r.status}</div>
                            </div>
                         ))}
                         {(rfqs || []).filter(r => r.buyerId === user.id).length === 0 && <div className="text-sm text-slate-400">No RFQs yet.</div>}
@@ -3196,7 +3111,6 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
                                  <div>
                                     <h4 className="font-bold text-slate-900">{o.cropName}</h4>
                                     <p className="text-sm text-slate-500">₹{currentPrice}/kg • {currentQty}kg</p>
-                                    {o.expectedDeliveryDate && <p className="text-xs text-slate-400 mt-1">Expected Delivery: {new Date(o.expectedDeliveryDate).toLocaleDateString()}</p>}
                                     {isCounterByFarmer && <div className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded mt-1 w-fit">Farmer Countered</div>}
                                  </div>
                               </div>
@@ -3210,33 +3124,20 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
                               </div>
                            </div>
                            
-                           {o.status === 'accepted' && (
-                              <div className="mt-4 pt-4 border-t border-slate-100 flex gap-3 justify-end items-center bg-green-50/50 -mx-6 -mb-6 p-4 rounded-b-xl">
-                                  <div className="text-sm font-bold text-green-700 mr-auto">Offer Accepted! Ready for purchase.</div>
-                                  <Button className="h-10 text-xs font-black bg-green-600 hover:bg-green-700 shadow-lg shadow-green-600/20" onClick={() => {
-                                      // Add to cart directly from here
-                                      if (listing) {
-                                          addToCart(listing, currentQty, currentPrice, o.id);
-                                          setView('cart');
-                                      }
-                                  }}>
-                                      <ShoppingCart className="w-4 h-4 mr-2" /> Buy Now
-                                  </Button>
-                              </div>
-                           )}
-                           
                            {o.status === 'pending' && (
                                <div className="mt-4 pt-4 border-t border-slate-100 flex gap-3 justify-end">
                                    <Button variant="outline" className="text-xs font-bold text-blue-600 hover:bg-blue-50 border-blue-200" onClick={() => onOpenChat(listing?.farmerId || '', listing?.farmerName || '', o.listingId, undefined, o.id)}>
                                        <MessageCircle className="w-4 h-4 mr-2" /> Chat
                                    </Button>
-                                   {isCounterByFarmer ? (
+                                   <Button variant="outline" className="text-xs font-bold text-red-500 hover:bg-red-50 hover:text-red-600 border-slate-200" onClick={() => onCancelOffer(o.id)}>Cancel Negotiation</Button>
+                                   {isCounterByFarmer && (
                                        <>
-                                           <Button variant="outline" className="text-xs font-bold text-red-600 hover:bg-red-50 border-red-200" onClick={() => onRejectOffer(o.id)}>Reject</Button>
+                                           <Button variant="outline" className="text-xs font-bold border-slate-200" onClick={() => {
+                                               setCounterModal({ open: true, offer: o });
+                                               setCounterPrice(o.counterPrice?.toString() || o.pricePerKg.toString());
+                                           }}>Counter Back</Button>
                                            <Button className="text-xs font-bold bg-green-600 hover:bg-green-700" onClick={() => onAcceptOffer(o.id)}>Accept Counter</Button>
                                        </>
-                                   ) : (
-                                       <Button variant="outline" className="text-xs font-bold text-slate-500 hover:bg-slate-50" onClick={() => onCancelOffer(o.id)}>Withdraw Offer</Button>
                                    )}
                                </div>
                            )}
@@ -3266,7 +3167,7 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
                               const l = listings.find((x: any) => x.id === ci.listingId);
                               if (!l) return null;
                               const maxQty = Number(l.availableQuantity || l.quantity || 0);
-                              const unitTotal = Number(ci.price || l.pricePerKg || 0) * Number(ci.quantity || 0);
+                              const unitTotal = Number(l.pricePerKg || 0) * Number(ci.quantity || 0);
                               return (
                                  <Card key={ci.listingId} className="p-6 border-slate-200 bg-white">
                                     <div className="flex flex-col md:flex-row justify-between gap-4">
@@ -3277,13 +3178,7 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
                                           <div className="min-w-0">
                                              <div className="font-black text-slate-900 truncate">{l.cropName}</div>
                                              <div className="text-xs text-slate-500 font-medium truncate">{l.farmerName} • {l.location}</div>
-                                             <div className="text-xs text-slate-400 font-bold">
-                                                {ci.price ? (
-                                                   <span className="text-green-600">Deal Price: ₹{ci.price}/kg</span>
-                                                ) : (
-                                                   <span>₹{l.pricePerKg}/kg</span>
-                                                )}
-                                             </div>
+                                             <div className="text-xs text-slate-400 font-bold">₹{l.pricePerKg}/kg</div>
                                           </div>
                                        </div>
                                        <div className="flex flex-col md:items-end gap-3">
@@ -3313,13 +3208,11 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
                                  <div className="text-2xl font-black text-slate-900">
                                     ₹{cartItems.reduce((sum, ci) => {
                                        const l = listings.find((x: any) => x.id === ci.listingId);
-                                       return sum + (Number(ci.price || l?.pricePerKg || 0) * Number(ci.quantity || 0));
+                                       return sum + (Number(l?.pricePerKg || 0) * Number(ci.quantity || 0));
                                     }, 0).toLocaleString()}
                                  </div>
                               </div>
-                              <Button className="h-12 px-8 text-base font-bold bg-green-600 hover:bg-green-700 shadow-lg shadow-green-600/20" onClick={handleCheckout}>
-                                 Proceed to Payment
-                              </Button>
+                              <Button className="h-12 bg-slate-900 hover:bg-slate-800 font-black" onClick={() => setView('home')}>Add More Items</Button>
                            </div>
                         </Card>
                      </div>
@@ -3357,19 +3250,7 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
                                  <div>
                                     <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Transport</div>
                                     {!req && <div className="text-sm font-bold text-slate-800">Not arranged yet</div>}
-                                    {req && (
-                                       <>
-                                         <div className="text-sm font-bold text-slate-800">{req.mode.replace('_', ' ')} • {req.status.replace('_', ' ')}</div>
-                                         {(req.pickupDate || req.pickupTime) && <div className="text-xs text-slate-500 mt-1">Scheduled: {req.pickupDate} {req.pickupTime}</div>}
-                                         {req.pickupConfirmedAt && <div className="text-xs text-green-600 mt-1 font-bold">Picked Up: {new Date(req.pickupConfirmedAt).toLocaleString()}</div>}
-                                         {req.deliveryConfirmedAt && <div className="text-xs text-green-600 mt-1 font-bold">Delivered: {new Date(req.deliveryConfirmedAt).toLocaleString()}</div>}
-                                         {req.pickupConfirmedAt && req.deliveryConfirmedAt && (
-                                             <div className="text-xs text-slate-500 mt-1 font-bold">
-                                                 Duration: {((new Date(req.deliveryConfirmedAt).getTime() - new Date(req.pickupConfirmedAt).getTime()) / (1000 * 60 * 60)).toFixed(1)} hrs
-                                             </div>
-                                         )}
-                                       </>
-                                    )}
+                                    {req && <div className="text-sm font-bold text-slate-800">{req.mode.replace('_', ' ')} • {req.status.replace('_', ' ')}</div>}
                                     {req?.deliveryOtp && req.status !== 'delivered' && <div className="text-xs text-slate-500 mt-1">Delivery OTP: <span className="font-black text-slate-800">{req.deliveryOtp}</span></div>}
                                  </div>
                                  {!req && (
@@ -3665,92 +3546,6 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
                </div>
             )}
 
-            {view === 'logistics' && (
-               <div className="space-y-6 animate-in slide-in-from-right-4">
-                  <div className="flex justify-between items-center">
-                      <div>
-                        <h2 className="text-2xl font-bold text-slate-900">Logistics</h2>
-                        <p className="text-slate-500">Manage shipments and transport bids.</p>
-                      </div>
-                      <Button className="bg-blue-600 hover:bg-blue-700 font-bold" onClick={() => {
-                          const orderId = prompt("Enter Order ID to create request for:");
-                          if (orderId) onCreateTransportRequest(orderId, 'marketplace');
-                      }}>Create Request</Button>
-                  </div>
-
-                  {/* Active Shipments */}
-                  <h3 className="text-lg font-bold text-slate-900 mt-6">Active Shipments</h3>
-                  {transportRequests.filter((r: any) => r.buyerId === user.id && r.status !== 'delivered' && r.status !== 'cancelled').map((r: any) => (
-                      <Card key={r.id} className="p-6 mb-4">
-                          <div className="flex justify-between">
-                              <div>
-                                  <h4 className="font-bold">Order #{r.orderId}</h4>
-                                  <div className="text-sm text-slate-500">{r.pickupLocation} → {r.dropLocation}</div>
-                                  <div className="text-sm font-bold text-blue-600 uppercase mt-1">{r.status}</div>
-                              </div>
-                              {r.transporterId && (
-                                  <div className="text-right">
-                                      <div className="text-xs text-slate-400 font-bold uppercase">Transporter</div>
-                                      <div className="font-bold">{allUsers.find((u: any) => u.id === r.transporterId)?.profile?.fullName || 'Unknown'}</div>
-                                      <Button size="sm" variant="outline" className="mt-2" onClick={() => onOpenChat?.(r.transporterId, r.orderId)}>Chat</Button>
-                                  </div>
-                              )}
-                          </div>
-                      </Card>
-                  ))}
-                  {transportRequests.filter((r: any) => r.buyerId === user.id && r.status !== 'delivered' && r.status !== 'cancelled').length === 0 && <div className="text-sm text-slate-400 italic mb-8">No active shipments.</div>}
-
-                  {/* Pending Bids */}
-                  <h3 className="text-lg font-bold text-slate-900 mt-8">Transport Bids</h3>
-                  {transportRequests.filter((r: any) => r.buyerId === user.id && (r.status === 'open' || r.status === 'awaiting_farmer')).map((r: any) => {
-                      const bids = transportBids.filter((b: any) => b.requestId === r.id);
-                      return (
-                          <Card key={r.id} className="p-6 mb-4 border-blue-100">
-                              <div className="flex justify-between mb-4">
-                                  <div>
-                                      <h4 className="font-bold">Request for Order #{r.orderId}</h4>
-                                      <div className="text-sm text-slate-500">Estimated Fare: ₹{r.estimatedFare}</div>
-                                  </div>
-                                  <div className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase">{bids.length} Bids</div>
-                              </div>
-                              
-                              <div className="space-y-3">
-                                  {bids.map((b: any) => (
-                                      <div key={b.id} className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                                          <div className="flex justify-between items-start">
-                                              <div>
-                                                  <div className="font-bold text-slate-900">
-                                                      {allUsers.find((u: any) => u.id === b.transporterId)?.profile?.fullName || 'Transporter'}
-                                                  </div>
-                                                  <div className="text-sm text-slate-500">{b.message || 'No message'}</div>
-                                                  <div className="mt-2 flex gap-2 text-xs">
-                                                      <span className="font-bold">Bid: ₹{b.amount}</span>
-                                                      {b.counterAmount && <span className="font-bold text-orange-600">Counter: ₹{b.counterAmount}</span>}
-                                                  </div>
-                                              </div>
-                                              <div className="flex flex-col gap-2 items-end">
-                                                  <div className="text-xl font-black text-slate-900">₹{b.counterAmount || b.amount}</div>
-                                                  <div className="flex gap-2">
-                                                      <Button size="sm" variant="outline" onClick={() => onOpenChat?.(b.transporterId, r.orderId)}>Chat</Button>
-                                                      <Button size="sm" variant="outline" onClick={() => {
-                                                          const amount = prompt("Enter counter offer amount:", (b.counterAmount || b.amount).toString());
-                                                          if (amount) onTransportBidCounter?.(b.id, Number(amount), 'buyer');
-                                                      }}>Counter</Button>
-                                                      <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => onAcceptTransportBid?.(b.id)}>Accept</Button>
-                                                  </div>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  ))}
-                                  {bids.length === 0 && <div className="text-sm text-slate-400 italic">No bids yet.</div>}
-                              </div>
-                          </Card>
-                      );
-                  })}
-                  {transportRequests.filter((r: any) => r.buyerId === user.id && (r.status === 'open' || r.status === 'awaiting_farmer')).length === 0 && <div className="text-sm text-slate-400 italic">No open requests.</div>}
-               </div>
-            )}
-
             {/* ===== HELP VIEW ===== */}
             {view === 'help' && (
                <div className="space-y-6 animate-in slide-in-from-right-4">
@@ -3785,79 +3580,6 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
          </main>
 
 
-
-         {/* Payment Simulation Modal */}
-         {showPaymentModal && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-               <Card className="w-full max-w-md shadow-2xl relative bg-white p-6">
-                  <button onClick={() => setShowPaymentModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
-                  <h3 className="text-xl font-bold mb-1">Secure Payment</h3>
-                  <p className="text-sm text-slate-500 mb-6">Complete your purchase safely</p>
-                  
-                  <div className="space-y-5">
-                     <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
-                        <div className="text-xs text-slate-500 font-bold uppercase tracking-wider">Total Amount</div>
-                        <div className="text-xl font-black text-slate-900">
-                           ₹{cartItems.reduce((sum, ci) => {
-                              const l = listings.find((x: any) => x.id === ci.listingId);
-                              return sum + (Number(ci.price || l?.pricePerKg || 0) * Number(ci.quantity || 0));
-                           }, 0).toLocaleString()}
-                        </div>
-                     </div>
-
-                     <div>
-                        <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">Payment Method</label>
-                        <div className="grid grid-cols-3 gap-2">
-                           <button className={`p-3 rounded-xl border flex flex-col items-center gap-2 transition-all ${paymentMethod === 'upi' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 hover:border-slate-300'}`} onClick={() => setPaymentMethod('upi')}>
-                              <Smartphone className="w-5 h-5" />
-                              <span className="text-[10px] font-bold">UPI</span>
-                           </button>
-                           <button className={`p-3 rounded-xl border flex flex-col items-center gap-2 transition-all ${paymentMethod === 'card' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 hover:border-slate-300'}`} onClick={() => setPaymentMethod('card')}>
-                              <CreditCard className="w-5 h-5" />
-                              <span className="text-[10px] font-bold">Card</span>
-                           </button>
-                           <button className={`p-3 rounded-xl border flex flex-col items-center gap-2 transition-all ${paymentMethod === 'netbanking' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 hover:border-slate-300'}`} onClick={() => setPaymentMethod('netbanking')}>
-                              <Store className="w-5 h-5" />
-                              <span className="text-[10px] font-bold">NetBanking</span>
-                           </button>
-                        </div>
-                     </div>
-
-                     {paymentMethod === 'upi' && (
-                         <div className="space-y-2">
-                             <label className="text-xs font-bold text-slate-500 uppercase">UPI ID</label>
-                             <Input placeholder="e.g. 9876543210@upi" className="font-bold" />
-                         </div>
-                     )}
-                     {paymentMethod === 'card' && (
-                         <div className="space-y-2">
-                             <label className="text-xs font-bold text-slate-500 uppercase">Card Number</label>
-                             <Input placeholder="0000 0000 0000 0000" className="font-bold" />
-                             <div className="grid grid-cols-2 gap-4">
-                                 <Input placeholder="MM/YY" className="font-bold" />
-                                 <Input placeholder="CVV" className="font-bold" />
-                             </div>
-                         </div>
-                     )}
-
-                     <Button 
-                         className="w-full h-12 text-base font-bold bg-green-600 hover:bg-green-700 shadow-lg shadow-green-600/20 relative" 
-                         onClick={processPaymentAndOrder}
-                         disabled={paymentProcessing}
-                     >
-                        {paymentProcessing ? (
-                            <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                Processing...
-                            </div>
-                        ) : (
-                            <>Pay Now</>
-                        )}
-                     </Button>
-                  </div>
-               </Card>
-            </div>
-         )}
 
          {/* Counter Offer Modal */}
          {counterModal.open && counterModal.offer && (
@@ -3913,14 +3635,6 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
                            onChange={e => setOfferData({ ...offerData, price: Number(e.target.value) })}
                         />
                      </div>
-                     <div>
-                         <label className="text-xs font-bold text-slate-500 uppercase block mb-1">Expected Delivery Date</label>
-                         <input 
-                             type="date" 
-                             className="w-full h-10 border border-slate-300 rounded-lg px-2 text-sm"
-                             onChange={e => setOfferData({ ...offerData, expectedDeliveryDate: e.target.value })}
-                         />
-                     </div>
                      <div className="p-5 bg-blue-50 rounded-2xl border border-blue-100 flex justify-between items-center">
                         <div className="text-sm font-bold text-blue-800">Total Offer Value</div>
                         <div className="text-2xl font-black text-blue-900 font-display">₹{(offerData.price * offerData.quantity).toLocaleString()}</div>
@@ -3940,46 +3654,11 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
                   <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-600" />
                   <button onClick={() => setShowTransportModal(false)} className="absolute top-4 right-4 p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-900 transition-all"><X className="w-5 h-5" /></button>
                   <h3 className="text-2xl font-bold text-slate-900 mb-2">Arrange Transport</h3>
-                  <p className="text-sm text-slate-500 mb-4 border-b border-slate-100 pb-4">Choose how you want transport for <span className="text-slate-900 font-bold">Order #{transportOrderId}</span></p>
-                  
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div>
-                          <label className="text-xs font-bold text-slate-500 uppercase block mb-1">Pickup Date</label>
-                          <input type="date" id="pickup-date" className="w-full h-10 border border-slate-300 rounded-lg px-2 text-sm" defaultValue={new Date().toISOString().split('T')[0]} />
-                      </div>
-                      <div>
-                          <label className="text-xs font-bold text-slate-500 uppercase block mb-1">Pickup Time</label>
-                          <input type="time" id="pickup-time" className="w-full h-10 border border-slate-300 rounded-lg px-2 text-sm" defaultValue="09:00" />
-                      </div>
-                  </div>
-
-                  <div className="space-y-4">
-                      <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                          <h4 className="font-bold text-sm text-slate-900 mb-2">Marketplace (Uber-style)</h4>
-                          <p className="text-xs text-slate-500 mb-3">Automatically find nearby vehicles. Negotiate price after matching.</p>
-                          <div className="grid grid-cols-2 gap-2">
-                              {['Bike', 'Auto', 'Mini Truck', 'Pickup', 'Truck'].map((v: any) => (
-                                  <Button key={v} variant="outline" className="text-xs" onClick={() => {
-                                      const date = (document.getElementById('pickup-date') as HTMLInputElement).value;
-                                      const time = (document.getElementById('pickup-time') as HTMLInputElement).value;
-                                      onCreateTransportRequest?.(transportOrderId, 'marketplace', v, date, time);
-                                      setShowTransportModal(false);
-                                  }}>{v}</Button>
-                              ))}
-                              <Button className="col-span-2 bg-blue-600 hover:bg-blue-700 text-xs font-bold" onClick={() => {
-                                  // Auto-recommend
-                                  const date = (document.getElementById('pickup-date') as HTMLInputElement).value;
-                                  const time = (document.getElementById('pickup-time') as HTMLInputElement).value;
-                                  onCreateTransportRequest?.(transportOrderId, 'marketplace', undefined, date, time);
-                                  setShowTransportModal(false);
-                              }}>Auto-Recommend Best Vehicle</Button>
-                          </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3">
-                         <Button variant="outline" className="h-10 font-bold border-slate-200 text-xs" onClick={() => { onCreateTransportRequest?.(transportOrderId, 'farmer_arranged'); setShowTransportModal(false); }}>Farmer Arranges</Button>
-                         <Button variant="outline" className="h-10 font-bold border-slate-200 text-xs" onClick={() => { onCreateTransportRequest?.(transportOrderId, 'buyer_own'); setShowTransportModal(false); }}>Self Pickup</Button>
-                      </div>
+                  <p className="text-sm text-slate-500 mb-8 border-b border-slate-100 pb-4">Choose how you want transport for <span className="text-slate-900 font-bold">Order #{transportOrderId}</span></p>
+                  <div className="grid md:grid-cols-3 gap-3">
+                     <Button className="h-12 bg-slate-900 hover:bg-slate-800 font-bold" onClick={() => { onCreateTransportRequest?.(transportOrderId, 'farmer_arranged'); setShowTransportModal(false); }}>Farmer Arranged</Button>
+                     <Button className="h-12 bg-blue-600 hover:bg-blue-700 font-bold" onClick={() => { onCreateTransportRequest?.(transportOrderId, 'marketplace'); setShowTransportModal(false); }}>Marketplace</Button>
+                     <Button variant="outline" className="h-12 font-bold border-slate-200" onClick={() => { onCreateTransportRequest?.(transportOrderId, 'buyer_own'); setShowTransportModal(false); }}>I Will Arrange</Button>
                   </div>
                </Card>
             </div>
@@ -3988,7 +3667,7 @@ const BuyerDashboard = ({ user, listings, setListings, offers, orders, setOrders
    );
 };
 
-const TransporterDashboard = ({ user, orders, messages, routePlans, transportRequests, transportBids, onAddRoutePlan, onSendMessage, onLogout, onUpdateOrderStatus, onUpdateProfile, onRaiseDispute, onAcceptTransportRequest, onAddTransportBid, onAcceptTransportBid, onTransportBidCounter, onUpdateTransportRequestStatus, onOpenChat }: any) => {
+const TransporterDashboard = ({ user, orders, messages, routePlans, transportRequests, transportBids, allUsers, onAddRoutePlan, onSendMessage, onLogout, onUpdateOrderStatus, onUpdateProfile, onRaiseDispute, onAcceptTransportRequest, onAddTransportBid, onUpdateTransportRequestStatus }: any) => {
    const [view, setView] = useState('home');
 
    // Vehicle & Profile State
@@ -4013,7 +3692,6 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
 
    // Load Board State
    const [loadFilter, setLoadFilter] = useState<'all' | 'local' | 'inter-city'>('all');
-   const [deliveryTab, setDeliveryTab] = useState<'active' | 'history'>('active');
 
    // Notifications State
    const [notifications, setNotifications] = useState([
@@ -4038,13 +3716,85 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
    const [issueOrderId, setIssueOrderId] = useState<string | null>(null);
    const [issueText, setIssueText] = useState('');
 
-   const availableJobs = (transportRequests || []).filter((r: any) => 
-      (r.status === 'open' || r.status === 'awaiting_farmer') && 
+   // Add Vehicle State
+   const [showAddVehicle, setShowAddVehicle] = useState(false);
+   const [isEditingVehicle, setIsEditingVehicle] = useState(false);
+   const [tempVehicle, setTempVehicle] = useState<Partial<Vehicle>>({ status: 'active' });
+
+   const handleImageUpload = (file: File, callback: (base64: string) => void) => {
+       if (!file) return;
+       const reader = new FileReader();
+       reader.onload = (e) => {
+           const img = new Image();
+           img.onload = () => {
+               const canvas = document.createElement('canvas');
+               const ctx = canvas.getContext('2d');
+               const maxSize = 800;
+               let width = img.width;
+               let height = img.height;
+               if (width > height) {
+                   if (width > maxSize) {
+                       height *= maxSize / width;
+                       width = maxSize;
+                   }
+               } else {
+                   if (height > maxSize) {
+                       width *= maxSize / height;
+                       height = maxSize;
+                   }
+               }
+               canvas.width = width;
+               canvas.height = height;
+               ctx?.drawImage(img, 0, 0, width, height);
+               const compressed = canvas.toDataURL('image/jpeg', 0.7);
+               callback(compressed);
+           };
+           img.src = e.target?.result as string;
+       };
+       reader.readAsDataURL(file);
+   };
+
+   const normalizeVehicleType = (t: string): TransportRequest['vehicleType'] | null => {
+      const s = (t || '').toLowerCase();
+      if (s.includes('bike')) return 'Bike';
+      if (s.includes('auto')) return 'Auto';
+      if (s.includes('mini')) return 'Mini Truck';
+      if (s.includes('pickup')) return 'Pickup';
+      if (s.includes('truck') || s.includes('large')) return 'Truck';
+      return null;
+   };
+
+   const vehicleRank = (t: TransportRequest['vehicleType']) =>
+      t === 'Bike' ? 1 : t === 'Auto' ? 2 : t === 'Mini Truck' ? 3 : t === 'Pickup' ? 4 : 5;
+
+   const getActiveVehicles = () => {
+      const fromArray = (profileData.vehicles || []).filter(v => (v.status || 'active') === 'active');
+      if (fromArray.length > 0) return fromArray;
+      const fallbackType = normalizeVehicleType(profileData.vehicleType);
+      const fallbackCap = Number(profileData.maxCapacity || 0);
+      if (!fallbackType || !Number.isFinite(fallbackCap) || fallbackCap <= 0) return [];
+      return [{ id: 'fallback', type: fallbackType, number: profileData.vehicleNumber || '', capacity: String(fallbackCap), status: 'active' as const }];
+   };
+
+   const matchesVehicle = (r: TransportRequest) => {
+      const vehicles = getActiveVehicles();
+      if (vehicles.length === 0) return false;
+      const reqRank = vehicleRank(r.vehicleType);
+      const weight = Number(r.weightKg || 0);
+      return vehicles.some(v => {
+         const vt = normalizeVehicleType(v.type);
+         if (!vt) return false;
+         const cap = Number(v.capacity || 0);
+         if (!Number.isFinite(cap) || cap <= 0) return false;
+         return vehicleRank(vt) >= reqRank && cap >= weight;
+      });
+   };
+
+   const availableJobs = (transportRequests || []).filter((r: any) =>
+      (r.status === 'open' || r.status === 'awaiting_farmer') &&
       !r.transporterId &&
-      // Only show jobs that haven't been assigned to anyone else
       r.status !== 'assigned' &&
-      // Filter by vehicle type: Only show jobs matching the transporter's vehicle type
-      r.vehicleType === profileData.vehicleType
+      matchesVehicle(r)
    );
    const myDeliveries = (transportRequests || []).filter((r: any) => r.transporterId === user.id);
    const completedDeliveries = myDeliveries.filter((r: any) => r.status === 'delivered');
@@ -4093,48 +3843,6 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
          <main className="flex-1 overflow-y-auto p-4 md:p-8 relative h-screen">
             {view === 'home' && (
                <div className="space-y-8 animate-in fade-in">
-                  
-                  {/* My Active Bids */}
-                  {transportBids.filter((b: any) => b.transporterId === user.id && b.status === 'pending').length > 0 && (
-                      <div className="mb-2">
-                          <h3 className="text-xl font-bold text-slate-900 mb-4">My Active Bids</h3>
-                          <div className="grid gap-4">
-                              {transportBids.filter((b: any) => b.transporterId === user.id && b.status === 'pending').map((b: any) => {
-                                  const req = transportRequests.find((r: any) => r.id === b.requestId);
-                                  return (
-                                      <Card key={b.id} className="p-5 border-blue-100 bg-white shadow-sm">
-                                          <div className="flex justify-between items-start">
-                                              <div>
-                                                  <div className="font-bold text-slate-900">Bid for Order #{req?.orderId}</div>
-                                                  <div className="text-sm text-slate-500">My Bid: ₹{b.amount}</div>
-                                                  {b.counterAmount && <div className="text-sm font-bold text-orange-600 mt-1">Buyer Counter: ₹{b.counterAmount}</div>}
-                                              </div>
-                                              <div className="flex flex-col items-end gap-2">
-                                                  <div className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase">{b.status}</div>
-                                                  {b.counterAmount && b.lastActionBy === 'buyer' && (
-                                                      <div className="flex gap-2 mt-2">
-                                                          <Button size="sm" variant="outline" onClick={() => onOpenChat?.(req?.buyerId, req?.orderId)}>Chat</Button>
-                                                          <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => onAcceptTransportBid?.(b.id)}>Accept Counter</Button>
-                                                          <Button size="sm" variant="outline" onClick={() => {
-                                                              const amount = prompt("Counter Buyer's offer:", b.counterAmount.toString());
-                                                              if (amount) onTransportBidCounter?.(b.id, Number(amount), 'transporter');
-                                                          }}>Counter</Button>
-                                                      </div>
-                                                  )}
-                                                  {(!b.counterAmount || b.lastActionBy === 'transporter') && (
-                                                       <div className="flex gap-2 mt-2">
-                                                           <Button size="sm" variant="outline" onClick={() => onOpenChat?.(req?.buyerId, req?.orderId)}>Chat</Button>
-                                                       </div>
-                                                  )}
-                                              </div>
-                                          </div>
-                                      </Card>
-                                  );
-                              })}
-                          </div>
-                      </div>
-                  )}
-
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                      <div>
                         <h2 className="text-3xl font-bold text-slate-900">Load Board</h2>
@@ -4183,7 +3891,6 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
                                        <div>
                                           <div className="text-[10px] text-slate-400 uppercase font-black">Pickup</div>
                                           <div className="text-sm font-bold truncate">{r.pickupLocation}</div>
-                                          {(r.pickupDate || r.pickupTime) && <div className="text-xs text-slate-500 font-medium">{r.pickupDate} {r.pickupTime}</div>}
                                        </div>
                                     </div>
                                     <div className="flex justify-center items-center py-2 md:py-0">
@@ -4222,234 +3929,62 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
 
             {view === 'deliveries' && (
                <div className="space-y-6 animate-in slide-in-from-right-4">
-                  <div className="flex items-center justify-between">
-                     <h2 className="text-2xl font-bold text-slate-900">My Deliveries</h2>
-                     <div className="flex bg-white p-1 rounded-xl border border-slate-200">
-                        <button 
-                           onClick={() => setDeliveryTab('active')}
-                           className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${deliveryTab === 'active' ? 'bg-orange-100 text-orange-700' : 'text-slate-500 hover:text-slate-900'}`}
-                        >
-                           Active <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${deliveryTab === 'active' ? 'bg-orange-200 text-orange-800' : 'bg-slate-100 text-slate-500'}`}>{activeDeliveries.length}</span>
-                        </button>
-                        <button 
-                           onClick={() => setDeliveryTab('history')}
-                           className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${deliveryTab === 'history' ? 'bg-green-100 text-green-700' : 'text-slate-500 hover:text-slate-900'}`}
-                        >
-                           History <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${deliveryTab === 'history' ? 'bg-green-200 text-green-800' : 'bg-slate-100 text-slate-500'}`}>{completedDeliveries.length}</span>
-                        </button>
-                     </div>
+                  <h2 className="text-2xl font-bold text-slate-900">My Active Shipments</h2>
+                  <div className="grid gap-6">
+                     {activeDeliveries.map((r: any) => {
+                        const order = orders.find((o: any) => o.id === r.orderId);
+                        return (
+                        <Card key={r.id} className="p-6 border-orange-100 bg-white">
+                           <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-8">
+                              <div className="flex gap-4">
+                                 <div className="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 shadow-sm"><Route className="w-8 h-8" /></div>
+                                 <div>
+                                    <h3 className="text-lg font-bold text-slate-900">Order #{order?.id || r.orderId} • {order?.cropName || 'Crop'}</h3>
+                                    <div className="flex items-center gap-2 mt-1">
+                                       <span className="px-3 py-1 bg-orange-100 text-orange-800 text-[10px] font-black rounded-full uppercase tracking-widest">{String(r.status).replace('_', ' ')}</span>
+                                       <span className="text-xs text-slate-400 font-medium">{order?.quantity || r.weightKg}kg • {r.pickupLocation} → {r.dropLocation}</span>
+                                    </div>
+                                 </div>
+                              </div>
+                              <div className="text-right w-full md:w-auto">
+                                 <div className="text-xs text-slate-400 font-bold uppercase mb-1">Status Update</div>
+                                 <select
+                                    className="w-full md:w-56 h-10 bg-slate-100 border-none rounded-xl px-3 text-xs font-bold outline-orange-500"
+                                    value={r.status}
+                                    onChange={(e) => {
+                                       const next = e.target.value as any;
+                                       if (next === 'delivered') {
+                                          const enteredOtp = r.deliveryOtp || '1234';
+                                          if (!confirm(`Verify delivery with OTP: ${enteredOtp}?`)) return;
+                                       }
+                                       onUpdateTransportRequestStatus?.(r.id, next);
+                                    }}
+                                 >
+                                    <option value="assigned">Assigned</option>
+                                    <option value="picked_up">Picked Up</option>
+                                    <option value="in_transit">In Transit</option>
+                                    <option value="delivered">Delivered</option>
+                                 </select>
+                              </div>
+                           </div>
+
+                           <div className="flex gap-3 mt-4 flex-wrap">
+                              <Button variant="outline" className="h-10 text-xs font-bold border-dashed border-slate-300 hover:border-orange-500 hover:text-orange-600 transition-colors">POD</Button>
+                              <Button className="h-10 text-xs font-bold bg-orange-600 hover:bg-orange-700" onClick={() => {
+                                 const farmerName = order?.farmerName;
+                                 const toUserId = farmerName ? '' : '';
+                                 if (toUserId) onSendMessage?.({ toUserId, text: `Update on shipment ${order?.id || r.orderId}` });
+                              }}>Message</Button>
+                              <Button variant="outline" className="h-10 text-xs font-bold" onClick={() => {
+                                 setIssueOrderId(order?.id || r.orderId);
+                                 setIssueText('');
+                                 setIssueModalOpen(true);
+                              }}>Report Issue</Button>
+                           </div>
+                        </Card>
+                     )})}
+                     {activeDeliveries.length === 0 && <div className="py-24 text-center border-2 border-dashed border-slate-200 rounded-3xl bg-white/50">No active shipments. Accept a job from the board to start.</div>}
                   </div>
-
-                  {deliveryTab === 'active' ? (
-                      <div className="grid gap-6">
-                         {activeDeliveries.map((r: any) => {
-                            const order = orders.find((o: any) => o.id === r.orderId);
-                            return (
-                               <Card key={r.id} className="overflow-hidden border-orange-100 shadow-sm hover:shadow-md transition-all">
-                                  <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-white rounded-lg border border-slate-200 flex items-center justify-center text-slate-400">
-                                            <Package className="w-5 h-5" />
-                                        </div>
-                                        <div>
-                                            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Order #{order?.id}</div>
-                                            <div className="font-bold text-slate-900">{order?.cropName} • {order?.quantity || r.weightKg} kg</div>
-                                        </div>
-                                     </div>
-                                     <div className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-black uppercase tracking-widest">{String(r.status).replace('_', ' ')}</div>
-                                  </div>
-
-                                  <div className="p-6">
-                                      <div className="flex flex-col md:flex-row gap-8 relative">
-                                          <div className="absolute left-[11px] top-8 bottom-8 w-0.5 bg-slate-200 md:hidden" />
-                                          
-                                          <div className="flex-1 space-y-6">
-                                              <div className="flex gap-4 relative">
-                                                  <div className="w-6 h-6 rounded-full bg-orange-100 border-4 border-white shadow-sm flex-shrink-0 z-10" />
-                                                  <div>
-                                                      <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Pickup Location</div>
-                                                      <div className="font-bold text-slate-900 text-lg leading-none mb-1">{r.pickupLocation}</div>
-                                                      <div className="text-sm text-slate-500 font-medium mb-2">{order?.farmerName} • Farmer</div>
-                                                      
-                                                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-lg border border-slate-100">
-                                                          <Calendar className="w-3 h-3 text-slate-400" />
-                                                          <div className="text-xs font-bold text-slate-600">
-                                                              {r.pickupConfirmedAt ? 
-                                                                  <span className="text-green-600">Picked: {new Date(r.pickupConfirmedAt).toLocaleString()}</span> : 
-                                                                  <span>Scheduled: {r.pickupDate} {r.pickupTime}</span>
-                                                              }
-                                                          </div>
-                                                      </div>
-                                                  </div>
-                                              </div>
-
-                                              <div className="flex gap-4 relative">
-                                                  <div className="w-6 h-6 rounded-full bg-slate-200 border-4 border-white shadow-sm flex-shrink-0 z-10" />
-                                                  <div>
-                                                      <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Drop Location</div>
-                                                      <div className="font-bold text-slate-900 text-lg leading-none mb-1">{r.dropLocation}</div>
-                                                      <div className="text-sm text-slate-500 font-medium">{order?.buyerName} • Buyer</div>
-                                                  </div>
-                                              </div>
-                                          </div>
-
-                                          <div className="w-full md:w-64 bg-slate-50 rounded-2xl p-4 flex flex-col justify-between">
-                                              <div className="mb-4">
-                                                  <div className="text-[10px] font-bold text-slate-400 uppercase">Estimated Fare</div>
-                                                  <div className="text-2xl font-black text-slate-900">₹{r.finalFare || r.estimatedFare}</div>
-                                              </div>
-                                              
-                                              <div className="space-y-2">
-                                                  <div className="text-[10px] font-bold text-slate-400 uppercase">Update Status</div>
-                                                  <select
-                                                     className="w-full h-10 bg-white border border-slate-200 rounded-xl px-3 text-xs font-bold outline-orange-500 focus:border-orange-500 transition-colors"
-                                                     value={r.status}
-                                                     onChange={(e) => {
-                                             const next = e.target.value as any;
-                                             if (next === 'delivered') {
-                                                // OTP Verification simulated for demo to avoid prompt() error
-                                                const enteredOtp = r.deliveryOtp || '1234';
-                                                console.log(`Auto-verifying delivery with OTP: ${enteredOtp}`);
-                                             }
-                                             onUpdateTransportRequestStatus?.(r.id, next);
-                                          }}
-                                                  >
-                                                     <option value="assigned">Assigned</option>
-                                                     <option value="picked_up">Picked Up</option>
-                                                     <option value="in_transit">In Transit</option>
-                                                     <option value="delivered">Delivered</option>
-                                                  </select>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-
-                                  <div className="bg-slate-50 px-6 py-3 border-t border-slate-100 flex gap-3">
-                                      <Button variant="outline" className="flex-1 h-9 text-xs font-bold bg-white" onClick={() => {
-                                          if (r.farmerId) onSendMessage?.({ toUserId: r.farmerId, text: `Update on shipment #${order?.id}` });
-                                      }}>Message Farmer</Button>
-                                      <Button variant="outline" className="flex-1 h-9 text-xs font-bold bg-white" onClick={() => {
-                                          setIssueOrderId(order?.id || r.orderId);
-                                          setIssueText('');
-                                          setIssueModalOpen(true);
-                                      }}>Report Issue</Button>
-                                  </div>
-                               </Card>
-                            );
-                         })}
-                         {activeDeliveries.length === 0 && (
-                            <div className="py-20 text-center">
-                               <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
-                                   <Truck className="w-10 h-10" />
-                               </div>
-                               <h3 className="text-lg font-bold text-slate-900">No active shipments</h3>
-                               <p className="text-slate-500 text-sm max-w-xs mx-auto mt-2">Check the Load Board to find new delivery jobs in your area.</p>
-                               <Button className="mt-6 bg-orange-600 font-bold" onClick={() => setView('home')}>Go to Load Board</Button>
-                            </div>
-                         )}
-                      </div>
-                  ) : (
-                      <div className="grid gap-6">
-                         {completedDeliveries.map((r: any) => {
-                            const order = orders.find((o: any) => o.id === r.orderId);
-                            const durationHrs = r.pickupConfirmedAt && r.deliveryConfirmedAt 
-                                ? ((new Date(r.deliveryConfirmedAt).getTime() - new Date(r.pickupConfirmedAt).getTime()) / (1000 * 60 * 60)).toFixed(1) 
-                                : null;
-                            return (
-                               <Card key={r.id} className="p-6 border-slate-200 bg-slate-50 hover:bg-white transition-colors">
-                                  {/* Header: Order ID & Status */}
-                                  <div className="flex justify-between items-start mb-6">
-                                      <div>
-                                          <div className="flex items-center gap-2 mb-1">
-                                              <span className="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-black uppercase tracking-widest rounded-full">Delivered</span>
-                                              <span className="text-xs text-slate-400 font-medium">{new Date(r.deliveryConfirmedAt || r.createdAt).toLocaleDateString()}</span>
-                                          </div>
-                                          <h3 className="text-xl font-bold text-slate-900">Order #{order?.id}</h3>
-                                      </div>
-                                      <div className="text-right">
-                                          <div className="text-2xl font-black text-slate-900">₹{r.finalFare || r.estimatedFare}</div>
-                                          <div className="text-[10px] text-slate-400 font-bold uppercase">Final Payout</div>
-                                      </div>
-                                  </div>
-                               
-                                  {/* Grid Details */}
-                                  <div className="grid md:grid-cols-2 gap-6 mb-6">
-                                      {/* Cargo Info */}
-                                      <div className="bg-white p-4 rounded-xl border border-slate-100">
-                                          <div className="text-[10px] font-bold text-slate-400 uppercase mb-2">Cargo Details</div>
-                                          <div className="flex items-center gap-3">
-                                              <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center text-orange-600"><Package className="w-5 h-5" /></div>
-                                              <div>
-                                                  <div className="font-bold text-slate-900">{order?.cropName || 'Crop'}</div>
-                                                  <div className="text-xs font-bold text-slate-500">{order?.quantity || r.weightKg} kg • {r.vehicleType || 'Mini Truck'}</div>
-                                              </div>
-                                          </div>
-                                      </div>
-                               
-                                      {/* Timing Info */}
-                                      <div className="bg-white p-4 rounded-xl border border-slate-100">
-                                          <div className="text-[10px] font-bold text-slate-400 uppercase mb-2">Timing & Duration</div>
-                                          <div className="flex justify-between items-center">
-                                              <div>
-                                                  <div className="text-xs text-slate-500">Duration</div>
-                                                  <div className="font-black text-slate-900 text-lg">{durationHrs || '--'} hrs</div>
-                                              </div>
-                                              <div className="text-right">
-                                                  <div className="text-[10px] text-slate-400">Delivered At</div>
-                                                  <div className="text-xs font-bold text-slate-700">{r.deliveryConfirmedAt ? new Date(r.deliveryConfirmedAt).toLocaleTimeString() : '--'}</div>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                               
-                                  {/* Route Details */}
-                                  <div className="relative pl-8 space-y-6">
-                                      {/* Connector Line */}
-                                      <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-slate-200" />
-                                      
-                                      {/* Pickup */}
-                                      <div className="relative">
-                                          <div className="absolute -left-[29px] top-1 w-6 h-6 rounded-full bg-white border-4 border-slate-300 z-10" />
-                                          <div className="flex justify-between items-start">
-                                              <div>
-                                                  <div className="text-[10px] font-bold text-slate-400 uppercase">Pickup</div>
-                                                  <div className="font-bold text-slate-900">{r.pickupLocation}</div>
-                                                  <div className="text-xs text-slate-500">{order?.farmerName}</div>
-                                              </div>
-                                              <div className="text-right">
-                                                  <div className="text-[10px] font-bold text-slate-400 uppercase">Time</div>
-                                                  <div className="text-xs font-bold text-slate-700">{r.pickupConfirmedAt ? new Date(r.pickupConfirmedAt).toLocaleString() : '--'}</div>
-                                              </div>
-                                          </div>
-                                      </div>
-                               
-                                      {/* Drop */}
-                                      <div className="relative">
-                                          <div className="absolute -left-[29px] top-1 w-6 h-6 rounded-full bg-green-500 border-4 border-green-100 z-10" />
-                                          <div className="flex justify-between items-start">
-                                              <div>
-                                                  <div className="text-[10px] font-bold text-slate-400 uppercase">Delivery</div>
-                                                  <div className="font-bold text-slate-900">{r.dropLocation}</div>
-                                                  <div className="text-xs text-slate-500">{order?.buyerName}</div>
-                                              </div>
-                                              <div className="text-right">
-                                                  <div className="text-[10px] font-bold text-slate-400 uppercase">Time</div>
-                                                  <div className="text-xs font-bold text-slate-700">{r.deliveryConfirmedAt ? new Date(r.deliveryConfirmedAt).toLocaleString() : '--'}</div>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                               
-                                  {/* Footer */}
-                                  <div className="mt-6 pt-4 border-t border-slate-200 flex justify-end">
-                                      <Button variant="outline" size="sm" className="font-bold">View Proof of Delivery (POD)</Button>
-                                  </div>
-                               </Card>
-                            );
-                         })}
-                         {completedDeliveries.length === 0 && <div className="py-20 text-center text-slate-400">No history yet.</div>}
-                      </div>
-                  )}
                </div>
             )}
 
@@ -4499,10 +4034,7 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
                               {completedDeliveries.map(o => (
                                  <tr key={o.id} className="hover:bg-slate-50 transition-colors">
                                     <td className="px-6 py-4 font-bold text-slate-700">#{o.id}</td>
-                                    <td className="px-6 py-4 text-slate-500">
-                                       {new Date(o.date).toLocaleDateString()}
-                                       <span className="block text-xs text-slate-400">{new Date(o.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                    </td>
+                                    <td className="px-6 py-4 text-slate-500">{new Date(o.date).toLocaleDateString()}</td>
                                     <td className="px-6 py-4 text-slate-500">{o.distanceKm || 45} KM</td>
                                     <td className="px-6 py-4 text-right font-black text-slate-900">₹{(o.distanceKm || 45) * 15}</td>
                                  </tr>
@@ -4519,31 +4051,154 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
             {view === 'vehicle' && (
                <div className="space-y-6 animate-in slide-in-from-right-4">
                   <div className="flex justify-between items-center">
-                     <div><h2 className="text-2xl font-black text-slate-900">Vehicle Management</h2><p className="text-slate-500">Manage your fleet and availability.</p></div>
-                     <Button className="bg-orange-600 hover:bg-orange-700 font-bold"><Plus className="w-5 h-5 mr-1" /> Add Vehicle</Button>
+                     <div><h2 className="text-2xl font-black text-slate-900">Vehicle Management</h2><p className="text-slate-500">Manage your fleet (Max 2).</p></div>
+                     {(!profileData.vehicles || profileData.vehicles.length < 2) && (
+                        <Button className="bg-orange-600 hover:bg-orange-700 font-bold" onClick={() => { setTempVehicle({ status: 'active', type: 'Mini Truck' }); setIsEditingVehicle(false); setShowAddVehicle(true); }}><Plus className="w-5 h-5 mr-1" /> Add Vehicle</Button>
+                     )}
                   </div>
-                  <Card className="p-6 border-orange-100 bg-white">
-                     <div className="flex flex-col md:flex-row gap-6 items-start">
-                        <div className="w-full md:w-64 h-40 bg-slate-100 rounded-xl flex items-center justify-center text-slate-300">
-                           {profileData.vehiclePhoto ? <img src={profileData.vehiclePhoto} alt="Vehicle" className="w-full h-full object-cover rounded-xl" /> : <Truck className="w-16 h-16" />}
-                        </div>
-                        <div className="flex-1 space-y-4 w-full">
-                           <div className="flex justify-between items-start">
-                              <div><h3 className="text-xl font-bold text-slate-900">{profileData.vehicleName || profileData.vehicleType}</h3><p className="text-sm text-slate-500 font-bold uppercase tracking-wider">{profileData.vehicleNumber || vehicleData.number}</p></div>
-                              <div className="flex items-center gap-2"><span className={`w-3 h-3 rounded-full ${vehicleData.available ? 'bg-green-500' : 'bg-slate-300'}`}></span><span className="text-sm font-bold text-slate-700">{vehicleData.available ? 'Available' : 'Off Duty'}</span></div>
-                           </div>
-                           <div className="grid grid-cols-2 gap-4">
-                              <div className="p-3 bg-slate-50 rounded-lg"><div className="text-[10px] text-slate-400 font-bold uppercase">Max Capacity</div><div className="font-bold text-slate-900">{profileData.maxCapacity || vehicleData.capacity} kg</div></div>
-                              <div className="p-3 bg-slate-50 rounded-lg"><div className="text-[10px] text-slate-400 font-bold uppercase">Permit Type</div><div className="font-bold text-slate-900">All India</div></div>
-                           </div>
-                           {profileData.numberPlatePhoto && <div className="pt-2"><img src={profileData.numberPlatePhoto} alt="Number Plate" className="h-16 object-cover rounded-lg border border-slate-200" /></div>}
-                           <div className="flex gap-3 pt-2">
-                              <Button variant="outline" className="flex-1 font-bold">Edit Details</Button>
-                              <Button variant="outline" className={`flex-1 font-bold ${vehicleData.available ? 'text-red-600 border-red-100 hover:bg-red-50' : 'text-green-600 border-green-100 hover:bg-green-50'}`} onClick={() => setVehicleData(prev => ({ ...prev, available: !prev.available }))}>{vehicleData.available ? 'Go Offline' : 'Go Online'}</Button>
-                           </div>
-                        </div>
-                     </div>
-                  </Card>
+
+                  {showAddVehicle && (
+                      <Card className="p-6 border-orange-200 bg-orange-50/50 mb-6">
+                          <h3 className="font-bold text-lg mb-4">{isEditingVehicle ? 'Edit Vehicle' : 'Add New Vehicle'}</h3>
+                          <div className="grid md:grid-cols-2 gap-4 mb-4">
+                              <div>
+                                  <label className="text-xs font-bold text-slate-500 uppercase block mb-2">Vehicle Type</label>
+                                  <select className="w-full h-10 bg-white border border-slate-300 rounded-lg px-3 outline-none" value={tempVehicle.type} onChange={e => setTempVehicle({ ...tempVehicle, type: e.target.value })}>
+                                      <option value="Bike">Bike (up to 150kg)</option>
+                                      <option value="Auto">Auto (up to 400kg)</option>
+                                      <option value="Mini Truck">Mini Truck (up to 2000kg)</option>
+                                      <option value="Pickup">Pickup (up to 5000kg)</option>
+                                      <option value="Truck">Truck (5000kg+)</option>
+                                  </select>
+                              </div>
+                              <Input label="Vehicle Number" placeholder="MP04 GA 1234" value={tempVehicle.number || ''} onChange={e => setTempVehicle({ ...tempVehicle, number: e.target.value })} />
+                              <Input label="Capacity (Kg)" type="number" value={tempVehicle.capacity || ''} onChange={e => setTempVehicle({ ...tempVehicle, capacity: e.target.value })} />
+                          </div>
+                          
+                          <div className="grid md:grid-cols-3 gap-4 mb-4">
+                              <div>
+                                  <label className="text-xs font-bold text-slate-500 uppercase block mb-2">Vehicle Photo</label>
+                                  <input type="file" accept="image/*" className="text-xs" onChange={e => {
+                                      const file = e.target.files?.[0];
+                                      if (file) handleImageUpload(file, (base64) => setTempVehicle(prev => ({ ...prev, vehiclePhoto: base64 })));
+                                  }} />
+                                  {tempVehicle.vehiclePhoto && <img src={tempVehicle.vehiclePhoto} className="mt-2 h-16 w-full object-cover rounded" />}
+                              </div>
+                              <div>
+                                  <label className="text-xs font-bold text-slate-500 uppercase block mb-2">Number Plate</label>
+                                  <input type="file" accept="image/*" className="text-xs" onChange={e => {
+                                      const file = e.target.files?.[0];
+                                      if (file) handleImageUpload(file, (base64) => setTempVehicle(prev => ({ ...prev, numberPlatePhoto: base64 })));
+                                  }} />
+                                  {tempVehicle.numberPlatePhoto && <img src={tempVehicle.numberPlatePhoto} className="mt-2 h-16 w-full object-cover rounded" />}
+                              </div>
+                              <div>
+                                  <label className="text-xs font-bold text-slate-500 uppercase block mb-2">Driver Photo</label>
+                                  <input type="file" accept="image/*" className="text-xs" onChange={e => {
+                                      const file = e.target.files?.[0];
+                                      if (file) handleImageUpload(file, (base64) => setTempVehicle(prev => ({ ...prev, driverPhoto: base64 })));
+                                  }} />
+                                  {tempVehicle.driverPhoto && <img src={tempVehicle.driverPhoto} className="mt-2 h-16 w-full object-cover rounded" />}
+                              </div>
+                          </div>
+
+                          <div className="flex gap-3 justify-end">
+                              <Button variant="ghost" onClick={() => setShowAddVehicle(false)}>Cancel</Button>
+                              <Button className="bg-orange-600 font-bold" onClick={async () => {
+                                  if (!tempVehicle.type || !tempVehicle.number || !tempVehicle.capacity) return alert('Please fill all fields');
+
+                                  const ensureUploaded = async (value?: string) => {
+                                     if (!value) return undefined;
+                                     if (!value.startsWith('data:')) return value;
+                                     const url = await uploadMedia(value, `vehicles/${user.id}`);
+                                     return url || value;
+                                  };
+
+                                  const vehiclePhoto = await ensureUploaded(tempVehicle.vehiclePhoto as any);
+                                  const numberPlatePhoto = await ensureUploaded(tempVehicle.numberPlatePhoto as any);
+                                  const driverPhoto = await ensureUploaded(tempVehicle.driverPhoto as any);
+                                  
+                                  let updatedVehicles = [...(profileData.vehicles || [])];
+                                  if (isEditingVehicle) {
+                                      updatedVehicles = updatedVehicles.map(v => v.id === tempVehicle.id ? { ...v, ...tempVehicle, vehiclePhoto, numberPlatePhoto, driverPhoto } as Vehicle : v);
+                                  } else {
+                                      if (updatedVehicles.length >= 2) return alert("Max 2 vehicles allowed.");
+                                      const newV: Vehicle = {
+                                          id: Math.random().toString(36).substr(2, 9),
+                                          type: tempVehicle.type!,
+                                          number: tempVehicle.number!,
+                                          capacity: tempVehicle.capacity!,
+                                          status: 'active',
+                                          vehiclePhoto,
+                                          numberPlatePhoto,
+                                          driverPhoto
+                                      };
+                                      updatedVehicles.push(newV);
+                                  }
+                                  setProfileData(prev => ({ ...prev, vehicles: updatedVehicles }));
+                                  onUpdateProfile?.({ ...user.profile, vehicles: updatedVehicles });
+                                  setShowAddVehicle(false);
+                                  setIsEditingVehicle(false);
+                              }}>{isEditingVehicle ? 'Update Vehicle' : 'Save Vehicle'}</Button>
+                          </div>
+                      </Card>
+                  )}
+
+                  <div className="grid gap-6">
+                     {(profileData.vehicles || []).map((v: Vehicle) => (
+                         <Card key={v.id} className="p-6 border-slate-200 bg-white">
+                             <div className="flex flex-col md:flex-row gap-6 items-start">
+                                <div className="w-24 h-24 bg-slate-100 rounded-xl flex items-center justify-center text-slate-300 flex-shrink-0 overflow-hidden relative">
+                                   {v.vehiclePhoto ? <img src={v.vehiclePhoto} className="w-full h-full object-cover" /> : <Truck className="w-10 h-10" />}
+                                </div>
+                                <div className="flex-1 w-full">
+                                   <div className="flex justify-between items-start mb-2">
+                                      <div>
+                                          <h3 className="text-xl font-bold text-slate-900">{v.type}</h3>
+                                          <p className="text-sm text-slate-500 font-bold uppercase tracking-wider">{v.number}</p>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                          <span className={`w-3 h-3 rounded-full ${v.status === 'active' ? 'bg-green-500' : 'bg-slate-300'}`}></span>
+                                          <span className="text-sm font-bold text-slate-700">{v.status === 'active' ? 'Active' : 'Inactive'}</span>
+                                      </div>
+                                   </div>
+                                   <div className="flex gap-4 text-sm text-slate-600 mb-4">
+                                       <span className="bg-slate-50 px-2 py-1 rounded border border-slate-100 font-bold">Capacity: {v.capacity} kg</span>
+                                       <span className="bg-slate-50 px-2 py-1 rounded border border-slate-100 font-bold">All India Permit</span>
+                                   </div>
+                                   <div className="flex gap-3">
+                                      <Button variant="outline" size="sm" className="font-bold" onClick={() => {
+                                          setTempVehicle(v);
+                                          setIsEditingVehicle(true);
+                                          setShowAddVehicle(true);
+                                      }}>Edit Details</Button>
+                                      <Button variant="outline" size="sm" className={`font-bold ${v.status === 'active' ? 'text-red-600 hover:bg-red-50' : 'text-green-600 hover:bg-green-50'}`} onClick={() => {
+                                          const updated = (profileData.vehicles || []).map((pv: Vehicle) =>
+                                             pv.id === v.id ? ({ ...pv, status: (pv.status === 'active' ? 'inactive' : 'active') as Vehicle['status'] } as Vehicle) : pv
+                                          );
+                                          setProfileData(prev => ({ ...prev, vehicles: updated }));
+                                          onUpdateProfile?.({ ...user.profile, vehicles: updated });
+                                      }}>{v.status === 'active' ? 'Deactivate' : 'Activate'}</Button>
+                                      <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700 hover:bg-red-50 font-bold" onClick={() => {
+                                          if(!confirm('Delete this vehicle?')) return;
+                                          const updated = (profileData.vehicles || []).filter((pv: Vehicle) => pv.id !== v.id);
+                                          setProfileData(prev => ({ ...prev, vehicles: updated }));
+                                          onUpdateProfile?.({ ...user.profile, vehicles: updated });
+                                      }}>Delete</Button>
+                                   </div>
+                                </div>
+                             </div>
+                         </Card>
+                     ))}
+                     {(!profileData.vehicles || profileData.vehicles.length === 0) && !showAddVehicle && (
+                         <div className="text-center py-12 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
+                             <Truck className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                             <h3 className="text-slate-900 font-bold">No Vehicles Added</h3>
+                             <p className="text-slate-500 text-sm mb-4">Add your trucks to start receiving orders.</p>
+                             <Button onClick={() => { setTempVehicle({ status: 'active', type: 'Mini Truck' }); setIsEditingVehicle(false); setShowAddVehicle(true); }}>Add First Vehicle</Button>
+                         </div>
+                     )}
+                  </div>
                </div>
             )}
 
@@ -4552,8 +4207,8 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
                <div className="space-y-6 animate-in slide-in-from-right-4">
                   <div className="flex flex-col md:flex-row gap-6">
                      <Card className="w-full md:w-80 p-6 h-fit text-center">
-                        <div className="w-24 h-24 bg-orange-100 rounded-full mx-auto flex items-center justify-center text-orange-600 mb-4 text-3xl font-black">{user.profile.fullName.charAt(0)}</div>
-                        <h2 className="text-xl font-bold text-slate-900">{user.profile.fullName}</h2>
+                        <div className="w-24 h-24 bg-orange-100 rounded-full mx-auto flex items-center justify-center text-orange-600 mb-4 text-3xl font-black">{(user.profile.fullName || 'U').charAt(0)}</div>
+                        <h2 className="text-xl font-bold text-slate-900">{user.profile.fullName || 'User'}</h2>
                         <p className="text-sm text-slate-500 mb-6">{user.profile.city || 'Mumbai'}, {user.profile.state || 'Maharashtra'}</p>
                         <div className="grid grid-cols-2 gap-4 mb-6 text-left">
                            <div className="p-3 bg-slate-50 rounded-xl"><div className="text-xs text-slate-400 font-bold uppercase">Rating</div><div className="font-bold text-slate-700 flex items-center gap-1">4.8 <Star className="w-3 h-3 text-orange-400 fill-current" /></div></div>
@@ -4567,6 +4222,26 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
                      <div className="flex-1">
                         {profileTab === 'overview' ? (
                            <div className="space-y-6">
+                              <Card className="p-6">
+                                 <h3 className="text-lg font-bold text-slate-900 mb-4">Primary Vehicle</h3>
+                                 {profileData.vehicles && profileData.vehicles.length > 0 ? (
+                                     <div className="flex items-center gap-4">
+                                         <div className="w-16 h-16 bg-slate-100 rounded-lg overflow-hidden flex items-center justify-center">
+                                             {profileData.vehicles[0].vehiclePhoto ? <img src={profileData.vehicles[0].vehiclePhoto} className="w-full h-full object-cover" /> : <Truck className="w-8 h-8 text-slate-400" />}
+                                         </div>
+                                         <div>
+                                             <div className="font-bold text-slate-900">{profileData.vehicles[0].type}</div>
+                                             <div className="text-sm text-slate-500 uppercase font-bold tracking-wider">{profileData.vehicles[0].number}</div>
+                                         </div>
+                                         <Button variant="outline" size="sm" className="ml-auto" onClick={() => setView('vehicle')}>Manage Fleet</Button>
+                                     </div>
+                                 ) : (
+                                     <div className="text-center py-4">
+                                         <p className="text-sm text-slate-500 mb-3">No vehicle added yet.</p>
+                                         <Button size="sm" onClick={() => { setView('vehicle'); setShowAddVehicle(true); setIsEditingVehicle(false); setTempVehicle({ status: 'active', type: 'Mini Truck' }); }}>Add Primary Vehicle</Button>
+                                     </div>
+                                 )}
+                              </Card>
                               <Card className="p-6">
                                  <h3 className="text-lg font-bold text-slate-900 mb-4">Business Profile</h3>
                                  <div className="grid md:grid-cols-2 gap-6">
@@ -4601,15 +4276,15 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
                               <div className="p-6">
                                  {editSection === 'personal' && (
                                     <div className="space-y-4 animate-in fade-in">
-                                       <div className="grid md:grid-cols-2 gap-4"><Input label="Full Name" value={profileData.fullName} onChange={e => setProfileData({ ...profileData, fullName: e.target.value })} /><Input label="Language" value={profileData.language} onChange={e => setProfileData({ ...profileData, language: e.target.value })} /></div>
-                                       <div className="grid md:grid-cols-2 gap-4"><Input label="City" value={profileData.city} onChange={e => setProfileData({ ...profileData, city: e.target.value })} /><Input label="State" value={profileData.state} onChange={e => setProfileData({ ...profileData, state: e.target.value })} /></div>
+                                       <div className="grid md:grid-cols-2 gap-4"><Input label="Full Name" value={profileData.fullName || ''} onChange={e => setProfileData({ ...profileData, fullName: e.target.value })} /><Input label="Language" value={profileData.language || ''} onChange={e => setProfileData({ ...profileData, language: e.target.value })} /></div>
+                                       <div className="grid md:grid-cols-2 gap-4"><Input label="City" value={profileData.city || ''} onChange={e => setProfileData({ ...profileData, city: e.target.value })} /><Input label="State" value={profileData.state || ''} onChange={e => setProfileData({ ...profileData, state: e.target.value })} /></div>
                                     </div>
                                  )}
 
                                  {editSection === 'business' && (
                                     <div className="space-y-4 animate-in fade-in">
-                                       <Input label="Business/Firm Name" value={profileData.businessName} onChange={e => setProfileData({ ...profileData, businessName: e.target.value })} />
-                                       <div className="grid md:grid-cols-2 gap-4"><Input label="GSTIN" value={profileData.gstin} onChange={e => setProfileData({ ...profileData, gstin: e.target.value })} /><Input label="PAN Number" value={profileData.pan} onChange={e => setProfileData({ ...profileData, pan: e.target.value })} /></div>
+                                       <Input label="Business/Firm Name" value={profileData.businessName || ''} onChange={e => setProfileData({ ...profileData, businessName: e.target.value })} />
+                                       <div className="grid md:grid-cols-2 gap-4"><Input label="GSTIN" value={profileData.gstin || ''} onChange={e => setProfileData({ ...profileData, gstin: e.target.value })} /><Input label="PAN Number" value={profileData.pan || ''} onChange={e => setProfileData({ ...profileData, pan: e.target.value })} /></div>
                                        <Input label="Operating Regions (Comma separated)" placeholder="e.g. Mumbai, Pune, Nashik" />
                                     </div>
                                  )}
@@ -4617,12 +4292,12 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
                                  {editSection === 'bank' && (
                                     <div className="space-y-4 animate-in fade-in">
                                        <div className="p-3 bg-blue-50 text-blue-700 rounded-lg text-sm mb-4 flex gap-2"><Lock className="w-4 h-4 mt-0.5" /> Bank details are securely stored and used only for payouts.</div>
-                                       <Input label="Account Holder Name" value={profileData.bankDetails?.holderName} onChange={e => setProfileData({ ...profileData, bankDetails: { ...profileData.bankDetails!, holderName: e.target.value } })} />
+                                       <Input label="Account Holder Name" value={profileData.bankDetails?.holderName || ''} onChange={e => setProfileData({ ...profileData, bankDetails: { ...(profileData.bankDetails || {}), holderName: e.target.value } as any })} />
                                        <div className="grid md:grid-cols-2 gap-4">
-                                          <Input label="Account Number" value={profileData.bankDetails?.accountNumber} onChange={e => setProfileData({ ...profileData, bankDetails: { ...profileData.bankDetails!, accountNumber: e.target.value } })} />
-                                          <Input label="IFSC Code" value={profileData.bankDetails?.ifsc} onChange={e => setProfileData({ ...profileData, bankDetails: { ...profileData.bankDetails!, ifsc: e.target.value } })} />
+                                          <Input label="Account Number" value={profileData.bankDetails?.accountNumber || ''} onChange={e => setProfileData({ ...profileData, bankDetails: { ...(profileData.bankDetails || {}), accountNumber: e.target.value } as any })} />
+                                          <Input label="IFSC Code" value={profileData.bankDetails?.ifsc || ''} onChange={e => setProfileData({ ...profileData, bankDetails: { ...(profileData.bankDetails || {}), ifsc: e.target.value } as any })} />
                                        </div>
-                                       <Input label="Bank Name" value={profileData.bankDetails?.bankName} onChange={e => setProfileData({ ...profileData, bankDetails: { ...profileData.bankDetails!, bankName: e.target.value } })} />
+                                       <Input label="Bank Name" value={profileData.bankDetails?.bankName || ''} onChange={e => setProfileData({ ...profileData, bankDetails: { ...(profileData.bankDetails || {}), bankName: e.target.value } as any })} />
                                     </div>
                                  )}
 
@@ -4632,11 +4307,7 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
                                           <div>
                                              <label className="text-xs font-bold text-slate-500 uppercase block mb-2">Vehicle Type</label>
                                              <select className="w-full h-12 bg-white border border-slate-300 rounded-xl px-3 outline-none" value={profileData.vehicleType} onChange={e => setProfileData({ ...profileData, vehicleType: e.target.value })}>
-                                                <option value="Bike">Bike (up to 150kg)</option>
-                                                <option value="Auto">Auto (up to 400kg)</option>
-                                                <option value="Mini Truck">Mini Truck (up to 2000kg)</option>
-                                                <option value="Pickup">Pickup (up to 5000kg)</option>
-                                                <option value="Truck">Truck (5000kg+)</option>
+                                                <option>Pickup Truck</option><option>Mini Truck</option><option>Tractor Trolley</option><option>Large Truck</option>
                                              </select>
                                           </div>
                                           <Input label="Vehicle Name" value={profileData.vehicleName || ''} onChange={e => setProfileData({ ...profileData, vehicleName: e.target.value })} />
@@ -4655,12 +4326,11 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
                                                 type="file"
                                                 accept="image/*"
                                                 className="w-full bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl px-4 py-3"
-                                                onChange={e => {
+                                                onChange={async e => {
                                                    const file = e.target.files?.[0];
                                                    if (!file || file.size > 5 * 1024 * 1024) return;
-                                                   const reader = new FileReader();
-                                                   reader.onloadend = () => setProfileData(prev => ({ ...prev, numberPlatePhoto: reader.result as string }));
-                                                   reader.readAsDataURL(file);
+                                                   const url = await uploadMedia(file, `vehicles/${user.id}`);
+                                                   if (url) setProfileData(prev => ({ ...prev, numberPlatePhoto: url }));
                                                 }}
                                              />
                                              {profileData.numberPlatePhoto && <img src={profileData.numberPlatePhoto} alt="Number Plate" className="mt-2 h-24 w-full object-cover rounded-lg border border-slate-200" />}
@@ -4671,12 +4341,11 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
                                                 type="file"
                                                 accept="image/*"
                                                 className="w-full bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl px-4 py-3"
-                                                onChange={e => {
+                                                onChange={async e => {
                                                    const file = e.target.files?.[0];
                                                    if (!file || file.size > 5 * 1024 * 1024) return;
-                                                   const reader = new FileReader();
-                                                   reader.onloadend = () => setProfileData(prev => ({ ...prev, vehiclePhoto: reader.result as string }));
-                                                   reader.readAsDataURL(file);
+                                                   const url = await uploadMedia(file, `vehicles/${user.id}`);
+                                                   if (url) setProfileData(prev => ({ ...prev, vehiclePhoto: url }));
                                                 }}
                                              />
                                              {profileData.vehiclePhoto && <img src={profileData.vehiclePhoto} alt="Vehicle" className="mt-2 h-24 w-full object-cover rounded-lg border border-slate-200" />}
@@ -4761,7 +4430,6 @@ const TransporterDashboard = ({ user, orders, messages, routePlans, transportReq
                               const select = document.getElementById('msg-recipient') as HTMLSelectElement;
                               const textEl = document.getElementById('msg-text') as HTMLInputElement;
                               const toName = select?.value;
-                              const toUser = (listings.length && toName) ? null : null;
                               const text = textEl?.value || '';
                               if (!text) return;
                               const counterpart = toName ? toName : 'Recipient';
@@ -5080,17 +4748,6 @@ const AdminDashboard = ({ allUsers, listings, orders, disputes, systemConfig, on
 };
 
 // Main App Component with full dashboard switch logic
-/*
-const App = () => {
-   return (
-      <div style={{ padding: 20, background: 'white', color: 'black', height: '100vh' }}>
-         <h1>Emergency Mode: App is Running</h1>
-         <p>If you can see this, React is working.</p>
-      </div>
-   );
-};
-*/
-
 const App = () => {
    const [screen, setScreen] = useState<'landing' | 'choose-role' | 'auth' | 'admin-login' | 'dashboard'>('landing');
    const [selectedRole, setSelectedRole] = useState<UserRole>(null);
@@ -5130,7 +4787,6 @@ const App = () => {
             const savedOrders = localStorage.getItem('kisansetu_orders');
             const savedTransportRequests = localStorage.getItem('kisansetu_transport_requests');
             const savedTransportBids = localStorage.getItem('kisansetu_transport_bids');
-            
             if (savedOrders) setOrders(JSON.parse(savedOrders));
             if (savedTransportRequests) setTransportRequests(JSON.parse(savedTransportRequests));
             if (savedTransportBids) setTransportBids(JSON.parse(savedTransportBids));
@@ -5203,11 +4859,7 @@ const App = () => {
       setCurrentUser(user); setScreen('dashboard');
    };
    const handleAdminLogin = () => { setCurrentUser({ id: 'admin', phone: '0000', role: 'admin', status: 'active', createdAt: new Date().toISOString() }); setScreen('dashboard'); };
-   const handleLogout = () => { 
-      setCurrentUser(null); 
-      setScreen('landing');
-      // Optional: Clear session storage if needed
-   };
+   const handleLogout = () => { setCurrentUser(null); setScreen('landing'); };
    const handleAddListing = async (l: any) => {
       try {
          const saved = await svc.addListing(l);
@@ -5305,20 +4957,38 @@ const App = () => {
           finalQuantity = offer.quantityRequested || offer.quantity;
       }
 
-      // Automatically add to cart if current user is buyer (simulated by checking if we are in buyer context)
-      // Since handleAcceptOffer is at App level, we can't directly access BuyerDashboard state.
-      // However, we can just update the offer status to 'accepted'. 
-      // The BuyerDashboard needs to react to this or we trigger a global event?
-      // Actually, if the Buyer accepts (e.g. accepts counter), they are the active user.
-      // If Farmer accepts, Buyer is not active.
-      // The requirement: "product must be automatically must get added to cart section with the finalized deal price".
-      
-      // We will implement this by having BuyerDashboard check for 'accepted' offers that are NOT ordered yet.
-      // But here we just update the status.
-      
+      const newOrder: Order = {
+         id: `ord_${Date.now()}`,
+         listingId: listing.id,
+         cropName: listing.cropName,
+         quantity: finalQuantity,
+         totalAmount: finalPrice * finalQuantity,
+         status: 'confirmed', // Order is confirmed, but payment is pending
+         paymentStatus: 'pending', // <--- New Payment Status
+         date: new Date().toISOString(),
+         farmerName: listing.farmerName,
+         farmerLocation: listing.location,
+         buyerName: offer.buyerName,
+         buyerLocation: offer.buyerLocation
+      };
+
       try {
+         const order = await svc.createOrder(newOrder);
+         if (!order) {
+            console.error("Order creation returned null (likely failed)");
+            return; 
+         }
+         
          await svc.setOfferStatus(offerId, 'accepted');
-         setOffers(prev => prev.map(o => o.id === offerId ? { ...o, status: 'accepted', finalPrice, finalQuantity } : o));
+         
+         // Update listing quantity
+         const updatedListing = { ...listing, availableQuantity: listing.availableQuantity - finalQuantity };
+         await svc.updateListing(updatedListing);
+
+         // Refresh local state with fresh data
+         setOrders(prev => [order, ...prev]);
+         setOffers(prev => prev.map(o => o.id === offerId ? { ...o, status: 'accepted' } : o));
+         setListings(prev => prev.map(l => l.id === listing.id ? updatedListing : l));
          console.log("Offer accepted successfully");
       } catch (error) {
          console.error("Error accepting offer:", error);
@@ -5431,66 +5101,35 @@ const App = () => {
 
   const generateOtp = () => String(Math.floor(100000 + Math.random() * 900000));
 
-  const handleCreateTransportRequest = async (orderId: string, mode: TransportRequest['mode'], vehicleTypeOverride?: TransportRequest['vehicleType'], pickupDate?: string, pickupTime?: string) => {
+  const handleCreateTransportRequest = async (orderId: string, mode: TransportRequest['mode']) => {
      const order = orders.find(o => o.id === orderId);
      if (!order) return;
-     
-     // Determine who is creating the request (Buyer or Farmer)
-     const isFarmer = currentUser?.role === 'farmer';
-     const buyerId = isFarmer ? (allUsers.find(u => u.profile?.fullName === order.buyerName)?.id || '') : (currentUser?.id || '');
-     const farmerId = isFarmer ? (currentUser?.id || '') : (allUsers.find(u => u.profile?.fullName === order.farmerName)?.id || '');
-     
+     const buyerId = currentUser?.id || '';
+     const farmerId = (allUsers.find(u => u.profile?.fullName === order.farmerName)?.id) || '';
      const weightKg = Number(order.quantity || 0);
-     
-     // 1. RECOMMENDATION LOGIC: Automatically determine vehicle based on crop weight
-     const recommendedVehicle = recommendVehicleType(weightKg);
-     
-     // 2. SELECTION LOGIC: User can override, otherwise use recommendation
-     const vehicleType = vehicleTypeOverride || recommendedVehicle;
-     
-     // 3. PRICING LOGIC: Estimate fare based on distance and vehicle type
+     const vehicleType = recommendVehicleType(weightKg);
      const estimatedFare = estimateTransportFare(Number(order.distanceKm || 45), vehicleType);
-     
-     // If Farmer is arranging, status is 'open' (looking for transporter) or 'assigned' (if they have own fleet - not implemented yet)
-     // If Buyer is arranging via Farmer ('farmer_arranged'), it goes to 'awaiting_farmer' first.
-     // But here, if Farmer is EXECUTING this action, it means they are fulfilling that request or creating a new one.
-     
-     let status: TransportRequest['status'] = 'open';
-     if (mode === 'buyer_own') status = 'assigned';
-     if (mode === 'farmer_arranged' && !isFarmer) status = 'awaiting_farmer'; // Buyer requesting Farmer
-     if (mode === 'farmer_arranged' && isFarmer) status = 'open'; // Farmer fulfilling request -> Open to market
-     if (mode === 'marketplace') status = 'open';
+     const status: TransportRequest['status'] =
+        mode === 'farmer_arranged' ? 'awaiting_farmer' : mode === 'buyer_own' ? 'assigned' : 'open';
 
      const newReq: TransportRequest = {
         id: `tr_${Date.now()}`,
         orderId: order.id,
         buyerId,
         farmerId,
-        pickupLocation: order.farmerLocation, // Automatically added
-        dropLocation: order.buyerLocation,    // Automatically added
-        weightKg,                             // Automatically added
+        pickupLocation: order.farmerLocation,
+        dropLocation: order.buyerLocation,
+        weightKg,
         vehicleType,
         mode,
         status,
         estimatedFare,
-        pickupDate,
-        pickupTime,
         deliveryOtp: generateOtp(),
         createdAt: new Date().toISOString()
      };
 
      await svc.addTransportRequest(newReq);
-     
-     // If updating an existing request (e.g. Farmer accepting to arrange), we should actually UPDATE not CREATE.
-     // But for simplicity in this mock, we assume creating a new one or overwriting if logic existed.
-     // For 'farmer_arranged' flow: Buyer creates 'awaiting_farmer'. Farmer sees it, and 'Accepts' it by creating a 'marketplace' request?
-     // Better: Farmer dashboard shows 'awaiting_farmer' requests. Farmer clicks 'Arrange Transport' -> opens similar modal -> creates 'open' request linked to same order.
-     
-     setTransportRequests(prev => [...prev, newReq]);
-     
-     if (mode === 'marketplace' || (mode === 'farmer_arranged' && isFarmer)) {
-         alert(`Request created! \n\nCrop: ${order.cropName} (${weightKg} kg)\nLocations: ${order.farmerLocation} -> ${order.buyerLocation}\nRecommended Vehicle: ${vehicleType}\nEstimated Fare: ₹${estimatedFare}\n\nWaiting for transporters...`);
-     }
+     setTransportRequests([newReq, ...transportRequests]);
   };
 
   const handleAddTransportBid = async (requestId: string, transporterId: string, amount: number, message?: string) => {
@@ -5507,48 +5146,17 @@ const App = () => {
      setTransportBids([bid, ...transportBids]);
   };
 
-  const handleTransportBidCounter = async (bidId: string, counterAmount: number, role: 'buyer' | 'transporter') => {
-     const bid = transportBids.find(b => b.id === bidId);
-     if (!bid) return;
-
-     const updatedHistory = [
-         ...(bid.history || []),
-         { role, amount: counterAmount, action: 'counter' as const, timestamp: new Date().toISOString() }
-     ];
-
-     const patch = { 
-         counterAmount: counterAmount, 
-         lastActionBy: role,
-         history: updatedHistory
-     };
-     
-     // In a real app, we would update this via API
-     // await svc.updateTransportBid(bidId, patch);
-     
-     const updatedBid = { ...bid, ...patch };
-     setTransportBids(prev => prev.map(b => b.id === bidId ? updatedBid : b));
-  };
-
   const handleAcceptTransportBid = async (bidId: string) => {
      const bid = transportBids.find(b => b.id === bidId);
      if (!bid) return;
      const req = transportRequests.find(r => r.id === bid.requestId);
      if (!req) return;
 
-     // Determine final fare based on negotiation status
-     const finalFare = (bid.counterAmount && bid.lastActionBy) ? bid.counterAmount : bid.amount;
-
      const requestBids = transportBids.filter(b => b.requestId === req.id);
      await Promise.all(requestBids.map(b => svc.setTransportBidStatus(b.id, b.id === bid.id ? 'accepted' : 'rejected')));
-     
-     // Update local state for bids
-     setTransportBids(prev => prev.map(b => {
-         if (b.requestId !== req.id) return b;
-         if (b.id === bid.id) return { ...b, status: 'accepted', counterAmount: finalFare }; // Ensure accepted price is recorded
-         return { ...b, status: 'rejected' };
-     }));
+     setTransportBids(prev => prev.map(b => b.requestId !== req.id ? b : { ...b, status: b.id === bid.id ? 'accepted' : 'rejected' }));
 
-     const patch = { transporterId: bid.transporterId, finalFare: finalFare, status: 'assigned' };
+     const patch = { transporterId: bid.transporterId, finalFare: bid.amount, status: 'assigned' };
      const saved = await svc.updateTransportRequest(req.id, patch);
      const updatedReq = saved ? saved : ({ ...req, ...patch } as TransportRequest);
      setTransportRequests(prev => prev.map(r => r.id === updatedReq.id ? updatedReq : r));
@@ -5584,13 +5192,8 @@ const App = () => {
   const handleUpdateTransportRequestStatus = async (requestId: string, status: TransportRequest['status']) => {
      const req = transportRequests.find(r => r.id === requestId);
      if (!req) return;
-     
-     const updates: any = { status };
-     if (status === 'picked_up') updates.pickupConfirmedAt = new Date().toISOString();
-     if (status === 'delivered') updates.deliveryConfirmedAt = new Date().toISOString();
-
-     const saved = await svc.updateTransportRequest(requestId, updates);
-     const updatedReq = saved ? saved : ({ ...req, ...updates } as TransportRequest);
+     const saved = await svc.updateTransportRequest(requestId, { status });
+     const updatedReq = saved ? saved : ({ ...req, status } as TransportRequest);
      setTransportRequests(prev => prev.map(r => r.id === updatedReq.id ? updatedReq : r));
 
      const orderStatus: OrderStatus | null =
@@ -5602,6 +5205,10 @@ const App = () => {
   };
 
    const handleUpdateOrderStatus = async (orderId: string, newStatus: OrderStatus) => { await svc.setOrderStatus(orderId, newStatus); setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o)); };
+  const handleUpdateOrderPayment = async (orderId: string, paymentStatus: Order['paymentStatus'], paymentProof?: string) => {
+     await svc.updateOrderPayment(orderId, paymentStatus as any, paymentProof);
+     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, paymentStatus, paymentProof: paymentProof ?? o.paymentProof } : o));
+  };
 
    const handleResolveDispute = async (disputeId: string, outcome: string) => { await svc.resolveDispute(disputeId, 'resolved'); setDisputes(disputes.map(d => d.id === disputeId ? { ...d, status: 'resolved' } : d)); };
 
@@ -5675,9 +5282,9 @@ const App = () => {
          {screen === 'admin-login' && <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4"><AdminLogin onLogin={handleAdminLogin} onBack={() => setScreen('landing')} /></div>}
 
          {screen === 'dashboard' && currentUser?.role === 'admin' && <AdminDashboard allUsers={allUsers} listings={listings} orders={orders} disputes={disputes} systemConfig={systemConfig} onUpdateConfig={setSystemConfig} onLogout={handleLogout} onUpdateUserStatus={handleUserStatusChange} onResolveDispute={handleResolveDispute} />}
-        {screen === 'dashboard' && currentUser?.role === 'farmer' && <FarmerDashboard user={currentUser} listings={listings} offers={offers} orders={orders} messages={messages} inventoryItems={inventoryItems} payouts={payouts} transportRequests={transportRequests} allUsers={allUsers} onAddInventoryItem={handleAddInventoryItem} onAddPayout={handleAddPayout} onSendMessage={handleSendMessage} onAddListing={handleAddListing} onUpdateListing={handleUpdateListing} onUpdateListingStatus={handleUpdateListingStatus} onDeleteListing={handleDeleteListing} onAcceptOffer={handleAcceptOffer} onRejectOffer={handleRejectOffer} onCounterOffer={handleCounterOffer} onUpdateProfile={handleUpdateProfile} onRaiseDispute={handleRaiseDispute} onLogout={handleLogout} onAcceptTransportRequest={handleAcceptTransportRequest} onOpenChat={handleOpenChat} onViewInvoice={handleViewInvoice} />}
-         {screen === 'dashboard' && currentUser?.role === 'buyer' && <BuyerDashboard user={currentUser} listings={listings} setListings={setListings} offers={offers} orders={orders} setOrders={setOrders} messages={messages} rfqs={rfqs} transportRequests={transportRequests} transportBids={transportBids} allUsers={allUsers} onAddRfq={handleAddRfq} onSendMessage={handleSendMessage} onPlaceOffer={handlePlaceOffer} onAcceptOffer={handleAcceptOffer} onCounterOffer={handleCounterOffer} onCancelOffer={handleCancelOffer} onUpdateProfile={handleUpdateProfile} onRaiseDispute={handleRaiseDispute} onLogout={handleLogout} onCreateTransportRequest={handleCreateTransportRequest} onAcceptTransportBid={handleAcceptTransportBid} onTransportBidCounter={handleTransportBidCounter} onOpenChat={handleOpenChat} onViewInvoice={handleViewInvoice} />}
-         {screen === 'dashboard' && currentUser?.role === 'transporter' && <TransporterDashboard user={currentUser} orders={orders} messages={messages} routePlans={routePlans} transportRequests={transportRequests} transportBids={transportBids} onAddRoutePlan={handleAddRoutePlan} onSendMessage={handleSendMessage} onRaiseDispute={handleRaiseDispute} onLogout={handleLogout} onUpdateOrderStatus={handleUpdateOrderStatus} onUpdateProfile={handleUpdateProfile} onAcceptTransportRequest={handleAcceptTransportRequest} onAddTransportBid={handleAddTransportBid} onAcceptTransportBid={handleAcceptTransportBid} onTransportBidCounter={handleTransportBidCounter} onUpdateTransportRequestStatus={handleUpdateTransportRequestStatus} onOpenChat={handleOpenChat} />}
+        {screen === 'dashboard' && currentUser?.role === 'farmer' && <FarmerDashboard user={currentUser} listings={listings} offers={offers} orders={orders} messages={messages} inventoryItems={inventoryItems} payouts={payouts} transportRequests={transportRequests} allUsers={allUsers} onAddInventoryItem={handleAddInventoryItem} onAddPayout={handleAddPayout} onSendMessage={handleSendMessage} onAddListing={handleAddListing} onUpdateListing={handleUpdateListing} onUpdateListingStatus={handleUpdateListingStatus} onDeleteListing={handleDeleteListing} onAcceptOffer={handleAcceptOffer} onRejectOffer={handleRejectOffer} onCounterOffer={handleCounterOffer} onUpdateProfile={handleUpdateProfile} onRaiseDispute={handleRaiseDispute} onLogout={handleLogout} onAcceptTransportRequest={handleAcceptTransportRequest} onOpenChat={handleOpenChat} onViewInvoice={handleViewInvoice} onUpdateOrderPayment={handleUpdateOrderPayment} />}
+         {screen === 'dashboard' && currentUser?.role === 'buyer' && <BuyerDashboard user={currentUser} listings={listings} offers={offers} orders={orders} messages={messages} rfqs={rfqs} transportRequests={transportRequests} transportBids={transportBids} allUsers={allUsers} onAddRfq={handleAddRfq} onSendMessage={handleSendMessage} onPlaceOffer={handlePlaceOffer} onAcceptOffer={handleAcceptOffer} onCounterOffer={handleCounterOffer} onCancelOffer={handleCancelOffer} onUpdateProfile={handleUpdateProfile} onRaiseDispute={handleRaiseDispute} onLogout={handleLogout} onCreateTransportRequest={handleCreateTransportRequest} onAcceptTransportBid={handleAcceptTransportBid} onOpenChat={handleOpenChat} onViewInvoice={handleViewInvoice} onUpdateOrderPayment={handleUpdateOrderPayment} />}
+        {screen === 'dashboard' && currentUser?.role === 'transporter' && <TransporterDashboard user={currentUser} orders={orders} messages={messages} routePlans={routePlans} transportRequests={transportRequests} transportBids={transportBids} allUsers={allUsers} onAddRoutePlan={handleAddRoutePlan} onSendMessage={handleSendMessage} onRaiseDispute={handleRaiseDispute} onLogout={handleLogout} onUpdateOrderStatus={handleUpdateOrderStatus} onUpdateProfile={handleUpdateProfile} onAcceptTransportRequest={handleAcceptTransportRequest} onAddTransportBid={handleAddTransportBid} onUpdateTransportRequestStatus={handleUpdateTransportRequestStatus} />}
          
          <ChatDrawer 
             open={chatDrawer.open} 

@@ -115,10 +115,23 @@ export interface BuyerProfile {
   memberSince?: string;
 }
 
+export interface Vehicle {
+  id: string;
+  type: string;
+  number: string;
+  capacity: string;
+  status: 'active' | 'inactive';
+  vehiclePhoto?: string;
+  numberPlatePhoto?: string;
+  driverPhoto?: string;
+}
+
 export interface TransporterProfile {
   fullName: string;
-  vehicleType: string; // 'Mini Truck' | 'Pickup' | 'Tractor' | 'Truck'
-  maxCapacity: string; // kg
+  vehicleType: string; // @deprecated - use vehicles array
+  maxCapacity: string; // @deprecated - use vehicles array
+  vehicles?: Vehicle[];
+  addresses?: any[];
   vehicleNumber?: string;
   vehicleName?: string;
   numberPlatePhoto?: string;
@@ -210,7 +223,6 @@ export interface CropListing {
   minOrderQuantity?: number;
   minOrderQuantityUnit?: 'kg' | 'quintal' | 'ton' | 'gram';
   availableDate?: string;
-  minOrderQuantity?: number;
   packagingDetails?: string;
   moistureContent?: number;
 }

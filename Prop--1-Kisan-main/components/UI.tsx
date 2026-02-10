@@ -1,21 +1,29 @@
 import React from 'react';
 
-export const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'outline' | 'ghost' }> = ({ 
+export const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'default', size?: 'sm' | 'md' | 'lg' }> = ({ 
   className = '', 
   variant = 'primary', 
+  size = 'md',
   children, 
   ...props 
 }) => {
   const variants = {
     primary: "bg-nature-600 hover:bg-nature-700 text-white shadow-lg shadow-nature-600/30",
+    default: "bg-nature-600 hover:bg-nature-700 text-white shadow-lg shadow-nature-600/30",
     secondary: "bg-earth-500 hover:bg-earth-600 text-white shadow-lg shadow-earth-500/30",
     outline: "border-2 border-nature-600 text-nature-700 hover:bg-nature-50",
     ghost: "bg-transparent hover:bg-black/5 text-slate-600"
   };
 
+  const sizes = {
+    sm: "px-4 py-2 text-sm",
+    md: "px-6 py-3",
+    lg: "px-8 py-4 text-lg"
+  };
+
   return (
     <button 
-      className={`px-6 py-3 rounded-xl font-medium transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${variants[variant]} ${className}`}
+      className={`${sizes[size]} rounded-xl font-medium transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${variants[variant]} ${className}`}
       {...props}
     >
       {children}

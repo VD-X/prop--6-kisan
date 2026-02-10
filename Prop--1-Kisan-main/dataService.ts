@@ -272,8 +272,10 @@ export async function resolveDispute(id: string, status: string) {
 
 export async function updateUserProfile(userId: string, profile: any) {
   const c = getSupabase(); if (!c) throw new Error('Supabase not configured')
-  const { data, error } = await c.from('users').update({ profile }).eq('id', userId).select().single()
+  console.log(`[DataService] Updating profile for ${userId}:`, profile);
+  const { data, error } = await c.from('users').upsert({ id: userId, profile }).select().single()
   if (error) { console.error('updateUserProfile error', error); throw error }
+  console.log('[DataService] Update success:', data);
   return data
 }
 

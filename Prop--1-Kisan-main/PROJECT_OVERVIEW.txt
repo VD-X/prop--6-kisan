@@ -1,0 +1,207 @@
+KISANSETU (prop--1-kisan-main) — PROJECT OVERVIEW
+
+1) What this project is
+KisanSetu is a single-page React (Vite) web app that connects:
+- Farmers: list crops and manage offers/orders
+- Buyers: browse marketplace, negotiate, place orders, and manage payments
+- Transporters: manage vehicles (fleet), view loadboard/transport jobs, bid/accept jobs, and update delivery status
+- Admin: manage users, system settings, and dispute resolution
+
+Backend services are handled via Supabase:
+- Postgres tables for core entities (users, listings, offers, orders, transport requests/bids, etc.)
+- Storage bucket ("media") for images and other uploads
+
+
+2) Tech stack (what is used)
+- Frontend: React + TypeScript + Vite
+- UI: Tailwind classes + lucide-react icons + local UI components (Button/Input/Card)
+- Backend: Supabase (Postgres + Storage)
+
+Key files:
+- App.tsx: Main UI and all dashboard logic (Farmer/Buyer/Transporter/Admin)
+- dataService.ts: All database calls (Supabase CRUD)
+- storage.ts: Uploads media to Supabase Storage
+- types.ts: Shared TypeScript types (User, Order, TransportRequest, Vehicle, etc.)
+- supabase_schema.sql: Database schema and policies (RLS currently “public access”)
+
+
+3) High-level app flow (how it works)
+3.1 Landing → Role selection → Auth
+- User selects role (farmer/buyer/transporter/admin)
+- User completes a simple auth/registration flow (phone-based lookup + profile form)
+- A user record is created in the "users" table with a JSONB "profile" field
+
+3.2 Dashboard per role
+After login, the app renders a role-based dashboard. Each dashboard shows role-relevant sections (views) such as:
+- Farmer: My Crops, Offers, Orders, Payments, Inventory, Messages, Profile
+- Buyer: Marketplace, Cart/Orders, Payments, RFQs, Messages, Profile
+- Transporter: Loadboard, Active Deliveries, Route Plans, Vehicles (Fleet), Messages, Profile
+- Admin: Users, Listings, Orders, Disputes, Config
+
+3.3 Data loading and persistence
+On startup / dashboard entry, the app pulls data from Supabase tables via dataService.ts:
+- users
+- listings
+- offers
+- orders
+- disputes
+- messages
+- inventory_items
+- payouts
+- rfqs
+- route_plans
+- transport_requests
+- transport_bids
+
+The UI usually applies local filtering (example: a farmer sees only their listings/offers/orders).
+
+
+4) Core business modules (end-to-end)
+
+4.1 Crop Listings (Farmer)
+Goal: Farmer publishes a crop listing to attract offers.
+Data:
+- listings table (id, farmerId, cropName, grade, quantity, availableQuantity, pricePerKg, images, etc.)
+Flow:
+1) Farmer adds a listing with photos (optionally video in UI)
+2) Media is uploaded to Supabase Storage (media bucket) when possible; URLs are stored
+3) Listing is inserted/updated in the "listings" table
+4) Buyers can browse listings in Marketplace
+
+
+4.2 Offers & Negotiation (Buyer ↔ Farmer)
+Goal: Buyer negotiates price/quantity with farmer before order is confirmed.
+Data:
+- offers table (listingId, offeredPrice, quantityRequested, status, negotiation history)
+Flow:
+1) Buyer places an offer on a listing
+2) Farmer can Accept / Reject / Counter
+3) Buyer can respond to counters (depending on UI flow)
+4) Offer history is stored (offers.history JSONB) to keep negotiation actions
+
+
+4.3 Orders (Deal lifecycle)
+Goal: Convert accepted offer into an order that can be delivered and paid.
+Data:
+- orders table (listingId, quantity, totalAmount, status)
+- order status transitions: confirmed → picked_up → in_transit → delivered (or cancelled)
+Flow:
+1) When a deal is confirmed, an order record is created
+2) Order appears for both Farmer and Buyer in their Orders views
+3) Transport may be requested/assigned to complete delivery
+
+
+4.4 Payments (Buyer payment proof → Farmer verification)
+Goal: Track whether buyer has paid and farmer has verified payment.
+Data:
+- orders.paymentStatus: pending | review | paid
+- orders.paymentProof: a reference/transaction id (mocked in UI)
+Flow (current behavior):
+1) Buyer “Pay Now” creates a payment proof and updates order paymentStatus to "review"
+2) Farmer sees paymentStatus "review" and can “Verify Payment”
+3) Verification updates paymentStatus to "paid"
+
+Note: This is a simplified workflow. It is not a real payment gateway integration.
+
+
+4.5 Transport / Logistics (Loadboard)
+Goal: Move goods from farmer pickup to buyer drop using transporters.
+Data:
+- transport_requests table: a transport job request tied to an order
+- transport_bids table: bids from transporters on a request
+Transport modes:
+- farmer_arranged: farmer handles transport (status typically awaiting_farmer)
+- buyer_own: buyer uses own transport (status typically assigned)
+- marketplace: open request in loadboard for transporters to bid/accept
+
+Flow:
+1) A transport request is created for an order (pickup/drop, weight, vehicleType, estimated fare)
+2) If marketplace mode, request becomes visible in transporter loadboard
+3) Transporters can bid; buyer/farmer can accept a bid
+4) When bid is accepted:
+   - transport_request is updated (transporterId, finalFare, status assigned)
+   - order.transporterId is set
+5) Transporter updates delivery stages:
+   - picked_up → in_transit → delivered
+   - these status changes also update the linked order status
+6) Delivery OTP exists in transport_requests.deliveryOtp (used as an additional confirmation mechanism in UI)
+
+
+4.6 Fleet / Vehicles (Transporter)
+Goal: Transporters maintain up to 2 vehicles, and loadboard matching is based on vehicles.
+Data:
+- users.profile JSONB for transporters includes vehicles[] (single source of truth)
+- Vehicle fields include type, number, capacity, status, and photos (vehiclePhoto, numberPlatePhoto, driverPhoto)
+Flow:
+1) Transporter adds a primary vehicle in Profile (quick entry)
+2) Transporter can add a second vehicle in Vehicle section (max 2 total)
+3) All vehicles are visible in Vehicle section
+4) Vehicle details and photos can be edited from Vehicle section
+5) Loadboard matching uses vehicles (active vehicles and capacities) to decide which requests should be shown to a transporter
+
+
+4.7 Messaging
+Goal: Simple chat between users linked to orders/listings.
+Data:
+- messages table (fromUserId, toUserId, listingId/orderId, text, timestamp)
+Flow:
+1) User sends a message from dashboard
+2) Message is inserted into messages table and shown in the Messages view
+
+
+4.8 Disputes
+Goal: Capture issues for a transaction and allow admin resolution.
+Data:
+- disputes table (orderId, role, issue, details, status)
+Flow:
+1) Farmer/Buyer/Transporter can raise a dispute tied to an order
+2) Admin can mark disputes resolved
+
+
+5) Database model (Supabase)
+Schema is defined in supabase_schema.sql. Main tables:
+- users (profile is jsonb)
+- listings
+- offers (history jsonb)
+- orders
+- transport_requests
+- transport_bids
+- disputes
+- messages
+- inventory_items
+- payouts
+- rfqs
+- route_plans
+
+Storage:
+- Supabase Storage bucket "media" (public) is used for uploading images/videos
+
+
+6) Security notes (current setup)
+The schema enables RLS and sets "public access" policies for most tables (policy uses true).
+This is fine for demos/testing but NOT recommended for production.
+For production, RLS should enforce:
+- users can only update their own profile
+- farmers can only modify their own listings
+- buyers can only create offers/orders as themselves
+- transporters can only bid as themselves and update their assigned requests
+- messages can only be read by sender/recipient
+
+
+7) How to run locally
+From the project folder:
+- npm install
+- npm run dev
+
+Supabase config:
+- Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your environment (.env for Vite)
+- If not set, the app can still render UI but database calls will return empty/null
+
+
+8) Where each feature is implemented
+- UI routing and dashboards: App.tsx
+- Supabase CRUD: dataService.ts
+- Media upload: storage.ts
+- Types: types.ts
+- Database schema: supabase_schema.sql
+
